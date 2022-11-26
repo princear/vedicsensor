@@ -28,6 +28,9 @@ import {
 
 import { NativeBaseProvider, Box, Center } from "native-base";
 import AppBar from "./src/components/AppBar.js";
+import AppFooter from "./src/components/AppFooter.js";
+import SampleList from "./src/components/FlatList.js";
+import Main from "./src/components/Main.js";
 
 /* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
  * LTI update could not be added via codemod */
@@ -65,12 +68,17 @@ const App: () => Node = () => {
   };
 
   return (
-    <NativeBaseProvider>
-      <Center>
-        <AppBar/>
-      </Center>
-    </NativeBaseProvider>
+    <Main/>
   );
+
+  // return (
+  //   <NativeBaseProvider>
+  //     <Center>
+  //       <AppBar/>
+  //     </Center>
+  //     <SampleList/>
+  //   </NativeBaseProvider>
+  // );
 };
 
 const styles = StyleSheet.create({
