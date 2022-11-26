@@ -24,7 +24,7 @@ const path = require('path');
 
 // Update to metro allowing react-native devDependency without breaking Metro/Hast
 // https://medium.com/@charpeni/setting-up-an-example-app-for-your-react-native-library-d940c5cf31e4
-const blacklist = require('metro-config/src/defaults/blacklist');
+const blacklist = require('metro-config/src/defaults/exclusionList');
 const bluetoothLib = path.resolve(
   __dirname,
   '../VedicSensor/node_modules/react-native-bluetooth-classic'
