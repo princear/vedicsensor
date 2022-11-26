@@ -258,7 +258,7 @@ export default class ConnectionScreen extends React.Component {
           <IconButton onPress={() => this.toggleConnection()}
                       icon={<Icon size="24px" as={MaterialIcons} name={toggleIcon} color="white" />} />
         </HStack>
-        <View style={styles.connectionScreenWrapper}>
+        <HStack bg="white" h="80%">
           <FlatList
             style={styles.connectionScreenOutput}
             contentContainerStyle={{ justifyContent: 'flex-end' }}
@@ -275,15 +275,17 @@ export default class ConnectionScreen extends React.Component {
                 <Text flexShrink={1}>{item.data.trim()}</Text>
               </View>
             )}
-          />
+        />
+        </HStack>
+        <HStack  bg="white" h="10%" w="100%">
           <InputArea
             text={this.state.text}
             onChangeText={text => this.setState({ text })}
             onSend={() => this.sendData()}
             disabled={!this.state.connection}
           />
-        </View>
-</>
+        </HStack>
+     </>
     );
   }
 }
