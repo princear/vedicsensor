@@ -9,6 +9,7 @@ import {
   Box,
   Heading,
   IconButton,
+  Toast,
 } from 'native-base';
 import {
   FlatList,
@@ -154,21 +155,44 @@ export default class ConnectionScreen extends React.Component {
     }
   }
 
+  postMetricData(data) {
+    fetch("https://madmachines.datasyndicate.in/v1/api/pulse-data", {method: "POST", body: JSON.stringify({pulses: data}), })
+      .then(resp => {
+        console.log("Data pushed successfully!");
+      })
+      .catch(error => {
+        Toast.show({
+          description: JSON.stringify(error),
+          duration: 5000,
+      });
+      });
+  }
+
   async performRead() {
     try {
       console.log('Polling for available messages');
       let available = await this.props.device.available();
       console.log(`There is data available [${available}], attempting read`);
-
       if (available > 0) {
+        let metricData = [];
         for (let i = 0; i < available; i++) {
           console.log(`reading ${i}th time`);
           let data = await this.props.device.read();
-
+          let amount = data.match(/[+-]?\d+(\.\d+)?/g);
+          let metric_amount = 0;
+          if (amount && amount.length > 0) {
+            metric_amount = amount[0];
+          }
+          metricData.push({
+            "metric_name": "kaf",
+            "amount": metric_amount,
+            "timestamp": new Date().getTime()
+          })
           console.log(`Read data ${data}`);
           console.log(data);
           this.onReceivedData({ data });
         }
+        this.postMetricData(metricData);
       }
     } catch (err) {
       console.log(err);
@@ -183,11 +207,22 @@ export default class ConnectionScreen extends React.Component {
    */
   async onReceivedData(event) {
     event.timestamp = new Date();
+    let amount = event?.data.match(/[+-]?\d+(\.\d+)?/g);
+    let metric_amount = 0;
+    if (amount && amount.length > 0) {
+      metric_amount = amount[0];
+    }
+    let metric_data = [{
+      metric_name: "kaf",
+      amount: metric_amount,
+      timestamp: event?.timestamp
+    }]
     this.addData({
       ...event,
       timestamp: new Date(),
       type: 'receive',
     });
+    this.postMetricData(metric_data);
   }
 
   async addData(message) {
@@ -243,7 +278,7 @@ export default class ConnectionScreen extends React.Component {
 
     return (
       <>
-        <HStack bg="violet.800" px="1" py="3" justifyContent="space-between" alignItems="center" w="100%">
+        <HStack bg="violet.800" px="1" py="3" justifyContent="space-between" alignItems="center" w="100%" h="10%">
           <IconButton onPress={this.props.onBack}
                       icon={<Icon size="24px" as={MaterialIcons} name="arrow-back" color="white" />} />
 
@@ -258,7 +293,7 @@ export default class ConnectionScreen extends React.Component {
           <IconButton onPress={() => this.toggleConnection()}
                       icon={<Icon size="24px" as={MaterialIcons} name={toggleIcon} color="white" />} />
         </HStack>
-        <HStack bg="white" h="80%">
+        <HStack bg="white" h="82%" w="100%">
           <FlatList
             style={styles.connectionScreenOutput}
             contentContainerStyle={{ justifyContent: 'flex-end' }}
@@ -270,14 +305,14 @@ export default class ConnectionScreen extends React.Component {
               <View
                 id={item.timestamp.toISOString()}
                 flexDirection={'row'} justifyContent={'flex-start'}>
-                <Text>{item.timestamp.toLocaleDateString()}</Text>
+                <Text>{item.timestamp.toISOString()}</Text>
                 <Text>{item.type === 'sent' ? ' < ' : ' > '}</Text>
                 <Text flexShrink={1}>{item.data.trim()}</Text>
               </View>
             )}
         />
         </HStack>
-        <HStack  bg="white" h="10%" w="100%">
+        <HStack  bg="white" h="8%" w="100%">
           <InputArea
             text={this.state.text}
             onChangeText={text => this.setState({ text })}
@@ -337,8 +372,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignContent: 'stretch',
     backgroundColor: '#90EE90',
-    paddingHorizontal: 16,
-    paddingVertical: 6,
+    width: "100%"
   },
   inputAreaTextInput: {
     flex: 1,
@@ -347,5 +381,8 @@ const styles = StyleSheet.create({
   inputAreaSendButton: {
     justifyContent: 'center',
     flexShrink: 1,
+    padding: 10,
+    color: 'white',
+    backgroundColor: '#39B5E0',
   },
 });
