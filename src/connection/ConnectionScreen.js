@@ -156,7 +156,16 @@ export default class ConnectionScreen extends React.Component {
   }
 
   postMetricData(data) {
-    fetch("https://madmachines.datasyndicate.in/v1/api/pulse-data", {method: "POST", body: {pulses: data}, })
+    const json_data = JSON.stringify({pulses: data});
+    fetch("https://madmachines.datasyndicate.in/v1/api/pulse-data",
+          {
+            method: "POST",
+            body: json_data,
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+          })
       .then(resp => {
         console.log("Data pushed successfully!");
       })
@@ -181,7 +190,7 @@ export default class ConnectionScreen extends React.Component {
           let amount = data.match(/[+-]?\d+(\.\d+)?/g);
           let metric_amount = 0;
           if (amount && amount.length > 0) {
-            metric_amount = amount[0];
+            metric_amount = parseFloat(amount[0]);
           }
           metricData.push({
             "metric_name": "kaf",
@@ -210,12 +219,12 @@ export default class ConnectionScreen extends React.Component {
     let amount = event?.data.match(/[+-]?\d+(\.\d+)?/g);
     let metric_amount = 0;
     if (amount && amount.length > 0) {
-      metric_amount = amount[0];
+      metric_amount = parseFloat(amount[0]);
     }
     let metric_data = [{
       metric_name: "kaf",
       amount: metric_amount,
-      timestamp: event?.timestamp
+      timestamp: new Date(event?.timestamp).getTime()
     }]
     this.addData({
       ...event,
