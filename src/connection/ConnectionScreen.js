@@ -215,17 +215,29 @@ export default class ConnectionScreen extends React.Component {
    * @param {ReadEvent} event
    */
   async onReceivedData(event) {
-    event.timestamp = new Date();
+    const metrics = JSON.parse(event?.data.split(":")[1]);
+    const event_ts = event?.timestamp ? new Date(event?.timestamp).getTime() : new Date().getTime();
     let amount = event?.data.match(/[+-]?\d+(\.\d+)?/g);
     let metric_amount = 0;
     if (amount && amount.length > 0) {
       metric_amount = parseFloat(amount[0]);
     }
-    let metric_data = [{
-      metric_name: "kaf",
-      amount: metric_amount,
-      timestamp: new Date(event?.timestamp).getTime()
-    }]
+    let metric_data = [
+      {
+        metric_name: "vat",
+        amount: parseFloat(metrics[0]),
+        timestamp: event_ts
+      },
+      {
+        metric_name: "pit",
+        amount: parseFloat(metrics[1]),
+        timestamp: event_ts,
+      },
+      {
+        metric_name: "kaf",
+        amount: parseFloat(metrics[2]),
+        timestamp: event_ts,
+      }];
     this.addData({
       ...event,
       timestamp: new Date(),
