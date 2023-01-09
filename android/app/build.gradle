@@ -217,6 +217,12 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+          storeFile file('vedic-dev.keystore')
+          storePassword System.console().readLine("\nKeystore password:")
+          keyAlias System.console().readLine("\nAlias: ")
+          keyPassword System.console().readLine("\nAlias password: ")
+      }
     }
     buildTypes {
         debug {
@@ -249,6 +255,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-bluetooth-classic')
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
     //noinspection GradleDynamicVersion
