@@ -44,6 +44,22 @@ const requestAccessFineLocationPermission = async () => {
   return granted === PermissionsAndroid.RESULTS.GRANTED;
 };
 
+const requestBluetoothPermission = async () => {
+  const granted = await PermissionsAndroid.request(
+    PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+    {
+      title: 'VedicSensor app needs access for bluetooth',
+      message:
+        'In order to perform discovery, you must enable/allow ' +
+        'bluetooth access.',
+      buttonNeutral: 'Ask Me Later',
+      buttonNegative: 'Cancel',
+      buttonPositive: 'OK',
+    }
+  );
+  return granted === PermissionsAndroid.RESULTS.GRANTED;
+};
+
 /**
  * Displays the device list and manages user interaction.  Initially
  * the NativeDevice[] contains a list of the bonded devices.  By using
@@ -86,6 +102,12 @@ export default class DeviceListScreen extends React.Component {
    */
   getBondedDevices = async (unloading) => {
     console.log('DeviceListScreen::getBondedDevices');
+    let granted = await requestBluetoothPermission();
+
+    if (!granted) {
+      throw new Error('Bluetooth Access was not granted');
+    }
+
     try {
       let bonded = await RNBluetoothClassic.getBondedDevices();
       console.log('DeviceListScreen::getBondedDevices found', bonded);
