@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import type {Node} from 'react';
 import {
   SafeAreaView,
@@ -16,6 +16,7 @@ import {
   Text,
   useColorScheme,
   View,
+  Image,
 } from 'react-native';
 
 import {
@@ -31,6 +32,7 @@ import AppBar from "./src/components/AppBar.js";
 import AppFooter from "./src/components/AppFooter.js";
 import SampleList from "./src/components/FlatList.js";
 import Main from "./src/components/Main.js";
+import staticImage from "./assets/icon.png";
 
 /* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
  * LTI update could not be added via codemod */
@@ -61,15 +63,33 @@ const Section = ({children, title}): Node => {
 };
 
 const App: () => Node = () => {
+  const [align, setAlign] = useState('center');
+  const [alignsecond, setAlignsecond] = useState(false);
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  return (
-    <Main/>
-  );
+  useEffect(() => {
+    let myTimeout = setTimeout(() => {
+      setAlign('flex-start'), setAlignsecond(true);
+    }, 3000);
+    return () => clearTimeout(myTimeout);
+  }, []);
+
+  return (!alignsecond ? (
+      <View
+        style={[
+          styles.container,
+          {justifyContent: align}
+        ]}>
+        <Image
+          source={staticImage}
+          style={{width: '100%', height: '100%'}}
+          />
+      </View>
+  ) : <Main/>)
 
   // return (
   //   <NativeBaseProvider>
@@ -97,6 +117,13 @@ const styles = StyleSheet.create({
   },
   highlight: {
     fontWeight: '700',
+  },
+  container: {
+    display: 'flex',
+    alignItems: 'center',
+    flexDirection: 'row',
+    height: '100%',
+    width: '100%',
   },
 });
 
