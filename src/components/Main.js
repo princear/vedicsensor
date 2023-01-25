@@ -8,6 +8,18 @@ import RNBluetoothClassic from 'react-native-bluetooth-classic';
 //import platform from './native-base-theme/variables/platform';
 import ConnectionScreen from './../connection/ConnectionScreen';
 import DeviceListScreen from './../device-list/DeviceListScreen';
+import HomeScreen from './../pages/HomeScreen.js';
+
+import
+ MaterialCommunityIcons
+from 'react-native-vector-icons/MaterialCommunityIcons';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
 
 export default class Main extends React.Component {
   constructor(props) {
@@ -91,7 +103,99 @@ export default class Main extends React.Component {
     });
   }
 
+  tabBarIcon(route, { focused, color, size }) {
+    let iconName;
+    if (route.name === 'HomeStack') {
+      iconName = focused
+        ? 'home-circle'
+        : 'home-circle-outline';
+    } else if (route.name === 'SettingsStack') {
+      iconName = focused
+        ? 'account-settings'
+        : 'account-settings-outline';
+    }
+    return (
+      <MaterialCommunityIcons
+        name={iconName}
+        size={size}
+        color={color}
+        />
+    );
+  }
+
+  renderHomeScreen() {
+    return (
+      <DeviceListScreen
+        bluetoothEnabled={this.state.bluetoothEnabled}
+        selectDevice={this.selectDevice} />
+    );
+  }
+
+  renderSettingsScreen() {
+    return (
+      <ConnectionScreen
+        device={this.state.device}
+        onBack={() => this.setState({ device: undefined })} />
+    );
+  }
+
+  HomeStack() {
+    return (
+      <Stack.Navigator
+        initialRouteName="Home"
+        screenOptions={{headerShown: false}}
+        >
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen} />
+      </Stack.Navigator>
+    );
+  }
+
+  SettingsStack() {
+    return (
+      <Stack.Navigator
+        initialRouteName="Settings"
+        screenOptions={{headerShown: false}}>
+        <Stack.Screen
+          name="Settings"
+          component={HomeScreen} />
+      </Stack.Navigator>
+    );
+  }
+
   render() {
+    return (
+      <NativeBaseProvider>
+        <NavigationContainer>
+          <Tab.Navigator
+            initialRouteName="Feed"
+            screenOptions={({ route }) => ({
+              headerStyle: { backgroundColor: '#42f44b' },
+              headerTintColor: '#fff',
+              headerTitleStyle: { fontWeight: 'bold' },
+              tabBarActiveTintColor: 'tomato',
+              tabBarInactiveTintColor: 'gray',
+              tabBarIcon: (props) => this.tabBarIcon(route, props)
+            })}>
+            <Tab.Screen
+              name="HomeStack"
+              component={this.HomeStack}
+              options={{
+                tabBarLabel: 'Home',
+                title: 'Home',
+              }}  />
+            <Tab.Screen
+              name="SettingsStack"
+              component={this.SettingsStack}
+              options={{
+                tabBarLabel: 'Settings',
+                title: 'Setting'
+              }} />
+          </Tab.Navigator>
+        </NavigationContainer>
+      </NativeBaseProvider>
+    );
     return (
       <NativeBaseProvider>
         <Box>
@@ -105,6 +209,7 @@ export default class Main extends React.Component {
                 onBack={() => this.setState({ device: undefined })} />
             )}
         </Box>
+
       </NativeBaseProvider>
     );
   }
