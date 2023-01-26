@@ -105,14 +105,14 @@ export default class Main extends React.Component {
 
   tabBarIcon(route, { focused, color, size }) {
     let iconName;
-    if (route.name === 'HomeStack') {
+    if (route.name === 'HealthStack') {
       iconName = focused
-        ? 'home-circle'
-        : 'home-circle-outline';
-    } else if (route.name === 'SettingsStack') {
-      iconName = focused
-        ? 'account-settings'
-        : 'account-settings-outline';
+        ? 'heart-circle'
+        : 'heart-circle-outline';
+    } else if (route.name === 'FitnessStack') {
+      iconName = 'meditation';
+    } else if (route.name === 'ManageStack') {
+      iconName = 'watch-variant';
     }
     return (
       <MaterialCommunityIcons
@@ -139,26 +139,26 @@ export default class Main extends React.Component {
     );
   }
 
-  HomeStack() {
+  HealthStack() {
     return (
       <Stack.Navigator
-        initialRouteName="Home"
+        initialRouteName="Health"
         screenOptions={{headerShown: false}}
         >
         <Stack.Screen
-          name="Home"
+          name="Health"
           component={HomeScreen} />
       </Stack.Navigator>
     );
   }
 
-  SettingsStack() {
+  ManageStack() {
     return (
       <Stack.Navigator
-        initialRouteName="Settings"
+        initialRouteName="Manage"
         screenOptions={{headerShown: false}}>
         <Stack.Screen
-          name="Settings"
+          name="Manage"
           component={HomeScreen} />
       </Stack.Navigator>
     );
@@ -171,26 +171,33 @@ export default class Main extends React.Component {
           <Tab.Navigator
             initialRouteName="Feed"
             screenOptions={({ route }) => ({
-              headerStyle: { backgroundColor: '#42f44b' },
+              headerStyle: { backgroundColor: '#5c9405' },
               headerTintColor: '#fff',
               headerTitleStyle: { fontWeight: 'bold' },
-              tabBarActiveTintColor: 'tomato',
+              tabBarActiveTintColor: '#5c9405',
               tabBarInactiveTintColor: 'gray',
               tabBarIcon: (props) => this.tabBarIcon(route, props)
             })}>
             <Tab.Screen
-              name="HomeStack"
-              component={this.HomeStack}
+              name="HealthStack"
+              component={this.HealthStack}
               options={{
-                tabBarLabel: 'Home',
-                title: 'Home',
+                tabBarLabel: 'Health',
+                title: 'Health',
               }}  />
             <Tab.Screen
-              name="SettingsStack"
-              component={this.SettingsStack}
+              name="FitnessStack"
+              component={this.HealthStack}
               options={{
-                tabBarLabel: 'Settings',
-                title: 'Setting'
+                tabBarLabel: 'Fitness',
+                title: 'Fitness',
+              }}  />
+            <Tab.Screen
+              name="ManageStack"
+              component={this.ManageStack}
+              options={{
+                tabBarLabel: 'Manage',
+                title: 'Manage',
               }} />
           </Tab.Navigator>
         </NavigationContainer>
