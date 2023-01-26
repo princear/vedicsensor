@@ -31,7 +31,7 @@ import { NativeBaseProvider, Box, Center } from "native-base";
 import AppBar from "./src/components/AppBar.js";
 import AppFooter from "./src/components/AppFooter.js";
 import SampleList from "./src/components/FlatList.js";
-import Main from "./src/components/Main.js";
+import HomeScreen from "./src/pages/HomeScreen.js";
 import staticImage from "./assets/icon.png";
 
 /* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
@@ -89,7 +89,7 @@ const App: () => Node = () => {
           style={{width: '100%', height: '100%'}}
           />
       </View>
-  ) : <Main/>)
+  ) : <HomeScreen/>)
 
   // return (
   //   <NativeBaseProvider>

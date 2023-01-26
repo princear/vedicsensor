@@ -8,7 +8,7 @@ import RNBluetoothClassic from 'react-native-bluetooth-classic';
 //import platform from './native-base-theme/variables/platform';
 import ConnectionScreen from './../connection/ConnectionScreen';
 import DeviceListScreen from './../device-list/DeviceListScreen';
-import HomeScreen from './../pages/HomeScreen.js';
+import HealthScreen from './../pages/HealthScreen.js';
 
 import
  MaterialCommunityIcons
@@ -123,7 +123,7 @@ export default class Main extends React.Component {
     );
   }
 
-  renderHomeScreen() {
+  renderHealthScreen() {
     return (
       <DeviceListScreen
         bluetoothEnabled={this.state.bluetoothEnabled}
@@ -147,7 +147,7 @@ export default class Main extends React.Component {
         >
         <Stack.Screen
           name="Health"
-          component={HomeScreen} />
+          component={HealthScreen} />
       </Stack.Navigator>
     );
   }
@@ -159,7 +159,7 @@ export default class Main extends React.Component {
         screenOptions={{headerShown: false}}>
         <Stack.Screen
           name="Manage"
-          component={HomeScreen} />
+          component={HealthScreen} />
       </Stack.Navigator>
     );
   }
