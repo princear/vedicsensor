@@ -171,10 +171,10 @@ export default class HomeScreen extends React.Component {
           <Tab.Navigator
             initialRouteName="Feed"
             screenOptions={({ route }) => ({
-              headerStyle: { backgroundColor: '#5c9405' },
+              headerStyle: { backgroundColor: '#528f04' },
               headerTintColor: '#fff',
               headerTitleStyle: { fontWeight: 'bold' },
-              tabBarActiveTintColor: '#5c9405',
+              tabBarActiveTintColor: '#528f04',
               tabBarInactiveTintColor: 'gray',
               tabBarIcon: (props) => this.tabBarIcon(route, props)
             })}>
