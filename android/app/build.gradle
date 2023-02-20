@@ -217,12 +217,12 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-        release {
-          storeFile file('vedic-dev.keystore')
-          storePassword System.console().readLine("\nKeystore password:")
-          keyAlias System.console().readLine("\nAlias: ")
-          keyPassword System.console().readLine("\nAlias password: ")
-      }
+        // release {
+      //     storeFile file('vedic-dev.keystore')
+      //     storePassword System.console().readLine("\nKeystore password:")
+      //     keyAlias System.console().readLine("\nAlias: ")
+      //     keyPassword System.console().readLine("\nAlias password: ")
+      // }
     }
     buildTypes {
         debug {
