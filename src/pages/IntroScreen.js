@@ -49,6 +49,7 @@ const IntroScreen = ({navigation}) => {
               let activeIdx = introStep - 1;
               return (
                 <View
+                  key={i}
                   style={
                     activeIdx == i
                       ? styles.active__bluedot
@@ -91,8 +92,7 @@ const IntroScreen = ({navigation}) => {
         {introStep == 3 && (
           <TouchableOpacity
             style={styles.button_blue}
-            //  onPress={() => navigation.navigate('Login')}
-          >
+            onPress={() => navigation.navigate('Login')}>
             <Text style={styles.button_blue_text}>Get Started</Text>
           </TouchableOpacity>
         )}
