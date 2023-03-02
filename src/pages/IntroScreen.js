@@ -1,8 +1,10 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {TouchableOpacity} from 'react-native';
 import {Image, StyleSheet, Text, View} from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import assets from '../../assets';
+import LottieView from 'lottie-react-native';
 
 const data = [
   {
@@ -23,8 +25,64 @@ const data = [
 ];
 
 const IntroScreen = ({navigation}) => {
+  const animation = useRef(null);
   const basePath = '../../assets/';
   const [introStep, setIntroStep] = useState(1);
+
+  useEffect(() => {
+    animation?.current?.play();
+  }, [introStep]);
+
+  const renderAnimation = () => {
+    if (introStep == 1) {
+      return (
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 10,
+            right: 10,
+            height: 300,
+            width: '100%',
+          }}>
+          <LottieView
+            ref={animation}
+            autoplay={true}
+            loop={true}
+            source={assets.lottieFiles.yoga}
+          />
+        </View>
+      );
+    } else if (introStep == 2) {
+      return (
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 10,
+            right: 10,
+            height: 260,
+            width: '100%',
+          }}>
+          <LottieView
+            ref={animation}
+            autoplay={true}
+            loop={true}
+            source={assets.lottieFiles.getThingsDone}
+          />
+        </View>
+      );
+    } else if (introStep == 3) {
+      return (
+        <View style={{position: 'absolute', height: 300, width: '100%'}}>
+          <LottieView
+            ref={animation}
+            autoplay={true}
+            loop={true}
+            source={assets.lottieFiles.search}
+          />
+        </View>
+      );
+    }
+  };
 
   return (
     <View style={{height: '100%'}}>
@@ -38,7 +96,7 @@ const IntroScreen = ({navigation}) => {
           style={styles.cloud}
           source={require(basePath + 'bg-blue.png')}
         />
-        {/* <Image style={styles.yoga} source={require(basePath + 'fruits.png')} /> */}
+        {renderAnimation()}
       </View>
       <View style={styles.content}>
         <View style={styles.alignCenter}>
