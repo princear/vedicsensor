@@ -1,8 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  NativeBaseProvider,
-} from 'native-base';
+import {Box, NativeBaseProvider} from 'native-base';
 import RNBluetoothClassic from 'react-native-bluetooth-classic';
 //import getTheme from './native-base-theme/components';
 //import platform from './native-base-theme/variables/platform';
@@ -10,22 +7,22 @@ import ConnectionScreen from './../connection/ConnectionScreen';
 import DeviceListScreen from './../device-list/DeviceListScreen';
 import HealthScreen from './../pages/HealthScreen.js';
 
-import
- MaterialCommunityIcons
-from 'react-native-vector-icons/MaterialCommunityIcons';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import LoginScreen from './LoginScreen.js';
+import IntroScreen from './IntroScreen.js';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
-
 
 export default class HomeScreen extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
+      signedin: false,
       device: undefined,
       bluetoothEnabled: true,
     };
@@ -40,10 +37,10 @@ export default class HomeScreen extends React.Component {
    *
    * @param device the BluetoothDevice selected or connected
    */
-  selectDevice = (device) => {
+  selectDevice = device => {
     console.log('App::selectDevice() called with: ', device);
-    this.setState({ device });
-  }
+    this.setState({device});
+  };
 
   /**
    * On mount:
@@ -52,12 +49,18 @@ export default class HomeScreen extends React.Component {
    * - determine if bluetooth is enabled (may be redundant with listener)
    */
   async componentDidMount() {
-    console.log('App::componentDidMount adding listeners: onBluetoothEnabled and onBluetoothDistabled');
-    console.log('App::componentDidMount alternatively could use onStateChanged');
-    this.enabledSubscription = RNBluetoothClassic
-      .onBluetoothEnabled((event) => this.onStateChanged(event));
-    this.disabledSubscription = RNBluetoothClassic
-      .onBluetoothDisabled((event) => this.onStateChanged(event));
+    console.log(
+      'App::componentDidMount adding listeners: onBluetoothEnabled and onBluetoothDistabled',
+    );
+    console.log(
+      'App::componentDidMount alternatively could use onStateChanged',
+    );
+    this.enabledSubscription = RNBluetoothClassic.onBluetoothEnabled(event =>
+      this.onStateChanged(event),
+    );
+    this.disabledSubscription = RNBluetoothClassic.onBluetoothDisabled(event =>
+      this.onStateChanged(event),
+    );
 
     this.checkBluetootEnabled();
   }
@@ -72,10 +75,10 @@ export default class HomeScreen extends React.Component {
       let enabled = await RNBluetoothClassic.isBluetoothEnabled();
 
       console.log(`App::componentDidMount Status: ${enabled}`);
-      this.setState({ bluetoothEnabled: enabled });
+      this.setState({bluetoothEnabled: enabled});
     } catch (error) {
       console.log('App::componentDidMount Status Error: ', error);
-      this.setState({ bluetoothEnabled: false });
+      this.setState({bluetoothEnabled: false});
     }
   }
 
@@ -83,8 +86,12 @@ export default class HomeScreen extends React.Component {
    * Clear subscriptions
    */
   componentWillUnmount() {
-    console.log('App:componentWillUnmount removing subscriptions: enabled and distabled');
-    console.log('App:componentWillUnmount alternatively could have used stateChanged');
+    console.log(
+      'App:componentWillUnmount removing subscriptions: enabled and distabled',
+    );
+    console.log(
+      'App:componentWillUnmount alternatively could have used stateChanged',
+    );
     this.enabledSubscription.remove();
     this.disabledSubscription.remove();
   }
@@ -95,7 +102,9 @@ export default class HomeScreen extends React.Component {
    * @param stateChangedEvent event sent from Native side during state change
    */
   onStateChanged(stateChangedEvent) {
-    console.log('App::onStateChanged event used for onBluetoothEnabled and onBluetoothDisabled');
+    console.log(
+      'App::onStateChanged event used for onBluetoothEnabled and onBluetoothDisabled',
+    );
 
     this.setState({
       bluetoothEnabled: stateChangedEvent.enabled,
@@ -103,31 +112,24 @@ export default class HomeScreen extends React.Component {
     });
   }
 
-  tabBarIcon(route, { focused, color, size }) {
+  tabBarIcon(route, {focused, color, size}) {
     let iconName;
     if (route.name === 'HealthStack') {
-      iconName = focused
-        ? 'heart-circle'
-        : 'heart-circle-outline';
+      iconName = focused ? 'heart-circle' : 'heart-circle-outline';
     } else if (route.name === 'FitnessStack') {
       iconName = 'meditation';
     } else if (route.name === 'ManageStack') {
       iconName = 'watch-variant';
     }
-    return (
-      <MaterialCommunityIcons
-        name={iconName}
-        size={size}
-        color={color}
-        />
-    );
+    return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
   }
 
   renderHealthScreen() {
     return (
       <DeviceListScreen
         bluetoothEnabled={this.state.bluetoothEnabled}
-        selectDevice={this.selectDevice} />
+        selectDevice={this.selectDevice}
+      />
     );
   }
 
@@ -135,7 +137,8 @@ export default class HomeScreen extends React.Component {
     return (
       <ConnectionScreen
         device={this.state.device}
-        onBack={() => this.setState({ device: undefined })} />
+        onBack={() => this.setState({device: undefined})}
+      />
     );
   }
 
@@ -143,11 +146,8 @@ export default class HomeScreen extends React.Component {
     return (
       <Stack.Navigator
         initialRouteName="Health"
-        screenOptions={{headerShown: false}}
-        >
-        <Stack.Screen
-          name="Health"
-          component={HealthScreen} />
+        screenOptions={{headerShown: false}}>
+        <Stack.Screen name="Health" component={HealthScreen} />
       </Stack.Navigator>
     );
   }
@@ -157,9 +157,58 @@ export default class HomeScreen extends React.Component {
       <Stack.Navigator
         initialRouteName="Manage"
         screenOptions={{headerShown: false}}>
-        <Stack.Screen
-          name="Manage"
-          component={HealthScreen} />
+        <Stack.Screen name="Manage" component={HealthScreen} />
+      </Stack.Navigator>
+    );
+  }
+
+  tabStack() {
+    return (
+      <Tab.Navigator
+        initialRouteName="Feed"
+        screenOptions={({route}) => ({
+          headerStyle: {backgroundColor: '#528f04'},
+          headerTintColor: '#fff',
+          headerTitleStyle: {fontWeight: 'bold'},
+          tabBarActiveTintColor: '#528f04',
+          tabBarInactiveTintColor: 'gray',
+          tabBarIcon: props => this.tabBarIcon(route, props),
+        })}>
+        <Tab.Screen
+          name="HealthStack"
+          component={this.HealthStack}
+          options={{
+            tabBarLabel: 'Health',
+            title: 'Health',
+          }}
+        />
+        <Tab.Screen
+          name="FitnessStack"
+          component={this.HealthStack}
+          options={{
+            tabBarLabel: 'Fitness',
+            title: 'Fitness',
+          }}
+        />
+        <Tab.Screen
+          name="ManageStack"
+          component={this.ManageStack}
+          options={{
+            tabBarLabel: 'Manage',
+            title: 'Manage',
+          }}
+        />
+      </Tab.Navigator>
+    );
+  }
+
+  authStack() {
+    return (
+      <Stack.Navigator
+        initialRouteName="Manage"
+        screenOptions={{headerShown: false}}>
+        <Stack.Screen name="IntroScreen" component={IntroScreen} />
+        <Stack.Screen name="Login" component={LoginScreen} />
       </Stack.Navigator>
     );
   }
@@ -168,38 +217,7 @@ export default class HomeScreen extends React.Component {
     return (
       <NativeBaseProvider>
         <NavigationContainer>
-          <Tab.Navigator
-            initialRouteName="Feed"
-            screenOptions={({ route }) => ({
-              headerStyle: { backgroundColor: '#528f04' },
-              headerTintColor: '#fff',
-              headerTitleStyle: { fontWeight: 'bold' },
-              tabBarActiveTintColor: '#528f04',
-              tabBarInactiveTintColor: 'gray',
-              tabBarIcon: (props) => this.tabBarIcon(route, props)
-            })}>
-            <Tab.Screen
-              name="HealthStack"
-              component={this.HealthStack}
-              options={{
-                tabBarLabel: 'Health',
-                title: 'Health',
-              }}  />
-            <Tab.Screen
-              name="FitnessStack"
-              component={this.HealthStack}
-              options={{
-                tabBarLabel: 'Fitness',
-                title: 'Fitness',
-              }}  />
-            <Tab.Screen
-              name="ManageStack"
-              component={this.ManageStack}
-              options={{
-                tabBarLabel: 'Manage',
-                title: 'Manage',
-              }} />
-          </Tab.Navigator>
+          {this.state.signedin ? this.tabStack() : this.authStack()}
         </NavigationContainer>
       </NativeBaseProvider>
     );
@@ -209,14 +227,15 @@ export default class HomeScreen extends React.Component {
           {!this.state.device ? (
             <DeviceListScreen
               bluetoothEnabled={this.state.bluetoothEnabled}
-              selectDevice={this.selectDevice} />
+              selectDevice={this.selectDevice}
+            />
           ) : (
-              <ConnectionScreen
-                device={this.state.device}
-                onBack={() => this.setState({ device: undefined })} />
-            )}
+            <ConnectionScreen
+              device={this.state.device}
+              onBack={() => this.setState({device: undefined})}
+            />
+          )}
         </Box>
-
       </NativeBaseProvider>
     );
   }

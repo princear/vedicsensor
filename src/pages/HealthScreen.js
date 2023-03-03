@@ -4,13 +4,13 @@ import {
   StyleSheet,
   View,
   Text,
-  SafeAreaView
+  SafeAreaView,
 } from 'react-native';
 
-const HealthScreen = ({ navigation }) => {
+const HealthScreen = ({navigation}) => {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ flex: 1, padding: 16 }}>
+    <SafeAreaView style={{flex: 1}}>
+      <View style={{flex: 1, padding: 16}}>
         <View
           style={{
             flex: 1,
@@ -21,23 +21,20 @@ const HealthScreen = ({ navigation }) => {
             style={{
               fontSize: 25,
               textAlign: 'center',
-              marginBottom: 16
+              marginBottom: 16,
             }}>
             You are on Home Screen
           </Text>
           <TouchableOpacity
             style={styles.button}
-            onPress={
-              () => navigation.navigate(
-                'SettingsStack', { screen: 'Settings' }
-              )}>
-            <Text>Go to settng Tab</Text>
+            onPress={() =>
+              navigation.navigate('SettingsStack', {screen: 'Settings'})
+            }>
+            <Text>Go to setting Tab</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.button}
-            onPress={
-              () => navigation.navigate('Details')
-            }>
+            onPress={() => navigation.navigate('Details')}>
             <Text>Open Details Screen</Text>
           </TouchableOpacity>
         </View>
@@ -45,7 +42,7 @@ const HealthScreen = ({ navigation }) => {
           style={{
             fontSize: 18,
             textAlign: 'center',
-            color: 'grey'
+            color: 'grey',
           }}>
           React Native Bottom Navigation
         </Text>
@@ -53,14 +50,14 @@ const HealthScreen = ({ navigation }) => {
           style={{
             fontSize: 16,
             textAlign: 'center',
-            color: 'grey'
+            color: 'grey',
           }}>
           www.aboutreact.com
         </Text>
       </View>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   button: {
