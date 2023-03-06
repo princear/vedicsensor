@@ -1,4 +1,5 @@
 apply plugin: "com.android.application"
+apply plugin: "com.google.gms.google-services" 
 
 import com.android.build.OutputFile
 import org.apache.tools.ant.taskdefs.condition.Os
@@ -188,7 +189,7 @@ android {
 
             // Due to a bug inside AGP, we have to explicitly set a dependency
             // between configureCMakeDebug* tasks and the preBuild tasks.
-            // This can be removed once this is solved: https://issuetracker.google.com/issues/207403732
+            // This can be removed once this is solved: https://issuetracker. .com/issues/207403732
             configureCMakeRelWithDebInfo.dependsOn(preReleaseBuild)
             configureCMakeDebug.dependsOn(preDebugBuild)
             reactNativeArchitectures().each { architecture ->

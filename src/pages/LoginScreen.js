@@ -17,9 +17,11 @@ import OTPInputView from '@twotalltotems/react-native-otp-input';
 const LoginScreen = () => {
   const animation = useRef(null);
   const inputRef = useRef(null);
-  const [isAnimationHidden, setIsAnimationHidden] = useState(false);
 
   const [step, setStep] = useState(1);
+  const [isAnimationHidden, setIsAnimationHidden] = useState(false);
+
+  const [phone, setPhone] = useState('');
 
   useEffect(() => {
     animation?.current?.play();
@@ -29,21 +31,24 @@ const LoginScreen = () => {
     if (step == 1) {
       return (
         <Step1
+          setStep={setStep}
+          phone={phone}
+          setPhone={setPhone}
           inputRef={inputRef}
           animation={animation}
           isAnimationHidden={isAnimationHidden}
           setIsAnimationHidden={setIsAnimationHidden}
-          setStep={setStep}
         />
       );
     } else if (step == 2) {
       return (
         <Step2
+          setStep={setStep}
+          phone={phone}
           inputRef={inputRef}
           animation={animation}
           isAnimationHidden={isAnimationHidden}
           setIsAnimationHidden={setIsAnimationHidden}
-          setStep={setStep}
         />
       );
     } else if (step == 3) {
@@ -63,6 +68,8 @@ const Step1 = props => {
     isAnimationHidden,
     setIsAnimationHidden,
     setStep,
+    phone,
+    setPhone,
   } = props;
   return (
     <SafeAreaView style={styles.container}>
@@ -97,6 +104,8 @@ const Step1 = props => {
             placeholder="Phone number"
             onBlur={() => setIsAnimationHidden(false)}
             onFocus={() => setIsAnimationHidden(true)}
+            value={phone}
+            onChangeText={val => setPhone(val)}
           />
         </View>
 
@@ -125,13 +134,38 @@ const Step2 = props => {
     isAnimationHidden,
     setIsAnimationHidden,
     setStep,
+    phone,
   } = props;
+
+  const [timer, setTimer] = useState(59);
+  const [otp, setOtp] = useState('');
+
+  const interval = setInterval(() => {
+    if (timer > 0) {
+      setTimer(timer - 1);
+    }
+
+    if (timer === 0) {
+      clearInterval(interval);
+    }
+  }, 1000);
+
+  useEffect(() => {
+    return () => {
+      clearInterval(interval);
+    };
+  });
+
+  useEffect(() => {
+    if (otp.length > 0) setIsAnimationHidden(true);
+    else setIsAnimationHidden(false);
+  }, [otp]);
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={{flex: 1}}>
         <Text style={styles.heading}>Verify phone</Text>
-        <Text style={styles.subHeading}>Code is sent to 9877777645</Text>
+        <Text style={styles.subHeading}>Code is sent to {phone}</Text>
 
         <View
           style={{
@@ -146,7 +180,33 @@ const Step2 = props => {
             source={assets.lottieFiles.sms}
           />
         </View>
-        <OTPInputView code="123" pinCount={4} />
+        <View
+          onPress={() => setIsAnimationHidden(true)}
+          style={{
+            alignItems: 'center',
+          }}>
+          <OTPInputView
+            code={otp}
+            onCodeChanged={e => setOtp(e)}
+            ref={inputRef}
+            pinCount={4}
+            style={{width: '80%', height: 60}}
+            codeInputFieldStyle={{borderColor: '#49454F', color: '#323232'}}
+            codeInputHighlightStyle={{borderColor: '#3460D7'}}
+          />
+          {timer == 0 ? (
+            <TouchableOpacity onPress={() => setTimer(5)}>
+              <Text
+                style={{marginTop: 10, fontWeight: '500', color: '#3460D7'}}>
+                Resend OTP
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <Text style={{marginTop: 10, fontWeight: '500', color: '#828282'}}>
+              RESEND OTP IN {timer} SECONDS
+            </Text>
+          )}
+        </View>
       </View>
       <View style={{flexDirection: 'row'}}>
         <TouchableOpacity
