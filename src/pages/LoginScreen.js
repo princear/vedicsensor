@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   View,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import assets from '../../assets';
 import LottieView from 'lottie-react-native';
@@ -13,6 +14,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
+import auth from '@react-native-firebase/auth';
 
 const LoginScreen = () => {
   const animation = useRef(null);
@@ -21,7 +23,9 @@ const LoginScreen = () => {
   const [step, setStep] = useState(1);
   const [isAnimationHidden, setIsAnimationHidden] = useState(false);
 
-  const [phone, setPhone] = useState('');
+  //   const [phone, setPhone] = useState('9084112090');
+  const [phone, setPhone] = useState('8445666963');
+  const [confirmation, setConfirmation] = useState();
 
   useEffect(() => {
     animation?.current?.play();
@@ -38,6 +42,7 @@ const LoginScreen = () => {
           animation={animation}
           isAnimationHidden={isAnimationHidden}
           setIsAnimationHidden={setIsAnimationHidden}
+          setConfirmation={setConfirmation}
         />
       );
     } else if (step == 2) {
@@ -49,6 +54,7 @@ const LoginScreen = () => {
           animation={animation}
           isAnimationHidden={isAnimationHidden}
           setIsAnimationHidden={setIsAnimationHidden}
+          confirmation={confirmation}
         />
       );
     } else if (step == 3) {
@@ -70,7 +76,27 @@ const Step1 = props => {
     setStep,
     phone,
     setPhone,
+    setConfirmation,
   } = props;
+
+  const [loading, setLoading] = useState(false);
+
+  const handleSignin = async () => {
+    if (phone.length == 10) {
+      setLoading(true);
+      try {
+        const res = await auth().signInWithPhoneNumber(`+91 ${phone}`);
+        setConfirmation(res);
+        setStep(2);
+
+        console.log(res);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={{flex: 1}}>
@@ -117,11 +143,26 @@ const Step1 = props => {
         </View>
       </View>
       <View>
-        <TouchableOpacity
-          style={styles.button_blue_disabled}
-          onPress={() => setStep(2)}>
-          <Text style={styles.button_blue_text}>Get OTP</Text>
-        </TouchableOpacity>
+        {loading ? (
+          <ActivityIndicator size="large" />
+        ) : (
+          <TouchableOpacity
+            style={
+              phone.length == 10
+                ? styles.button_blue
+                : styles.button_blue_disabled
+            }
+            onPress={handleSignin}>
+            <Text
+              style={
+                phone.length == 10
+                  ? styles.button_blue_text
+                  : styles.button_blue_text_disabled
+              }>
+              Get OTP
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -135,10 +176,12 @@ const Step2 = props => {
     setIsAnimationHidden,
     setStep,
     phone,
+    confirmation,
   } = props;
 
+  const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(59);
-  const [otp, setOtp] = useState('');
+  const [otp, setOtp] = useState('1234');
 
   const interval = setInterval(() => {
     if (timer > 0) {
@@ -160,6 +203,19 @@ const Step2 = props => {
     if (otp.length > 0) setIsAnimationHidden(true);
     else setIsAnimationHidden(false);
   }, [otp]);
+
+  async function confirmCode() {
+    try {
+      setLoading(true);
+      const res = await confirmation.confirm('123456');
+      console.log(res);
+      setStep(3);
+    } catch (error) {
+      console.log('Invalid code.', error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -217,15 +273,31 @@ const Step2 = props => {
             borderWidth: 1,
             marginRight: 10,
           }}
-          onPress={() => setStep(1)}>
+          onPress={() => !loading && setStep(1)}>
           <Text style={{color: '#3460D7', textAlign: 'center'}}>
             Edit number
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.button_blue_disabled, {flex: 1}]}
-          onPress={() => setStep(3)}>
-          <Text style={styles.button_blue_text_disabled}>Verify</Text>
+          style={[
+            otp.length < 4 || loading
+              ? styles.button_blue_disabled
+              : styles.button_blue,
+            {flex: 1},
+          ]}
+          onPress={() => !loading && confirmCode()}>
+          {loading ? (
+            <ActivityIndicator color="#3460D7" />
+          ) : (
+            <Text
+              style={
+                otp.length == 4
+                  ? styles.button_blue_text
+                  : styles.button_blue_text_disabled
+              }>
+              Verify
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>
