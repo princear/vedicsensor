@@ -6,6 +6,8 @@ import {
   View,
   TextInput,
   ActivityIndicator,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import assets from '../../assets';
 import LottieView from 'lottie-react-native';
@@ -47,7 +49,6 @@ const LoginScreen = ({navigation}) => {
         <Step2
           setStep={setStep}
           phone={phone}
-          inputRef={inputRef}
           animation={animation}
           isAnimationHidden={isAnimationHidden}
           setIsAnimationHidden={setIsAnimationHidden}
@@ -164,7 +165,6 @@ const Step1 = props => {
 
 const Step2 = props => {
   const {
-    inputRef,
     animation,
     isAnimationHidden,
     setIsAnimationHidden,
@@ -195,9 +195,24 @@ const Step2 = props => {
   });
 
   useEffect(() => {
-    if (otp.length > 0) setIsAnimationHidden(true);
-    else setIsAnimationHidden(false);
-  }, [otp]);
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setIsAnimationHidden(true);
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setIsAnimationHidden(false);
+      },
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
 
   async function confirmCode() {
     try {
@@ -231,15 +246,10 @@ const Step2 = props => {
             source={assets.lottieFiles.sms}
           />
         </View>
-        <View
-          onPress={() => setIsAnimationHidden(true)}
-          style={{
-            alignItems: 'center',
-          }}>
+        <View style={{alignItems: 'center'}}>
           <OTPInputView
             code={otp}
             onCodeChanged={e => setOtp(e)}
-            ref={inputRef}
             pinCount={6}
             style={{width: '98%', height: 60}}
             codeInputFieldStyle={{borderColor: '#49454F', color: '#323232'}}

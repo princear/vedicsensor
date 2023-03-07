@@ -27,12 +27,12 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
-import { NativeBaseProvider, Box, Center } from "native-base";
-import AppBar from "./src/components/AppBar.js";
-import AppFooter from "./src/components/AppFooter.js";
-import SampleList from "./src/components/FlatList.js";
-import HomeScreen from "./src/pages/HomeScreen.js";
-import staticImage from "./assets/icon.png";
+import {NativeBaseProvider, Box, Center} from 'native-base';
+import AppBar from './src/components/AppBar.js';
+import AppFooter from './src/components/AppFooter.js';
+import SampleList from './src/components/FlatList.js';
+import HomeScreen from './src/pages/HomeScreen.js';
+import staticImage from './assets/icon.png';
 
 /* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
  * LTI update could not be added via codemod */
@@ -78,18 +78,23 @@ const App: () => Node = () => {
     return () => clearTimeout(myTimeout);
   }, []);
 
-  return (!alignsecond ? (
-      <View
-        style={[
-          styles.container,
-          {justifyContent: align}
-        ]}>
-        <Image
-          source={staticImage}
-          style={{width: '100%', height: '100%'}}
-          />
-      </View>
-  ) : <HomeScreen/>)
+  return !alignsecond ? (
+    <View style={[styles.container, {justifyContent: align}]}>
+      <Image source={staticImage} style={{width: 300, height: 300}} />
+      <Text
+        style={{
+          fontSize: 16,
+          fontWeight: '700',
+          color: '#ffffff',
+          letterSpacing: 3,
+          marginTop: -40,
+        }}>
+        MAD MACHINES
+      </Text>
+    </View>
+  ) : (
+    <HomeScreen />
+  );
 
   // return (
   //   <NativeBaseProvider>
@@ -119,11 +124,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   container: {
-    display: 'flex',
+    flex: 1,
     alignItems: 'center',
-    flexDirection: 'row',
-    height: '100%',
-    width: '100%',
+    justifyContent: 'center',
+    backgroundColor: '#090909',
   },
 });
 
