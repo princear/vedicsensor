@@ -217,7 +217,7 @@ const Step2 = props => {
   async function confirmCode() {
     try {
       setLoading(true);
-      const res = await confirmation.confirm('123456');
+      const res = await confirmation.confirm(otp);
       console.log(res);
       navigation.navigate('OnBoarding');
     } catch (error) {
