@@ -17,7 +17,7 @@ import {
 const OnBoardingScreen = ({navigation}) => {
   const [onBoardingStep, setOnBoardingStep] = useState(1);
   const [onBoardingDetails, setOnBoardingDetails] = useState({
-    gender: 'male',
+    gender: '',
   });
 
   const renderOnBoadingSteps = () => {

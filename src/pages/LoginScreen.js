@@ -286,7 +286,7 @@ const Step2 = props => {
           ) : (
             <Text
               style={
-                otp.length == 4
+                otp.length == 6
                   ? styles.button_blue_text
                   : styles.button_blue_text_disabled
               }>

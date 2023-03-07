@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Slider from '@react-native-community/slider';
 import LinearGradient from 'react-native-linear-gradient';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -6,6 +6,15 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Text, StyleSheet, TouchableOpacity, View} from 'react-native';
 
 const Questionnaire = ({navigation}) => {
+  const [value, setValue] = useState(0);
+
+  const renderValue = () => {
+    if (value == 0) return 0;
+    else if (value == 1) return 'low';
+    else if (value == 2) return 'medium';
+    else if (value == 3) return 'high';
+  };
+
   return (
     <LinearGradient
       colors={['#C65267', '#B05376', '#9B5483', '#805696', '#6F57A2']}>
@@ -27,16 +36,23 @@ const Questionnaire = ({navigation}) => {
             <Slider
               style={{width: 400, height: 40, marginTop: 20}}
               minimumValue={0}
-              maximumValue={4}
+              maximumValue={3}
               step={1}
+              thumbTintColor="#3460D7"
               minimumTrackTintColor="rgba(52, 96, 215, 0.5)"
               maximumTrackTintColor="#E6EAF3"
+              value={value}
+              onValueChange={val => setValue(val)}
             />
+            <Text style={styles.zero}>0</Text>
+            <Text style={styles.low}>Low</Text>
+            <Text style={styles.medium}>Medium</Text>
+            <Text style={styles.high}>High</Text>
           </View>
 
           <TouchableOpacity style={styles.option}>
             <Text style={{fontSize: 12, fontWeight: '500', color: '#ffffff'}}>
-              I usually have 0 skin dryness.
+              I usually have {renderValue()} skin dryness.
             </Text>
           </TouchableOpacity>
         </View>
@@ -107,6 +123,34 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.5)',
+  },
+  zero: {
+    fontWeight: '500',
+    color: '#ffffff',
+    position: 'absolute',
+    left: 16,
+    bottom: -20,
+  },
+  low: {
+    fontWeight: '500',
+    color: '#ffffff',
+    position: 'absolute',
+    left: 125,
+    bottom: -20,
+  },
+  medium: {
+    fontWeight: '500',
+    color: '#ffffff',
+    position: 'absolute',
+    right: 110,
+    bottom: -20,
+  },
+  high: {
+    fontWeight: '500',
+    color: '#ffffff',
+    position: 'absolute',
+    right: 5,
+    bottom: -20,
   },
 });
 
