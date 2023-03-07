@@ -21,7 +21,7 @@ const LoginScreen = ({navigation}) => {
   const [isAnimationHidden, setIsAnimationHidden] = useState(false);
 
   //   const [phone, setPhone] = useState('9084112090');
-  const [phone, setPhone] = useState('8445666963');
+  const [phone, setPhone] = useState('');
   const [confirmation, setConfirmation] = useState();
 
   useEffect(() => {
@@ -176,7 +176,7 @@ const Step2 = props => {
 
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(59);
-  const [otp, setOtp] = useState('1234');
+  const [otp, setOtp] = useState('');
 
   const interval = setInterval(() => {
     if (timer > 0) {
@@ -240,8 +240,8 @@ const Step2 = props => {
             code={otp}
             onCodeChanged={e => setOtp(e)}
             ref={inputRef}
-            pinCount={4}
-            style={{width: '80%', height: 60}}
+            pinCount={6}
+            style={{width: '98%', height: 60}}
             codeInputFieldStyle={{borderColor: '#49454F', color: '#323232'}}
             codeInputHighlightStyle={{borderColor: '#3460D7'}}
           />
