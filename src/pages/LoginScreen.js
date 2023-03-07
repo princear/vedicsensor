@@ -10,9 +10,6 @@ import {
 import assets from '../../assets';
 import LottieView from 'lottie-react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
 import auth from '@react-native-firebase/auth';
 
