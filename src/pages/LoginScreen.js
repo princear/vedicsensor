@@ -16,7 +16,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
 import auth from '@react-native-firebase/auth';
 
-const LoginScreen = () => {
+const LoginScreen = ({navigation}) => {
   const animation = useRef(null);
   const inputRef = useRef(null);
 
@@ -55,12 +55,9 @@ const LoginScreen = () => {
           isAnimationHidden={isAnimationHidden}
           setIsAnimationHidden={setIsAnimationHidden}
           confirmation={confirmation}
+          navigation={navigation}
         />
       );
-    } else if (step == 3) {
-      return <Step3 setStep={setStep} />;
-    } else if (step == 4) {
-      return <Step4 setStep={setStep} />;
     }
   };
 
@@ -177,6 +174,7 @@ const Step2 = props => {
     setStep,
     phone,
     confirmation,
+    navigation,
   } = props;
 
   const [loading, setLoading] = useState(false);
@@ -209,7 +207,7 @@ const Step2 = props => {
       setLoading(true);
       const res = await confirmation.confirm('123456');
       console.log(res);
-      setStep(3);
+      navigation.navigate('OnBoarding');
     } catch (error) {
       console.log('Invalid code.', error);
     } finally {
@@ -298,90 +296,6 @@ const Step2 = props => {
               Verify
             </Text>
           )}
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
-  );
-};
-
-const Step3 = props => {
-  const {setStep} = props;
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={{flex: 1}}>
-        <Text style={styles.heading}>Enter your details</Text>
-        <View style={styles.inputContainer}>
-          <MaterialIcons name="person-outline" size={26} color="#1C1B1F" />
-          <TextInput style={styles.textField} placeholder="First name" />
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput style={styles.textField} placeholder="Last name" />
-        </View>
-        <View style={styles.inputContainer}>
-          <MaterialCommunityIcons
-            name="email-outline"
-            size={24}
-            color="black"
-          />
-          <TextInput style={styles.textField} placeholder="E mail-id" />
-        </View>
-      </View>
-
-      <View>
-        <TouchableOpacity style={styles.button_blue} onPress={() => setStep(4)}>
-          <Text style={styles.button_blue_text}>Continue</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
-  );
-};
-
-const Step4 = props => {
-  const {setStep} = props;
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={{flex: 1}}>
-        <Text style={styles.heading}>Enter your details</Text>
-        <View style={{flexDirection: 'row'}}>
-          <MaterialIcons name="redeem" size={24} color="black" />
-          <View style={{width: '95%'}}>
-            <TextInput style={styles.textField} placeholder="Date of birth" />
-            <Text style={{marginLeft: 20, marginBottom: 20}}>dd/mm/yyyy</Text>
-          </View>
-        </View>
-        <View style={{flexDirection: 'row'}}>
-          <MaterialCommunityIcons
-            name="map-marker-outline"
-            size={26}
-            color="black"
-          />
-          <View style={{width: '95%'}}>
-            <TextInput style={styles.textField} placeholder="Place of birth" />
-            <Text style={{marginLeft: 20, marginBottom: 20}}>
-              Enter the place where you were born.
-            </Text>
-          </View>
-        </View>
-        <View style={{flexDirection: 'row'}}>
-          <MaterialCommunityIcons
-            name="clock-outline"
-            size={26}
-            color="black"
-          />
-          <View style={{width: '95%'}}>
-            <TextInput style={styles.textField} placeholder="Time of birth" />
-            <Text style={{marginLeft: 20}}>
-              Enter if you are sure of the time.
-            </Text>
-            <Text style={{marginLeft: 20, marginBottom: 20}}>
-              Note: Ask your parents.
-            </Text>
-          </View>
-        </View>
-      </View>
-      <View>
-        <TouchableOpacity style={styles.button_blue} onPress={() => setStep(4)}>
-          <Text style={styles.button_blue_text}>Continue</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
