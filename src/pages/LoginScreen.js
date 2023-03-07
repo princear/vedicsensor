@@ -5,21 +5,24 @@ import {
   TouchableOpacity,
   View,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import assets from '../../assets';
 import LottieView from 'lottie-react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
+import auth from '@react-native-firebase/auth';
 
-const LoginScreen = () => {
+const LoginScreen = ({navigation}) => {
   const animation = useRef(null);
   const inputRef = useRef(null);
-  const [isAnimationHidden, setIsAnimationHidden] = useState(false);
 
   const [step, setStep] = useState(1);
+  const [isAnimationHidden, setIsAnimationHidden] = useState(false);
+
+  //   const [phone, setPhone] = useState('9084112090');
+  const [phone, setPhone] = useState('');
+  const [confirmation, setConfirmation] = useState();
 
   useEffect(() => {
     animation?.current?.play();
@@ -29,27 +32,29 @@ const LoginScreen = () => {
     if (step == 1) {
       return (
         <Step1
+          setStep={setStep}
+          phone={phone}
+          setPhone={setPhone}
           inputRef={inputRef}
           animation={animation}
           isAnimationHidden={isAnimationHidden}
           setIsAnimationHidden={setIsAnimationHidden}
-          setStep={setStep}
+          setConfirmation={setConfirmation}
         />
       );
     } else if (step == 2) {
       return (
         <Step2
+          setStep={setStep}
+          phone={phone}
           inputRef={inputRef}
           animation={animation}
           isAnimationHidden={isAnimationHidden}
           setIsAnimationHidden={setIsAnimationHidden}
-          setStep={setStep}
+          confirmation={confirmation}
+          navigation={navigation}
         />
       );
-    } else if (step == 3) {
-      return <Step3 setStep={setStep} />;
-    } else if (step == 4) {
-      return <Step4 setStep={setStep} />;
     }
   };
 
@@ -63,7 +68,29 @@ const Step1 = props => {
     isAnimationHidden,
     setIsAnimationHidden,
     setStep,
+    phone,
+    setPhone,
+    setConfirmation,
   } = props;
+
+  const [loading, setLoading] = useState(false);
+
+  const handleSignin = async () => {
+    if (phone.length == 10) {
+      setLoading(true);
+      try {
+        const res = await auth().signInWithPhoneNumber(`+91 ${phone}`);
+        setConfirmation(res);
+        setStep(2);
+
+        console.log(res);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={{flex: 1}}>
@@ -97,6 +124,8 @@ const Step1 = props => {
             placeholder="Phone number"
             onBlur={() => setIsAnimationHidden(false)}
             onFocus={() => setIsAnimationHidden(true)}
+            value={phone}
+            onChangeText={val => setPhone(val)}
           />
         </View>
 
@@ -108,11 +137,26 @@ const Step1 = props => {
         </View>
       </View>
       <View>
-        <TouchableOpacity
-          style={styles.button_blue_disabled}
-          onPress={() => setStep(2)}>
-          <Text style={styles.button_blue_text}>Get OTP</Text>
-        </TouchableOpacity>
+        {loading ? (
+          <ActivityIndicator size="large" />
+        ) : (
+          <TouchableOpacity
+            style={
+              phone.length == 10
+                ? styles.button_blue
+                : styles.button_blue_disabled
+            }
+            onPress={handleSignin}>
+            <Text
+              style={
+                phone.length == 10
+                  ? styles.button_blue_text
+                  : styles.button_blue_text_disabled
+              }>
+              Get OTP
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -125,13 +169,54 @@ const Step2 = props => {
     isAnimationHidden,
     setIsAnimationHidden,
     setStep,
+    phone,
+    confirmation,
+    navigation,
   } = props;
+
+  const [loading, setLoading] = useState(false);
+  const [timer, setTimer] = useState(59);
+  const [otp, setOtp] = useState('');
+
+  const interval = setInterval(() => {
+    if (timer > 0) {
+      setTimer(timer - 1);
+    }
+
+    if (timer === 0) {
+      clearInterval(interval);
+    }
+  }, 1000);
+
+  useEffect(() => {
+    return () => {
+      clearInterval(interval);
+    };
+  });
+
+  useEffect(() => {
+    if (otp.length > 0) setIsAnimationHidden(true);
+    else setIsAnimationHidden(false);
+  }, [otp]);
+
+  async function confirmCode() {
+    try {
+      setLoading(true);
+      const res = await confirmation.confirm('123456');
+      console.log(res);
+      navigation.navigate('OnBoarding');
+    } catch (error) {
+      console.log('Invalid code.', error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={{flex: 1}}>
         <Text style={styles.heading}>Verify phone</Text>
-        <Text style={styles.subHeading}>Code is sent to 9877777645</Text>
+        <Text style={styles.subHeading}>Code is sent to {phone}</Text>
 
         <View
           style={{
@@ -146,7 +231,33 @@ const Step2 = props => {
             source={assets.lottieFiles.sms}
           />
         </View>
-        <OTPInputView code="123" pinCount={4} />
+        <View
+          onPress={() => setIsAnimationHidden(true)}
+          style={{
+            alignItems: 'center',
+          }}>
+          <OTPInputView
+            code={otp}
+            onCodeChanged={e => setOtp(e)}
+            ref={inputRef}
+            pinCount={6}
+            style={{width: '98%', height: 60}}
+            codeInputFieldStyle={{borderColor: '#49454F', color: '#323232'}}
+            codeInputHighlightStyle={{borderColor: '#3460D7'}}
+          />
+          {timer == 0 ? (
+            <TouchableOpacity onPress={() => setTimer(5)}>
+              <Text
+                style={{marginTop: 10, fontWeight: '500', color: '#3460D7'}}>
+                Resend OTP
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <Text style={{marginTop: 10, fontWeight: '500', color: '#828282'}}>
+              RESEND OTP IN {timer} SECONDS
+            </Text>
+          )}
+        </View>
       </View>
       <View style={{flexDirection: 'row'}}>
         <TouchableOpacity
@@ -157,99 +268,31 @@ const Step2 = props => {
             borderWidth: 1,
             marginRight: 10,
           }}
-          onPress={() => setStep(1)}>
+          onPress={() => !loading && setStep(1)}>
           <Text style={{color: '#3460D7', textAlign: 'center'}}>
             Edit number
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.button_blue_disabled, {flex: 1}]}
-          onPress={() => setStep(3)}>
-          <Text style={styles.button_blue_text_disabled}>Verify</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
-  );
-};
-
-const Step3 = props => {
-  const {setStep} = props;
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={{flex: 1}}>
-        <Text style={styles.heading}>Enter your details</Text>
-        <View style={styles.inputContainer}>
-          <MaterialIcons name="person-outline" size={26} color="#1C1B1F" />
-          <TextInput style={styles.textField} placeholder="First name" />
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput style={styles.textField} placeholder="Last name" />
-        </View>
-        <View style={styles.inputContainer}>
-          <MaterialCommunityIcons
-            name="email-outline"
-            size={24}
-            color="black"
-          />
-          <TextInput style={styles.textField} placeholder="E mail-id" />
-        </View>
-      </View>
-
-      <View>
-        <TouchableOpacity style={styles.button_blue} onPress={() => setStep(4)}>
-          <Text style={styles.button_blue_text}>Continue</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
-  );
-};
-
-const Step4 = props => {
-  const {setStep} = props;
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={{flex: 1}}>
-        <Text style={styles.heading}>Enter your details</Text>
-        <View style={{flexDirection: 'row'}}>
-          <MaterialIcons name="redeem" size={24} color="black" />
-          <View style={{width: '95%'}}>
-            <TextInput style={styles.textField} placeholder="Date of birth" />
-            <Text style={{marginLeft: 20, marginBottom: 20}}>dd/mm/yyyy</Text>
-          </View>
-        </View>
-        <View style={{flexDirection: 'row'}}>
-          <MaterialCommunityIcons
-            name="map-marker-outline"
-            size={26}
-            color="black"
-          />
-          <View style={{width: '95%'}}>
-            <TextInput style={styles.textField} placeholder="Place of birth" />
-            <Text style={{marginLeft: 20, marginBottom: 20}}>
-              Enter the place where you were born.
+          style={[
+            otp.length < 4 || loading
+              ? styles.button_blue_disabled
+              : styles.button_blue,
+            {flex: 1},
+          ]}
+          onPress={() => !loading && confirmCode()}>
+          {loading ? (
+            <ActivityIndicator color="#3460D7" />
+          ) : (
+            <Text
+              style={
+                otp.length == 6
+                  ? styles.button_blue_text
+                  : styles.button_blue_text_disabled
+              }>
+              Verify
             </Text>
-          </View>
-        </View>
-        <View style={{flexDirection: 'row'}}>
-          <MaterialCommunityIcons
-            name="clock-outline"
-            size={26}
-            color="black"
-          />
-          <View style={{width: '95%'}}>
-            <TextInput style={styles.textField} placeholder="Time of birth" />
-            <Text style={{marginLeft: 20}}>
-              Enter if you are sure of the time.
-            </Text>
-            <Text style={{marginLeft: 20, marginBottom: 20}}>
-              Note: Ask your parents.
-            </Text>
-          </View>
-        </View>
-      </View>
-      <View>
-        <TouchableOpacity style={styles.button_blue} onPress={() => setStep(4)}>
-          <Text style={styles.button_blue_text}>Continue</Text>
+          )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>

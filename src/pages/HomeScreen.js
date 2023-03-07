@@ -13,6 +13,8 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import LoginScreen from './LoginScreen.js';
 import IntroScreen from './IntroScreen.js';
+import OnBoardingScreen from './OnBoardingScreen';
+import Questionnaire from './Questionnaire';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -204,11 +206,11 @@ export default class HomeScreen extends React.Component {
 
   authStack() {
     return (
-      <Stack.Navigator
-        initialRouteName="Manage"
-        screenOptions={{headerShown: false}}>
+      <Stack.Navigator screenOptions={{headerShown: false}}>
         <Stack.Screen name="IntroScreen" component={IntroScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="OnBoarding" component={OnBoardingScreen} />
+        <Stack.Screen name="Questionnaire" component={Questionnaire} />
       </Stack.Navigator>
     );
   }
