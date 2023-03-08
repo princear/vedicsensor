@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 
 const OnBoardingScreen = ({navigation}) => {
-  const [onBoardingStep, setOnBoardingStep] = useState(1);
+  const [onBoardingStep, setOnBoardingStep] = useState(4);
   const [onBoardingDetails, setOnBoardingDetails] = useState({
     gender: '',
   });
@@ -261,10 +261,14 @@ const Step4 = props => {
   const {onBoardingStep, setOnBoardingStep, onBoardingDetails} = props;
 
   const [unit, setUnit] = useState({
-    height: 'ft/in', // [ft/in, cm]
-    weight: 'kg', // [kg, lbs]
+    // [ft/in, cm]
+    height: 'ft/in',
+    // [kg, lbs]
+    weight: 'kg',
   });
 
+  const [heightInteger, setHeightInteger] = useState(6);
+  const [heightDecimal, setHeightDecimal] = useState(7);
   return (
     <SafeAreaView style={styles.container}>
       {onBoardingStep > 1 && (
@@ -281,6 +285,9 @@ const Step4 = props => {
             style={styles.tab_text}
             keyboardType="numeric"
             placeholder="-"
+            value={`${heightInteger}.${heightDecimal}`}
+            editable={false}
+            selectTextOnFocus={false}
           />
           <View
             style={{
@@ -318,25 +325,37 @@ const Step4 = props => {
           </View>
         </View>
 
-        <View
-          style={{
-            marginTop: 20,
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'row',
-            position: 'relative',
-            height: 300,
-          }}>
+        <View style={styles.slider_container}>
           <View style={styles.slider_left_contianer}>
             <Slider
               style={styles.slider_left}
-              step={0.1}
+              step={1}
               minimumValue={0}
               maximumValue={12}
-              value={12}
+              value={heightInteger}
+              onValueChange={val => setHeightInteger(val)}
+              thumbTintColor="#FF8B8B"
               minimumTrackTintColor="#DCDCDC"
               maximumTrackTintColor="#DCDCDC"
             />
+            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((item, idx) => {
+              let left = 26.5;
+              return (
+                <View
+                  key={idx}
+                  style={[styles.dash_sm_left, {left: left + idx * 22}]}
+                />
+              );
+            })}
+            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((item, idx) => {
+              let left = 15.5;
+              return (
+                <View
+                  key={idx}
+                  style={[styles.dash_left, {left: left + idx * 22}]}
+                />
+              );
+            })}
           </View>
           <View>
             {onBoardingDetails.gender == 'male' ? (
@@ -360,13 +379,33 @@ const Step4 = props => {
           <View style={styles.slider_right_container}>
             <Slider
               style={styles.slider_right}
-              step={0.1}
+              step={1}
               minimumValue={0}
               maximumValue={12}
-              value={1}
+              thumbTintColor="#FF8B8B"
               minimumTrackTintColor="#DCDCDC"
               maximumTrackTintColor="#DCDCDC"
+              value={heightDecimal}
+              onValueChange={val => setHeightDecimal(val)}
             />
+            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((item, idx) => {
+              let left = 15.5;
+              return (
+                <View
+                  key={idx}
+                  style={[styles.dash_right, {left: left + idx * 22}]}
+                />
+              );
+            })}
+            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((item, idx) => {
+              let left = 26.5;
+              return (
+                <View
+                  key={idx}
+                  style={[styles.dash_sm_right, {left: left + idx * 22}]}
+                />
+              );
+            })}
           </View>
         </View>
       </View>
@@ -430,12 +469,49 @@ const Step5 = props => {
 };
 
 const styles = StyleSheet.create({
+  dash_left: {
+    width: 1,
+    height: 20,
+    backgroundColor: '#D9D9D9',
+    position: 'absolute',
+    top: 18,
+  },
+  dash_sm_left: {
+    width: 1,
+    height: 12,
+    backgroundColor: '#D9D9D9',
+    position: 'absolute',
+    top: 18,
+  },
+  dash_right: {
+    width: 1,
+    height: 20,
+    backgroundColor: '#D9D9D9',
+    position: 'absolute',
+    left: 37.5,
+    bottom: 18,
+  },
+  dash_sm_right: {
+    width: 1,
+    height: 12,
+    backgroundColor: '#d9d9d9',
+    position: 'absolute',
+    bottom: 18,
+  },
   arrow_back: {
     fontSize: 20,
     color: '#1C1B1F',
     position: 'absolute',
     top: -35,
     left: -4,
+  },
+  slider_container: {
+    marginTop: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    position: 'relative',
+    height: 300,
   },
   slider_left_contianer: {
     transform: [{rotate: '-90deg'}],
