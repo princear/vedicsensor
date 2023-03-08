@@ -5,6 +5,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Slider from '@react-native-community/slider';
+import {RadialSlider} from 'react-native-radial-slider';
 import {
   Text,
   StyleSheet,
@@ -261,14 +262,13 @@ const Step4 = props => {
   const {onBoardingStep, setOnBoardingStep, onBoardingDetails} = props;
 
   const [unit, setUnit] = useState({
-    // [ft/in, cm]
     height: 'ft/in',
-    // [kg, lbs]
     weight: 'kg',
   });
 
   const [heightInteger, setHeightInteger] = useState(6);
   const [heightDecimal, setHeightDecimal] = useState(7);
+  const [weight, setWeight] = useState(60);
   return (
     <SafeAreaView style={styles.container}>
       {onBoardingStep > 1 && (
@@ -406,6 +406,77 @@ const Step4 = props => {
                 />
               );
             })}
+          </View>
+        </View>
+      </View>
+
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+        }}>
+        <RadialSlider
+          isHideLines={true}
+          isHideMarkerLine={true}
+          isHideButtons={true}
+          isHideCenterContent={true}
+          isHideTailText={true}
+          sliderTrackColor="#D9D9D9"
+          sliderWidth={30}
+          thumbRadius={18}
+          thumbColor="#FF8B8B"
+          thumbBorderWidth={2}
+          //  linearGradient={{offset: '0%', color: '#ffaca6'}}
+          value={weight}
+          min={0}
+          max={200}
+          radius={110}
+          markerCircleColor="#FF8B8B"
+          onChange={wt => setWeight(wt)}
+        />
+
+        <View style={{alignItems: 'center', position: 'absolute', bottom: 60}}>
+          <TextInput
+            style={styles.tab_text}
+            keyboardType="numeric"
+            placeholder="-"
+            value={`${weight}`}
+            editable={false}
+            selectTextOnFocus={false}
+          />
+          <View
+            style={{
+              backgroundColor: '#DCDCDC',
+              flexDirection: 'row',
+              borderRadius: 16,
+            }}>
+            <TouchableOpacity
+              onPress={() => setUnit({...unit, weight: 'kg'})}
+              style={[
+                styles.tab,
+                {
+                  backgroundColor: unit.weight == 'kg' ? '#FF8B8B' : '#DCDCDC',
+                },
+              ]}>
+              <Text
+                style={{textAlign: 'center', color: '#323232', fontSize: 12}}>
+                Kg
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setUnit({...unit, weight: 'lbs'})}
+              style={[
+                styles.tab,
+                {
+                  backgroundColor: unit.weight == 'lbs' ? '#FF8B8B' : '#DCDCDC',
+                },
+              ]}>
+              <Text
+                style={{textAlign: 'center', color: '#323232', fontSize: 12}}>
+                Lbs
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>

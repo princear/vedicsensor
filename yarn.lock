@@ -7825,6 +7825,11 @@
   "resolved" "https://registry.npmjs.org/react-native-linear-gradient/-/react-native-linear-gradient-2.6.2.tgz"
   "version" "2.6.2"
 
+"react-native-radial-slider@^0.0.4":
+  "integrity" "sha512-GnPgu+b/4Z+c1j3d1ONnYefvOOjtKTYpX4zzQ/rF8EPsBlCkwzXYiGC/U07Au25QA8874j+SJnMEanyO7vAjCw=="
+  "resolved" "https://registry.npmjs.org/react-native-radial-slider/-/react-native-radial-slider-0.0.4.tgz"
+  "version" "0.0.4"
+
 "react-native-safe-area-context@*", "react-native-safe-area-context@^3.3.2", "react-native-safe-area-context@>= 3.0.0":
   "integrity" "sha512-yOwiiPJ1rk+/nfK13eafbpW6sKW0jOnsRem2C1LPJjM3tfTof6hlvV5eWHATye3XOpu2cJ7N+HdkUvUDGwFD2Q=="
   "resolved" "https://registry.npmjs.org/react-native-safe-area-context/-/react-native-safe-area-context-3.3.2.tgz"
