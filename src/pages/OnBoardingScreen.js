@@ -269,6 +269,9 @@ const Step4 = props => {
   const [heightInteger, setHeightInteger] = useState(6);
   const [heightDecimal, setHeightDecimal] = useState(7);
   const [weight, setWeight] = useState(60);
+
+  const len = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
   return (
     <SafeAreaView style={styles.container}>
       {onBoardingStep > 1 && (
@@ -338,24 +341,19 @@ const Step4 = props => {
               minimumTrackTintColor="#DCDCDC"
               maximumTrackTintColor="#DCDCDC"
             />
-            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((item, idx) => {
-              let left = 26.5;
-              return (
+
+            {len.map((item, idx) => (
+              <>
+                <View
+                  key={`${idx}large`}
+                  style={[styles.dash_sm_left, {left: 26.5 + idx * 22}]}
+                />
                 <View
                   key={idx}
-                  style={[styles.dash_sm_left, {left: left + idx * 22}]}
+                  style={[styles.dash_left, {left: 15.5 + idx * 22}]}
                 />
-              );
-            })}
-            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((item, idx) => {
-              let left = 15.5;
-              return (
-                <View
-                  key={idx}
-                  style={[styles.dash_left, {left: left + idx * 22}]}
-                />
-              );
-            })}
+              </>
+            ))}
           </View>
           <View>
             {onBoardingDetails.gender == 'male' ? (
@@ -388,24 +386,18 @@ const Step4 = props => {
               value={heightDecimal}
               onValueChange={val => setHeightDecimal(val)}
             />
-            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((item, idx) => {
-              let left = 15.5;
-              return (
+            {len.map((_, idx) => (
+              <>
                 <View
                   key={idx}
-                  style={[styles.dash_right, {left: left + idx * 22}]}
+                  style={[styles.dash_right, {left: 15.5 + idx * 22}]}
                 />
-              );
-            })}
-            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((item, idx) => {
-              let left = 26.5;
-              return (
                 <View
-                  key={idx}
-                  style={[styles.dash_sm_right, {left: left + idx * 22}]}
+                  key={`${idx}small`}
+                  style={[styles.dash_sm_right, {left: 26.5 + idx * 22}]}
                 />
-              );
-            })}
+              </>
+            ))}
           </View>
         </View>
       </View>
