@@ -8,6 +8,7 @@ import DeviceListScreen from './../device-list/DeviceListScreen';
 import HealthScreen from './../pages/HealthScreen.js';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -114,14 +115,22 @@ export default class HomeScreen extends React.Component {
     });
   }
 
+  //   NutritionStack
+  // Notification
+  // Profile
   tabBarIcon(route, {focused, color, size}) {
     let iconName;
-    if (route.name === 'HealthStack') {
-      iconName = focused ? 'heart-circle' : 'heart-circle-outline';
-    } else if (route.name === 'FitnessStack') {
-      iconName = 'meditation';
-    } else if (route.name === 'ManageStack') {
-      iconName = 'watch-variant';
+    if (route.name === 'HomeStack') {
+      iconName = focused ? 'home-variant' : 'home-outline';
+    } else if (route.name === 'ActivityStack') {
+      iconName = 'run-fast';
+    } else if (route.name === 'NutritionStack') {
+      iconName = focused ? 'food-apple' : 'food-apple-outline';
+    } else if (route.name === 'Notification') {
+      iconName = focused ? 'bell' : 'bell-outline';
+    } else if (route.name === 'Profile') {
+      iconName = focused ? 'person' : 'person-outline';
+      return <Ionicons name={iconName} size={size} color={color} />;
     }
     return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
   }
@@ -169,35 +178,59 @@ export default class HomeScreen extends React.Component {
       <Tab.Navigator
         initialRouteName="Feed"
         screenOptions={({route}) => ({
-          headerStyle: {backgroundColor: '#528f04'},
+          headerShown: false,
           headerTintColor: '#fff',
           headerTitleStyle: {fontWeight: 'bold'},
-          tabBarActiveTintColor: '#528f04',
+          tabBarActiveTintColor: '#000000',
           tabBarInactiveTintColor: 'gray',
           tabBarIcon: props => this.tabBarIcon(route, props),
+          tabBarStyle: {
+            backgroundColor: '#ffffff',
+            height: 60,
+          },
+          tabBarItemStyle: {
+            margin: 6,
+            borderRadius: 10,
+          },
         })}>
         <Tab.Screen
-          name="HealthStack"
+          name="HomeStack"
           component={this.HealthStack}
           options={{
-            tabBarLabel: 'Health',
-            title: 'Health',
+            tabBarLabel: 'Home',
+            title: 'Home',
           }}
         />
         <Tab.Screen
-          name="FitnessStack"
+          name="ActivityStack"
           component={this.HealthStack}
           options={{
-            tabBarLabel: 'Fitness',
-            title: 'Fitness',
+            tabBarLabel: 'Activity',
+            title: 'Activity',
           }}
         />
         <Tab.Screen
-          name="ManageStack"
+          name="NutritionStack"
           component={this.ManageStack}
           options={{
-            tabBarLabel: 'Manage',
-            title: 'Manage',
+            tabBarLabel: 'Nutrition',
+            title: 'Nutrition',
+          }}
+        />
+        <Tab.Screen
+          name="Notification"
+          component={this.ManageStack}
+          options={{
+            tabBarLabel: 'Notification',
+            title: 'Notification',
+          }}
+        />
+        <Tab.Screen
+          name="Profile"
+          component={this.ManageStack}
+          options={{
+            tabBarLabel: 'Profile',
+            title: 'Profile',
           }}
         />
       </Tab.Navigator>
@@ -219,7 +252,7 @@ export default class HomeScreen extends React.Component {
     return (
       <NativeBaseProvider>
         <NavigationContainer>
-          {this.state.signedin ? this.tabStack() : this.authStack()}
+          {!this.state.signedin ? this.tabStack() : this.authStack()}
         </NavigationContainer>
       </NativeBaseProvider>
     );
