@@ -27,9 +27,11 @@
     "react-native": "0.70.6",
     "react-native-bluetooth-classic": "^1.60.0-rc.24",
     "react-native-linear-gradient": "^2.6.2",
+    "react-native-radial-slider": "^0.0.4",
     "react-native-safe-area-context": "^3.3.2",
     "react-native-screens": "^3.19.0",
     "react-native-svg": "12.1.1",
+    "react-native-svg-transformer": "^1.0.0",
     "react-native-vector-icons": "^9.2.0"
   },
   "devDependencies": {

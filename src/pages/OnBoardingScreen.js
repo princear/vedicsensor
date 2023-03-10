@@ -5,6 +5,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Slider from '@react-native-community/slider';
+import {RadialSlider} from 'react-native-radial-slider';
 import {
   Text,
   StyleSheet,
@@ -15,7 +16,7 @@ import {
 } from 'react-native';
 
 const OnBoardingScreen = ({navigation}) => {
-  const [onBoardingStep, setOnBoardingStep] = useState(1);
+  const [onBoardingStep, setOnBoardingStep] = useState(4);
   const [onBoardingDetails, setOnBoardingDetails] = useState({
     gender: '',
   });
@@ -261,9 +262,15 @@ const Step4 = props => {
   const {onBoardingStep, setOnBoardingStep, onBoardingDetails} = props;
 
   const [unit, setUnit] = useState({
-    height: 'ft/in', // [ft/in, cm]
-    weight: 'kg', // [kg, lbs]
+    height: 'ft/in',
+    weight: 'kg',
   });
+
+  const [heightInteger, setHeightInteger] = useState(6);
+  const [heightDecimal, setHeightDecimal] = useState(7);
+  const [weight, setWeight] = useState(60);
+
+  const len = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -281,6 +288,9 @@ const Step4 = props => {
             style={styles.tab_text}
             keyboardType="numeric"
             placeholder="-"
+            value={`${heightInteger}.${heightDecimal}`}
+            editable={false}
+            selectTextOnFocus={false}
           />
           <View
             style={{
@@ -318,25 +328,32 @@ const Step4 = props => {
           </View>
         </View>
 
-        <View
-          style={{
-            marginTop: 20,
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'row',
-            position: 'relative',
-            height: 300,
-          }}>
+        <View style={styles.slider_container}>
           <View style={styles.slider_left_contianer}>
             <Slider
               style={styles.slider_left}
-              step={0.1}
+              step={1}
               minimumValue={0}
               maximumValue={12}
-              value={12}
+              value={heightInteger}
+              onValueChange={val => setHeightInteger(val)}
+              thumbTintColor="#FF8B8B"
               minimumTrackTintColor="#DCDCDC"
               maximumTrackTintColor="#DCDCDC"
             />
+
+            {len.map((item, idx) => (
+              <>
+                <View
+                  key={`${idx}large`}
+                  style={[styles.dash_sm_left, {left: 26.5 + idx * 22}]}
+                />
+                <View
+                  key={idx}
+                  style={[styles.dash_left, {left: 15.5 + idx * 22}]}
+                />
+              </>
+            ))}
           </View>
           <View>
             {onBoardingDetails.gender == 'male' ? (
@@ -360,13 +377,98 @@ const Step4 = props => {
           <View style={styles.slider_right_container}>
             <Slider
               style={styles.slider_right}
-              step={0.1}
+              step={1}
               minimumValue={0}
               maximumValue={12}
-              value={1}
+              thumbTintColor="#FF8B8B"
               minimumTrackTintColor="#DCDCDC"
               maximumTrackTintColor="#DCDCDC"
+              value={heightDecimal}
+              onValueChange={val => setHeightDecimal(val)}
             />
+            {len.map((_, idx) => (
+              <>
+                <View
+                  key={idx}
+                  style={[styles.dash_right, {left: 15.5 + idx * 22}]}
+                />
+                <View
+                  key={`${idx}small`}
+                  style={[styles.dash_sm_right, {left: 26.5 + idx * 22}]}
+                />
+              </>
+            ))}
+          </View>
+        </View>
+      </View>
+
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+        }}>
+        <RadialSlider
+          isHideLines={true}
+          isHideMarkerLine={true}
+          isHideButtons={true}
+          isHideCenterContent={true}
+          isHideTailText={true}
+          sliderTrackColor="#D9D9D9"
+          sliderWidth={30}
+          thumbRadius={18}
+          thumbColor="#FF8B8B"
+          thumbBorderWidth={2}
+          //  linearGradient={{offset: '0%', color: '#ffaca6'}}
+          value={weight}
+          min={0}
+          max={200}
+          radius={110}
+          markerCircleColor="#FF8B8B"
+          onChange={wt => setWeight(wt)}
+        />
+
+        <View style={{alignItems: 'center', position: 'absolute', bottom: 60}}>
+          <TextInput
+            style={styles.tab_text}
+            keyboardType="numeric"
+            placeholder="-"
+            value={`${weight}`}
+            editable={false}
+            selectTextOnFocus={false}
+          />
+          <View
+            style={{
+              backgroundColor: '#DCDCDC',
+              flexDirection: 'row',
+              borderRadius: 16,
+            }}>
+            <TouchableOpacity
+              onPress={() => setUnit({...unit, weight: 'kg'})}
+              style={[
+                styles.tab,
+                {
+                  backgroundColor: unit.weight == 'kg' ? '#FF8B8B' : '#DCDCDC',
+                },
+              ]}>
+              <Text
+                style={{textAlign: 'center', color: '#323232', fontSize: 12}}>
+                Kg
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setUnit({...unit, weight: 'lbs'})}
+              style={[
+                styles.tab,
+                {
+                  backgroundColor: unit.weight == 'lbs' ? '#FF8B8B' : '#DCDCDC',
+                },
+              ]}>
+              <Text
+                style={{textAlign: 'center', color: '#323232', fontSize: 12}}>
+                Lbs
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -430,12 +532,49 @@ const Step5 = props => {
 };
 
 const styles = StyleSheet.create({
+  dash_left: {
+    width: 1,
+    height: 20,
+    backgroundColor: '#D9D9D9',
+    position: 'absolute',
+    top: 18,
+  },
+  dash_sm_left: {
+    width: 1,
+    height: 12,
+    backgroundColor: '#D9D9D9',
+    position: 'absolute',
+    top: 18,
+  },
+  dash_right: {
+    width: 1,
+    height: 20,
+    backgroundColor: '#D9D9D9',
+    position: 'absolute',
+    left: 37.5,
+    bottom: 18,
+  },
+  dash_sm_right: {
+    width: 1,
+    height: 12,
+    backgroundColor: '#d9d9d9',
+    position: 'absolute',
+    bottom: 18,
+  },
   arrow_back: {
     fontSize: 20,
     color: '#1C1B1F',
     position: 'absolute',
     top: -35,
     left: -4,
+  },
+  slider_container: {
+    marginTop: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    position: 'relative',
+    height: 300,
   },
   slider_left_contianer: {
     transform: [{rotate: '-90deg'}],
