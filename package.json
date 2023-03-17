@@ -26,6 +26,7 @@
     "react": "18.1.0",
     "react-native": "0.70.6",
     "react-native-bluetooth-classic": "^1.60.0-rc.24",
+    "react-native-calendar-picker": "^7.1.4",
     "react-native-linear-gradient": "^2.6.2",
     "react-native-radial-slider": "^0.0.4",
     "react-native-safe-area-context": "^3.3.2",

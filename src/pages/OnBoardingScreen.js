@@ -13,10 +13,12 @@ import {
   View,
   TextInput,
   Image,
+  Modal,
 } from 'react-native';
+import CalendarPicker from 'react-native-calendar-picker';
 
 const OnBoardingScreen = ({navigation}) => {
-  const [onBoardingStep, setOnBoardingStep] = useState(4);
+  const [onBoardingStep, setOnBoardingStep] = useState(2);
   const [onBoardingDetails, setOnBoardingDetails] = useState({
     gender: '',
   });
@@ -103,6 +105,23 @@ const Step1 = props => {
 
 const Step2 = props => {
   const {onBoardingStep, setOnBoardingStep} = props;
+  const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <SafeAreaView style={styles.container}>
       {onBoardingStep > 1 && (
@@ -114,9 +133,14 @@ const Step2 = props => {
         <Text style={styles.heading}>Enter your details</Text>
         <View style={{flexDirection: 'row'}}>
           <MaterialIcons name="redeem" size={24} color="black" />
-          <View style={{width: '95%'}}>
+          <View onPress={() => setIsModalOpen(true)} style={{width: '95%'}}>
             <TextInput style={styles.textField} placeholder="Date of birth" />
             <Text style={{marginLeft: 20, marginBottom: 20}}>dd/mm/yyyy</Text>
+            <TouchableOpacity
+              onPress={() => setIsModalOpen(true)}
+              style={{position: 'absolute', top: 11, right: 25}}>
+              <MaterialIcons name="date-range" size={24} color="black" />
+            </TouchableOpacity>
           </View>
         </View>
         <View style={{flexDirection: 'row'}}>
@@ -156,6 +180,49 @@ const Step2 = props => {
           <Text style={styles.button_blue_text}>Continue</Text>
         </TouchableOpacity>
       </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isModalOpen}
+        onRequestClose={() => {}}>
+        <View style={{flex: 1, backgroundColor: '#00000099'}}>
+          <View style={styles.modal_content}>
+            <CalendarPicker
+              weekdays={weekdays}
+              months={months}
+              previousComponent={
+                <MaterialIcons name="chevron-left" size={28} color="black" />
+              }
+              nextComponent={
+                <MaterialIcons name="chevron-right" size={28} color="black" />
+              }
+              selectedDayColor="#3460D7"
+              selectedDayTextColor="#ffffff"
+              todayTextStyle="#000000"
+              onDateChange={() => {}}
+            />
+            <View
+              style={{
+                marginTop: 20,
+                paddingHorizontal: 30,
+                justifyContent: 'flex-end',
+                flexDirection: 'row',
+              }}>
+              <TouchableOpacity onPress={() => setIsModalOpen(false)}>
+                <Text style={{color: '#3460D7', fontWeight: '500'}}>
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{marginLeft: 40}}
+                onPress={() => setIsModalOpen(false)}>
+                <Text style={{color: '#3460D7', fontWeight: '500'}}>Ok</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -532,6 +599,15 @@ const Step5 = props => {
 };
 
 const styles = StyleSheet.create({
+  modal_content: {
+    position: 'absolute',
+    bottom: 0,
+    backgroundColor: '#ffffff',
+    height: 400,
+    paddingTop: 20,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+  },
   dash_left: {
     width: 1,
     height: 20,

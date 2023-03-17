@@ -252,7 +252,7 @@ export default class HomeScreen extends React.Component {
     return (
       <NativeBaseProvider>
         <NavigationContainer>
-          {!this.state.signedin ? this.tabStack() : this.authStack()}
+          {this.state.signedin ? this.tabStack() : this.authStack()}
         </NavigationContainer>
       </NativeBaseProvider>
     );
