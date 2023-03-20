@@ -16,6 +16,7 @@ import {
   Modal,
 } from 'react-native';
 import CalendarPicker from 'react-native-calendar-picker';
+import RNDateTimePicker from '@react-native-community/datetimepicker';
 
 const OnBoardingScreen = ({navigation}) => {
   const [onBoardingStep, setOnBoardingStep] = useState(2);
@@ -121,7 +122,12 @@ const Step2 = props => {
     'Dec',
   ];
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCalenderModalOpen, setIsCalenderModalOpen] = useState(false);
+  const [isTimeModalOpen, setIsTimeModalOpen] = useState(false);
+
+  const [timeOfBirth, setTimeOfBirth] = useState(new Date());
+  const [dateOfBirth, setDateOfBirth] = useState(new Date());
+
   return (
     <SafeAreaView style={styles.container}>
       {onBoardingStep > 1 && (
@@ -133,11 +139,13 @@ const Step2 = props => {
         <Text style={styles.heading}>Enter your details</Text>
         <View style={{flexDirection: 'row'}}>
           <MaterialIcons name="redeem" size={24} color="black" />
-          <View onPress={() => setIsModalOpen(true)} style={{width: '95%'}}>
+          <View
+            onPress={() => setIsCalenderModalOpen(true)}
+            style={{width: '95%'}}>
             <TextInput style={styles.textField} placeholder="Date of birth" />
             <Text style={{marginLeft: 20, marginBottom: 20}}>dd/mm/yyyy</Text>
             <TouchableOpacity
-              onPress={() => setIsModalOpen(true)}
+              onPress={() => setIsCalenderModalOpen(true)}
               style={{position: 'absolute', top: 11, right: 25}}>
               <MaterialIcons name="date-range" size={24} color="black" />
             </TouchableOpacity>
@@ -149,12 +157,12 @@ const Step2 = props => {
             size={26}
             color="black"
           />
-          <View style={{width: '95%'}}>
+          <TouchableOpacity style={{width: '95%'}}>
             <TextInput style={styles.textField} placeholder="Place of birth" />
             <Text style={{marginLeft: 20, marginBottom: 20}}>
               Enter the place where you were born.
             </Text>
-          </View>
+          </TouchableOpacity>
         </View>
         <View style={{flexDirection: 'row'}}>
           <MaterialCommunityIcons
@@ -163,7 +171,13 @@ const Step2 = props => {
             color="black"
           />
           <View style={{width: '95%'}}>
-            <TextInput style={styles.textField} placeholder="Time of birth" />
+            <TextInput
+              value=""
+              style={styles.textField}
+              placeholder="Time of birth"
+              onBlur={() => setIsTimeModalOpen(false)}
+              onFocus={() => setIsTimeModalOpen(true)}
+            />
             <Text style={{marginLeft: 20}}>
               Enter if you are sure of the time.
             </Text>
@@ -184,7 +198,7 @@ const Step2 = props => {
       <Modal
         animationType="slide"
         transparent={true}
-        visible={isModalOpen}
+        visible={isCalenderModalOpen}
         onRequestClose={() => {}}>
         <View style={{flex: 1, backgroundColor: '#00000099'}}>
           <View style={styles.modal_content}>
@@ -200,6 +214,7 @@ const Step2 = props => {
               selectedDayColor="#3460D7"
               selectedDayTextColor="#ffffff"
               todayTextStyle="#000000"
+              value={dateOfBirth}
               onDateChange={() => {}}
             />
             <View
@@ -209,20 +224,33 @@ const Step2 = props => {
                 justifyContent: 'flex-end',
                 flexDirection: 'row',
               }}>
-              <TouchableOpacity onPress={() => setIsModalOpen(false)}>
+              <TouchableOpacity onPress={() => setIsCalenderModalOpen(false)}>
                 <Text style={{color: '#3460D7', fontWeight: '500'}}>
                   Cancel
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={{marginLeft: 40}}
-                onPress={() => setIsModalOpen(false)}>
+                onPress={() => setIsCalenderModalOpen(false)}>
                 <Text style={{color: '#3460D7', fontWeight: '500'}}>Ok</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
+
+      {isTimeModalOpen && (
+        <RNDateTimePicker
+          display="clock"
+          mode="time"
+          positiveButton={{label: 'Done'}}
+          value={new Date()}
+          onChange={(event, date) => {
+            setTimeOfBirth(`${date.getHours()}:${date.getMinutes()}`);
+            setIsTimeModalOpen(false);
+          }}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -603,6 +631,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     backgroundColor: '#ffffff',
+    width: '100%',
     height: 400,
     paddingTop: 20,
     borderTopLeftRadius: 30,
