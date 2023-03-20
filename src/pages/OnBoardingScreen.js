@@ -17,12 +17,16 @@ import {
 } from 'react-native';
 import CalendarPicker from 'react-native-calendar-picker';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
+import moment from 'moment';
 
 const OnBoardingScreen = ({navigation}) => {
   const [onBoardingStep, setOnBoardingStep] = useState(2);
   const [onBoardingDetails, setOnBoardingDetails] = useState({
     gender: '',
   });
+
+  const [timeOfBirth, setTimeOfBirth] = useState(new Date());
+  const [dateOfBirth, setDateOfBirth] = useState(new Date());
 
   const renderOnBoadingSteps = () => {
     if (onBoardingStep == 1)
@@ -37,6 +41,10 @@ const OnBoardingScreen = ({navigation}) => {
         <Step2
           onBoardingStep={onBoardingStep}
           setOnBoardingStep={setOnBoardingStep}
+          timeOfBirth={timeOfBirth}
+          setTimeOfBirth={setTimeOfBirth}
+          dateOfBirth={dateOfBirth}
+          setDateOfBirth={setDateOfBirth}
         />
       );
     else if (onBoardingStep == 3)
@@ -105,7 +113,14 @@ const Step1 = props => {
 };
 
 const Step2 = props => {
-  const {onBoardingStep, setOnBoardingStep} = props;
+  const {
+    onBoardingStep,
+    setOnBoardingStep,
+    timeOfBirth,
+    setTimeOfBirth,
+    dateOfBirth,
+    setDateOfBirth,
+  } = props;
   const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   const months = [
     'Jan',
@@ -125,9 +140,6 @@ const Step2 = props => {
   const [isCalenderModalOpen, setIsCalenderModalOpen] = useState(false);
   const [isTimeModalOpen, setIsTimeModalOpen] = useState(false);
 
-  const [timeOfBirth, setTimeOfBirth] = useState(new Date());
-  const [dateOfBirth, setDateOfBirth] = useState(new Date());
-
   return (
     <SafeAreaView style={styles.container}>
       {onBoardingStep > 1 && (
@@ -142,7 +154,12 @@ const Step2 = props => {
           <View
             onPress={() => setIsCalenderModalOpen(true)}
             style={{width: '95%'}}>
-            <TextInput style={styles.textField} placeholder="Date of birth" />
+            <TextInput
+              style={styles.textField}
+              value={dateOfBirth}
+              onChangeText={e => setDateOfBirth(e)}
+              placeholder="Date of birth"
+            />
             <Text style={{marginLeft: 20, marginBottom: 20}}>dd/mm/yyyy</Text>
             <TouchableOpacity
               onPress={() => setIsCalenderModalOpen(true)}
@@ -172,7 +189,7 @@ const Step2 = props => {
           />
           <View style={{width: '95%'}}>
             <TextInput
-              value=""
+              value={timeOfBirth}
               style={styles.textField}
               placeholder="Time of birth"
               onBlur={() => setIsTimeModalOpen(false)}
@@ -215,7 +232,10 @@ const Step2 = props => {
               selectedDayTextColor="#ffffff"
               todayTextStyle="#000000"
               value={dateOfBirth}
-              onDateChange={() => {}}
+              onDateChange={event => {
+                let date = moment(event).format('DD/MM/YYYY');
+                setDateOfBirth(date);
+              }}
             />
             <View
               style={{
