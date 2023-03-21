@@ -22,9 +22,26 @@ import moment from 'moment';
 import Map from '../components/Map';
 
 const OnBoardingScreen = ({navigation}) => {
-  const [onBoardingStep, setOnBoardingStep] = useState(2);
+  const [onBoardingStep, setOnBoardingStep] = useState(1);
   const [onBoardingDetails, setOnBoardingDetails] = useState({
-    gender: '',
+    first_name: 'rohaan',
+    last_name: 'ansari',
+    email: 'rohaan@dataorc.in',
+    dob: '10/07/2001',
+    tob: '15:21', // 24 hrs format
+    pob: {
+      latitude: 28.62243758781894,
+      longitude: 77.2031226195395,
+    },
+    gender: 'male',
+    height: {
+      unit: 'ft/in',
+      value: '5.7',
+    },
+    weight: {
+      unit: 'kg',
+      value: '70',
+    },
   });
 
   const [timeOfBirth, setTimeOfBirth] = useState(new Date());
@@ -47,11 +64,15 @@ const OnBoardingScreen = ({navigation}) => {
         <Step1
           onBoardingStep={onBoardingStep}
           setOnBoardingStep={setOnBoardingStep}
+          onBoardingDetails={onBoardingDetails}
+          setOnBoardingDetails={setOnBoardingDetails}
         />
       );
     else if (onBoardingStep == 2)
       return (
         <Step2
+          onBoardingDetails={onBoardingDetails}
+          setOnBoardingDetails={setOnBoardingDetails}
           onBoardingStep={onBoardingStep}
           setOnBoardingStep={setOnBoardingStep}
           timeOfBirth={timeOfBirth}
@@ -88,6 +109,8 @@ const OnBoardingScreen = ({navigation}) => {
           navigation={navigation}
           onBoardingStep={onBoardingStep}
           setOnBoardingStep={setOnBoardingStep}
+          onBoardingDetails={onBoardingDetails}
+          setOnBoardingDetails={setOnBoardingDetails}
         />
       );
   };
@@ -96,17 +119,30 @@ const OnBoardingScreen = ({navigation}) => {
 };
 
 const Step1 = props => {
-  const {setOnBoardingStep} = props;
+  const {setOnBoardingStep, onBoardingDetails, setOnBoardingDetails} = props;
+  const handleChange = (k, v) => {
+    setOnBoardingDetails({...onBoardingDetails, [k]: v});
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={{flex: 1}}>
         <Text style={styles.heading}>Enter your details</Text>
         <View style={styles.inputContainer}>
           <MaterialIcons name="person-outline" size={26} color="#1C1B1F" />
-          <TextInput style={styles.textField} placeholder="First name" />
+          <TextInput
+            style={styles.textField}
+            placeholder="First name"
+            value={onBoardingDetails.first_name}
+            onChangeText={val => handleChange('first_name', val)}
+          />
         </View>
         <View style={styles.inputContainer}>
-          <TextInput style={styles.textField} placeholder="Last name" />
+          <TextInput
+            style={styles.textField}
+            placeholder="Last name"
+            value={onBoardingDetails.last_name}
+            onChangeText={val => handleChange('last_name', val)}
+          />
         </View>
         <View style={styles.inputContainer}>
           <MaterialCommunityIcons
@@ -114,7 +150,12 @@ const Step1 = props => {
             size={24}
             color="black"
           />
-          <TextInput style={styles.textField} placeholder="E mail-id" />
+          <TextInput
+            style={styles.textField}
+            placeholder="E mail-id"
+            value={onBoardingDetails.email}
+            onChangeText={val => handleChange('email', val)}
+          />
         </View>
       </View>
 
@@ -141,6 +182,8 @@ const Step2 = props => {
     setMarkerLatLng,
     region,
     setRegion,
+    onBoardingDetails,
+    setOnBoardingDetails,
   } = props;
   const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   const months = [
@@ -195,7 +238,13 @@ const Step2 = props => {
             color="black"
           />
           <View style={{width: '95%'}}>
-            <TextInput style={styles.textField} placeholder="Place of birth" />
+            <TextInput
+              style={styles.textField}
+              placeholder="Place of birth"
+              value={`Lat: ${markerLatLng.latitude.toFixed(
+                4,
+              )}, Lng: ${markerLatLng.longitude.toFixed(4)}`}
+            />
             <Text style={{marginLeft: 20, marginBottom: 20}}>
               Enter the place where you were born.
             </Text>
@@ -232,7 +281,18 @@ const Step2 = props => {
       <View>
         <TouchableOpacity
           style={styles.button_blue}
-          onPress={() => setOnBoardingStep(3)}>
+          onPress={() => {
+            setOnBoardingDetails({
+              ...onBoardingDetails,
+              dob: dateOfBirth,
+              tob: timeOfBirth,
+              pob: {
+                latitude: markerLatLng.latitude,
+                longitude: markerLatLng.longitude,
+              },
+            });
+            setOnBoardingStep(3);
+          }}>
           <Text style={styles.button_blue_text}>Continue</Text>
         </TouchableOpacity>
       </View>
@@ -425,7 +485,12 @@ const Step3 = props => {
 };
 
 const Step4 = props => {
-  const {onBoardingStep, setOnBoardingStep, onBoardingDetails} = props;
+  const {
+    onBoardingStep,
+    setOnBoardingStep,
+    onBoardingDetails,
+    setOnBoardingDetails,
+  } = props;
 
   const [unit, setUnit] = useState({
     height: 'ft/in',
@@ -435,7 +500,6 @@ const Step4 = props => {
   const [heightInteger, setHeightInteger] = useState(6);
   const [heightDecimal, setHeightDecimal] = useState(7);
   const [weight, setWeight] = useState(60);
-
   const len = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
   return (
@@ -641,7 +705,17 @@ const Step4 = props => {
 
       <TouchableOpacity
         style={[styles.button_blue]}
-        onPress={() => setOnBoardingStep(5)}>
+        onPress={() => {
+          setOnBoardingDetails({
+            ...onBoardingDetails,
+            height: {
+              unit: unit.height,
+              value: `${heightInteger}.${heightDecimal}`,
+            },
+            weight: {unit: unit.weight, value: weight},
+          });
+          setOnBoardingStep(5);
+        }}>
         <Text style={styles.button_blue_text}>Done</Text>
       </TouchableOpacity>
     </SafeAreaView>
@@ -649,7 +723,13 @@ const Step4 = props => {
 };
 
 const Step5 = props => {
-  const {navigation, onBoardingStep, setOnBoardingStep} = props;
+  const {
+    navigation,
+    onBoardingStep,
+    setOnBoardingStep,
+    onBoardingDetails,
+    setOnBoardingDetails,
+  } = props;
   const animation = useRef();
 
   useEffect(() => {
@@ -703,8 +783,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: '#ffffff',
     width: '100%',
-    height: 400,
-    paddingTop: 20,
+    height: 450,
+    paddingTop: 40,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
   },
