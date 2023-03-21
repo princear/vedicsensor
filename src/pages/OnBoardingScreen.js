@@ -4,6 +4,7 @@ import LottieView from 'lottie-react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Slider from '@react-native-community/slider';
 import {RadialSlider} from 'react-native-radial-slider';
 import {
@@ -18,6 +19,7 @@ import {
 import CalendarPicker from 'react-native-calendar-picker';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
+import Map from '../components/Map';
 
 const OnBoardingScreen = ({navigation}) => {
   const [onBoardingStep, setOnBoardingStep] = useState(2);
@@ -27,6 +29,17 @@ const OnBoardingScreen = ({navigation}) => {
 
   const [timeOfBirth, setTimeOfBirth] = useState(new Date());
   const [dateOfBirth, setDateOfBirth] = useState(new Date());
+
+  const [markerLatLng, setMarkerLatLng] = useState({
+    latitude: 28.62243758781894,
+    longitude: 77.2031226195395,
+  });
+  const [region, setRegion] = useState({
+    latitude: 28.62243758781894,
+    longitude: 77.2031226195395,
+    latitudeDelta: 0.822,
+    longitudeDelta: 0.621,
+  });
 
   const renderOnBoadingSteps = () => {
     if (onBoardingStep == 1)
@@ -45,6 +58,10 @@ const OnBoardingScreen = ({navigation}) => {
           setTimeOfBirth={setTimeOfBirth}
           dateOfBirth={dateOfBirth}
           setDateOfBirth={setDateOfBirth}
+          markerLatLng={markerLatLng}
+          setMarkerLatLng={setMarkerLatLng}
+          region={region}
+          setRegion={setRegion}
         />
       );
     else if (onBoardingStep == 3)
@@ -120,6 +137,10 @@ const Step2 = props => {
     setTimeOfBirth,
     dateOfBirth,
     setDateOfBirth,
+    markerLatLng,
+    setMarkerLatLng,
+    region,
+    setRegion,
   } = props;
   const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   const months = [
@@ -139,6 +160,7 @@ const Step2 = props => {
 
   const [isCalenderModalOpen, setIsCalenderModalOpen] = useState(false);
   const [isTimeModalOpen, setIsTimeModalOpen] = useState(false);
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -151,9 +173,7 @@ const Step2 = props => {
         <Text style={styles.heading}>Enter your details</Text>
         <View style={{flexDirection: 'row'}}>
           <MaterialIcons name="redeem" size={24} color="black" />
-          <View
-            onPress={() => setIsCalenderModalOpen(true)}
-            style={{width: '95%'}}>
+          <View style={{width: '95%'}}>
             <TextInput
               style={styles.textField}
               value={dateOfBirth}
@@ -174,12 +194,17 @@ const Step2 = props => {
             size={26}
             color="black"
           />
-          <TouchableOpacity style={{width: '95%'}}>
+          <View style={{width: '95%'}}>
             <TextInput style={styles.textField} placeholder="Place of birth" />
             <Text style={{marginLeft: 20, marginBottom: 20}}>
               Enter the place where you were born.
             </Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setIsMapModalOpen(true)}
+              style={{position: 'absolute', top: 11, right: 25}}>
+              <Ionicons name="md-pin-sharp" size={24} color="black" />
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={{flexDirection: 'row'}}>
           <MaterialCommunityIcons
@@ -216,7 +241,7 @@ const Step2 = props => {
         animationType="slide"
         transparent={true}
         visible={isCalenderModalOpen}
-        onRequestClose={() => {}}>
+        onRequestClose={() => setIsCalenderModalOpen(false)}>
         <View style={{flex: 1, backgroundColor: '#00000099'}}>
           <View style={styles.modal_content}>
             <CalendarPicker
@@ -271,6 +296,32 @@ const Step2 = props => {
           }}
         />
       )}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isMapModalOpen}
+        onRequestClose={() => setIsMapModalOpen(false)}>
+        <View style={{flex: 1, backgroundColor: '#00000099'}}>
+          <View
+            style={[
+              styles.modal_content,
+              {height: 600, paddingTop: 0, overflow: 'hidden'},
+            ]}>
+            <Map
+              height={600}
+              markerLatLng={markerLatLng}
+              setMarkerLatLng={setMarkerLatLng}
+              region={region}
+              setRegion={setRegion}
+            />
+            <TouchableOpacity
+              style={{position: 'absolute', top: 12, right: 16}}
+              onPress={() => setIsMapModalOpen(false)}>
+              <Ionicons name="close" size={24} color="black" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
