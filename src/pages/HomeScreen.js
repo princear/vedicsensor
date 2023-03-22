@@ -240,10 +240,10 @@ export default class HomeScreen extends React.Component {
   authStack() {
     return (
       <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Screen name="Questionnaire" component={Questionnaire} />
         <Stack.Screen name="OnBoarding" component={OnBoardingScreen} />
         <Stack.Screen name="IntroScreen" component={IntroScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Questionnaire" component={Questionnaire} />
       </Stack.Navigator>
     );
   }
