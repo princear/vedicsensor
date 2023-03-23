@@ -1,15 +1,90 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import SittingSvg from '../../assets/sitting.svg';
+import WalkingDog from '../../assets/walking_my_dog.svg';
 import Slider from '@react-native-community/slider';
 import LinearGradient from 'react-native-linear-gradient';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Text, StyleSheet, TouchableOpacity, View} from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
+
+const ques = [
+  {
+    answered: false,
+    bgColor: '#3259CB',
+    question: 'How many hours a day do you spend sitting?',
+    helperText: 'Like sitting on a chair etc',
+    svg: <SittingSvg width={'100%'} height={'100%'} />, // or svg_url
+    type: 'slider',
+    min: {value: 0, label: '< 2 Hours'},
+    max: {value: 4, label: '5+ Hours'},
+    values: [
+      'Less than 2 hours',
+      '2-3 Hours',
+      '3-4 Hours',
+      '4-5 Hours',
+      '5 Hours +',
+    ],
+  },
+  {
+    answered: false,
+    bgColor: '#087C53',
+    question: 'How much physical activity is required by your job?',
+    helperText: 'Like gym or cycling',
+    svg: <WalkingDog width={'100%'} height={'100%'} />, // or svg_url
+    type: 'slider',
+    min: {value: 0, label: 'Not much'},
+    max: {value: 4, label: 'Intense'},
+    values: ['Not much', 'Moderate', 'Average', 'Intense', 'Very intense'],
+  },
+];
+
+const ans = [
+  {
+    question: 'How many hours a day do you spend sitting?',
+    answer: '3-4 Hours',
+    valueIndex: 1,
+  },
+  {
+    question: 'How much physical activity is required by your job?',
+    answer: 'Intense',
+    valueIndex: 2,
+  },
+];
 
 const Questionnaire = ({navigation}) => {
+  const [answers, setAnswers] = useState(ans);
+  const [questions, setQuestions] = useState(ques);
+  const [questionIndex, setQuestionIndex] = useState(0);
+
+  const [sliderValue, setSliderValue] = useState(0);
+  const offset = useSharedValue(0.8);
+
+  const animatedStyles = useAnimatedStyle(() => {
+    return {
+      transform: [{scale: withSpring(offset.value)}],
+    };
+  });
+
+  useEffect(() => {
+    if (answers[questionIndex].valueIndex == 0) offset.value = 0.8;
+    else if (answers[questionIndex].valueIndex == 1) offset.value = 1.3;
+    else if (answers[questionIndex].valueIndex == 2) offset.value = 1.8;
+    else if (answers[questionIndex].valueIndex == 3) offset.value = 2.3;
+    else if (answers[questionIndex].valueIndex == 4) offset.value = 2.8;
+  }, [answers[questionIndex].valueIndex]);
+
   return (
     <SafeAreaView style={{flex: 1, alignItems: 'center'}}>
-      <View style={styles.blue_curve}>
+      <View
+        style={[
+          styles.blue_curve,
+          {backgroundColor: questions[questionIndex].bgColor},
+        ]}>
         <View
           style={{
             flexDirection: 'row',
@@ -25,29 +100,86 @@ const Questionnaire = ({navigation}) => {
           </TouchableOpacity>
         </View>
         <View style={{marginTop: 24, marginBottom: 60}}>
-          <Text>Progress bar</Text>
+          {/* <Text>Progress bar</Text> */}
         </View>
         <View style={{width: '50%'}}>
           <Text style={styles.question}>
-            How many hours a day do you spend sitting?
+            {questions[questionIndex].question}
           </Text>
           <Text style={styles.info}>
-            (such as gardening, house cleaning etc)
+            {questions[questionIndex]?.helperText}
           </Text>
         </View>
       </View>
       <View style={styles.content}>
-        <SittingSvg style={styles.svg} width={200} height={150} />
+        <Animated.View style={[{width: 100, height: 100}, animatedStyles]}>
+          {/* <SittingSvg width={'100%'} height={'100%'} /> */}
+          {questions[questionIndex]?.svg}
+        </Animated.View>
+        <View style={{width: '100%', alignItems: 'center', marginTop: 80}}>
+          <Text
+            style={{
+              color: '#3259CB',
+              fontWeight: '700',
+              fontFamily: 'Poppins',
+            }}>
+            {questions[questionIndex]?.values[sliderValue]}
+          </Text>
+          <View style={{width: '80%', alignItems: 'center'}}>
+            <Slider
+              style={{width: '80%'}}
+              step={1}
+              minimumValue={questions[questionIndex]?.min?.value}
+              maximumValue={4}
+              value={answers[questionIndex]?.valueIndex}
+              onValueChange={val => {
+                setAnswers(
+                  answers.map(item =>
+                    item.question === questions[questionIndex].question
+                      ? {...item, valueIndex: val}
+                      : item,
+                  ),
+                );
+                //   setAnswers([{...answers, answers[questionIndex]["valueIndex"]: val}])
+                //   setAnswers([...answers, answers[questionIndex].valueIndex: val]);
+              }}
+              thumbTintColor="#67160F"
+              minimumTrackTintColor="#F94F41"
+              maximumTrackTintColor="#67160F"
+            />
+            <Text style={styles.label_left}>
+              {questions[questionIndex]?.min?.label}
+            </Text>
+            <Text style={styles.label_right}>
+              {questions[questionIndex]?.max?.label}
+            </Text>
+          </View>
+        </View>
       </View>
-      <View style={styles.bottom_buttons}>
-        <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}}>
-          <MaterialIcons name="chevron-left" size={28} color="black" />
-          <Text style={{color: '#1C1B1F', fontWeight: '500'}}>Previous</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}}>
-          <Text style={{color: '#1C1B1F', fontWeight: '500'}}>Next</Text>
-          <MaterialIcons name="chevron-right" size={28} color="black" />
-        </TouchableOpacity>
+      <View
+        style={[
+          styles.bottom_buttons,
+          {justifyContent: questionIndex == 0 ? 'flex-end' : 'space-between'},
+        ]}>
+        {questionIndex > 0 && (
+          <TouchableOpacity
+            style={{flexDirection: 'row', alignItems: 'center'}}
+            onPress={() => setQuestionIndex(0)}>
+            <MaterialIcons name="chevron-left" size={28} color="black" />
+            <Text style={{color: '#1C1B1F', fontWeight: '500'}}>Previous</Text>
+          </TouchableOpacity>
+        )}
+
+        {questionIndex < questions.length - 1 && (
+          <TouchableOpacity
+            style={{flexDirection: 'row', alignItems: 'center'}}
+            onPress={() => {
+              setQuestionIndex(1);
+            }}>
+            <Text style={{color: '#1C1B1F', fontWeight: '500'}}>Next</Text>
+            <MaterialIcons name="chevron-right" size={28} color="black" />
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -137,12 +269,28 @@ const styles = StyleSheet.create({
   },
   content: {
     position: 'relative',
-    //  backgroundColor: 'lightpink',
     flex: 1,
     width: '100%',
     alignItems: 'center',
+    paddingTop: 70,
   },
-  svg: {marginTop: 40},
+  svg: {marginTop: 0},
+  label_left: {
+    fontWeight: '700',
+    fontSize: 12,
+    fontFamily: 'Poppins',
+    position: 'absolute',
+    left: 20,
+    bottom: -20,
+  },
+  label_right: {
+    fontWeight: '700',
+    fontSize: 12,
+    fontFamily: 'Poppins',
+    position: 'absolute',
+    right: 20,
+    bottom: -20,
+  },
   bottom_buttons: {
     width: '100%',
     height: 80,
