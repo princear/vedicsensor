@@ -1,16 +1,25 @@
 import React, {useEffect, useState} from 'react';
 import SittingSvg from '../../assets/sitting.svg';
 import WalkingDog from '../../assets/walking_my_dog.svg';
+import StruggleSvg from '../../assets/struggle.svg';
 import Slider from '@react-native-community/slider';
 import LinearGradient from 'react-native-linear-gradient';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {Text, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Pressable,
+} from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
+
+// question types - slider, tap, yes/no, select, multi select,
 
 const ques = [
   {
@@ -35,8 +44,19 @@ const ques = [
     bgColor: '#087C53',
     question: 'How much physical activity is required by your job?',
     helperText: 'Like gym or cycling',
-    svg: <WalkingDog width={'100%'} height={'100%'} />, // or svg_url
+    svg: <WalkingDog width={'100%'} height={'100%'} />,
     type: 'slider',
+    min: {value: 0, label: 'Not much'},
+    max: {value: 4, label: 'Intense'},
+    values: ['Not much', 'Moderate', 'Average', 'Intense', 'Very intense'],
+  },
+  {
+    answered: false,
+    bgColor: '#3259CB',
+    question: 'How much effort do you believe you normally put in?',
+    helperText: '(1 means very little while 5 means great deal of effort)',
+    svg: <StruggleSvg width={60} height={60} />,
+    type: 'scale',
     min: {value: 0, label: 'Not much'},
     max: {value: 4, label: 'Intense'},
     values: ['Not much', 'Moderate', 'Average', 'Intense', 'Very intense'],
@@ -54,6 +74,10 @@ const ans = [
     answer: 'Intense',
     valueIndex: 2,
   },
+  {
+    question: 'How much effort do you believe you normally put in?',
+    answer: 3,
+  },
 ];
 
 const Questionnaire = ({navigation}) => {
@@ -61,9 +85,9 @@ const Questionnaire = ({navigation}) => {
   const [questions, setQuestions] = useState(ques);
   const [questionIndex, setQuestionIndex] = useState(0);
 
-  const [sliderValue, setSliderValue] = useState(0);
-  const offset = useSharedValue(0.8);
+  const [value, setValue] = useState(0);
 
+  const offset = useSharedValue(0.8);
   const animatedStyles = useAnimatedStyle(() => {
     return {
       transform: [{scale: withSpring(offset.value)}],
@@ -71,6 +95,7 @@ const Questionnaire = ({navigation}) => {
   });
 
   useEffect(() => {
+    if (questions[questionIndex].type !== 'slider') return;
     if (answers[questionIndex].valueIndex == 0) offset.value = 0.8;
     else if (answers[questionIndex].valueIndex == 1) offset.value = 1.3;
     else if (answers[questionIndex].valueIndex == 2) offset.value = 1.8;
@@ -78,6 +103,163 @@ const Questionnaire = ({navigation}) => {
     else if (answers[questionIndex].valueIndex == 4) offset.value = 2.8;
   }, [answers[questionIndex].valueIndex]);
 
+  const renderQuestion = question => {
+    if (question.type === 'slider') {
+      return (
+        <View style={styles.content}>
+          <Animated.View style={[{width: 100, height: 100}, animatedStyles]}>
+            {questions[questionIndex]?.svg}
+          </Animated.View>
+          <View style={{width: '100%', alignItems: 'center', marginTop: 80}}>
+            <Text
+              style={{
+                color: '#3259CB',
+                fontWeight: '700',
+                fontFamily: 'Poppins',
+                textTransform: 'uppercase',
+              }}>
+              {
+                questions[questionIndex]?.values[
+                  answers[questionIndex]?.valueIndex
+                ]
+              }
+            </Text>
+            <View style={{width: '80%', alignItems: 'center'}}>
+              <Slider
+                style={{width: '80%'}}
+                step={1}
+                minimumValue={questions[questionIndex]?.min?.value}
+                maximumValue={4}
+                value={answers[questionIndex]?.valueIndex}
+                onValueChange={val => {
+                  setAnswers(
+                    answers.map(item =>
+                      item.question === questions[questionIndex].question
+                        ? {
+                            ...item,
+                            answer: questions[questionIndex]?.values[val],
+                            valueIndex: val,
+                          }
+                        : item,
+                    ),
+                  );
+                }}
+                thumbTintColor="#67160F"
+                minimumTrackTintColor="#F94F41"
+                maximumTrackTintColor="#67160F"
+              />
+              <Text style={styles.label_left}>
+                {questions[questionIndex]?.min?.label}
+              </Text>
+              <Text style={styles.label_right}>
+                {questions[questionIndex]?.max?.label}
+              </Text>
+            </View>
+          </View>
+        </View>
+      );
+    } else if (question.type === 'scale') {
+      let value = answers[questionIndex].answer;
+      const handleChange = newValue => {
+        setAnswers(
+          answers.map(item =>
+            item.question === questions[questionIndex].question
+              ? {...item, answer: newValue}
+              : item,
+          ),
+        );
+      };
+      return (
+        <View style={styles.content}>
+          <StruggleSvg width={100} height={100} />
+          <View style={{marginTop: 30, flexDirection: 'row'}}>
+            <Pressable
+              style={[
+                styles.left_rounded_box,
+                {
+                  backgroundColor: value >= 1 ? '#FFB8B2' : '#D9D9D9',
+                },
+              ]}
+              onPress={() => handleChange(1)}>
+              <Text
+                style={[
+                  styles.box_text,
+                  {
+                    color: value >= 1 ? '#3259CB' : '#BFBFBF',
+                  },
+                ]}>
+                1
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[
+                styles.square_box,
+                {
+                  backgroundColor: value >= 2 ? '#FF9D95' : '#D9D9D9',
+                },
+              ]}
+              onPress={() => handleChange(2)}>
+              <Text
+                style={[
+                  styles.box_text,
+                  {
+                    color: value >= 2 ? '#3259CB' : '#BFBFBF',
+                  },
+                ]}>
+                2
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[
+                styles.square_box,
+                {
+                  backgroundColor: value >= 3 ? '#FF857B' : '#D9D9D9',
+                },
+              ]}
+              onPress={() => handleChange(3)}>
+              <Text
+                style={[
+                  styles.box_text,
+                  {
+                    color: value >= 3 ? '#3259CB' : '#BFBFBF',
+                  },
+                ]}>
+                3
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[
+                styles.square_box,
+                {backgroundColor: value >= 4 ? '#FF6D61' : '#D9D9D9'},
+              ]}
+              onPress={() => handleChange(4)}>
+              <Text
+                style={[
+                  styles.box_text,
+                  {color: value >= 4 ? '#3259CB' : '#BFBFBF'},
+                ]}>
+                4
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[
+                styles.right_rounded_box,
+                {backgroundColor: value >= 5 ? '#F94F41' : '#D9D9D9'},
+              ]}
+              onPress={() => handleChange(5)}>
+              <Text
+                style={[
+                  styles.box_text,
+                  {color: value >= 5 ? '#3259CB' : '#BFBFBF'},
+                ]}>
+                5
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      );
+    }
+  };
   return (
     <SafeAreaView style={{flex: 1, alignItems: 'center'}}>
       <View
@@ -95,7 +277,9 @@ const Questionnaire = ({navigation}) => {
             style={{color: 'white', fontWeight: '600', fontFamily: 'poppins'}}>
             Physical Activity
           </Text>
-          <TouchableOpacity style={{position: 'absolute', right: 10}}>
+          <TouchableOpacity
+            onPress={() => console.log(answers)}
+            style={{position: 'absolute', right: 10}}>
             <MaterialIcons name="close" size={20} color="white" />
           </TouchableOpacity>
         </View>
@@ -111,51 +295,7 @@ const Questionnaire = ({navigation}) => {
           </Text>
         </View>
       </View>
-      <View style={styles.content}>
-        <Animated.View style={[{width: 100, height: 100}, animatedStyles]}>
-          {/* <SittingSvg width={'100%'} height={'100%'} /> */}
-          {questions[questionIndex]?.svg}
-        </Animated.View>
-        <View style={{width: '100%', alignItems: 'center', marginTop: 80}}>
-          <Text
-            style={{
-              color: '#3259CB',
-              fontWeight: '700',
-              fontFamily: 'Poppins',
-            }}>
-            {questions[questionIndex]?.values[sliderValue]}
-          </Text>
-          <View style={{width: '80%', alignItems: 'center'}}>
-            <Slider
-              style={{width: '80%'}}
-              step={1}
-              minimumValue={questions[questionIndex]?.min?.value}
-              maximumValue={4}
-              value={answers[questionIndex]?.valueIndex}
-              onValueChange={val => {
-                setAnswers(
-                  answers.map(item =>
-                    item.question === questions[questionIndex].question
-                      ? {...item, valueIndex: val}
-                      : item,
-                  ),
-                );
-                //   setAnswers([{...answers, answers[questionIndex]["valueIndex"]: val}])
-                //   setAnswers([...answers, answers[questionIndex].valueIndex: val]);
-              }}
-              thumbTintColor="#67160F"
-              minimumTrackTintColor="#F94F41"
-              maximumTrackTintColor="#67160F"
-            />
-            <Text style={styles.label_left}>
-              {questions[questionIndex]?.min?.label}
-            </Text>
-            <Text style={styles.label_right}>
-              {questions[questionIndex]?.max?.label}
-            </Text>
-          </View>
-        </View>
-      </View>
+      {renderQuestion(questions[questionIndex])}
       <View
         style={[
           styles.bottom_buttons,
@@ -164,7 +304,7 @@ const Questionnaire = ({navigation}) => {
         {questionIndex > 0 && (
           <TouchableOpacity
             style={{flexDirection: 'row', alignItems: 'center'}}
-            onPress={() => setQuestionIndex(0)}>
+            onPress={() => setQuestionIndex(questionIndex - 1)}>
             <MaterialIcons name="chevron-left" size={28} color="black" />
             <Text style={{color: '#1C1B1F', fontWeight: '500'}}>Previous</Text>
           </TouchableOpacity>
@@ -174,7 +314,7 @@ const Questionnaire = ({navigation}) => {
           <TouchableOpacity
             style={{flexDirection: 'row', alignItems: 'center'}}
             onPress={() => {
-              setQuestionIndex(1);
+              setQuestionIndex(questionIndex + 1);
             }}>
             <Text style={{color: '#1C1B1F', fontWeight: '500'}}>Next</Text>
             <MaterialIcons name="chevron-right" size={28} color="black" />
@@ -282,6 +422,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 20,
     bottom: -20,
+    textTransform: 'uppercase',
   },
   label_right: {
     fontWeight: '700',
@@ -290,6 +431,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 20,
     bottom: -20,
+    textTransform: 'uppercase',
   },
   bottom_buttons: {
     width: '100%',
@@ -300,6 +442,37 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
+  },
+  left_rounded_box: {
+    backgroundColor: '#D9D9D9',
+    height: 70,
+    width: 70,
+    borderTopLeftRadius: 50,
+    borderBottomLeftRadius: 50,
+    marginRight: 4,
+    alignItems: 'center',
+  },
+  square_box: {
+    backgroundColor: '#D9D9D9',
+    height: 70,
+    width: 70,
+    marginRight: 4,
+    alignItems: 'center',
+  },
+  right_rounded_box: {
+    backgroundColor: '#D9D9D9',
+    height: 70,
+    width: 70,
+    borderTopRightRadius: 50,
+    borderBottomRightRadius: 50,
+    alignItems: 'center',
+  },
+  box_text: {
+    color: '#BFBFBF',
+    fontFamily: 'Poppins',
+    fontWeight: '700',
+    position: 'absolute',
+    bottom: -30,
   },
 });
 
