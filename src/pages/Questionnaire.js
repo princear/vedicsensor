@@ -1,4 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
+import assets from '../../assets';
+import LottieView from 'lottie-react-native';
 import SittingSvg from '../../assets/sitting.svg';
 import WalkingDog from '../../assets/walking_my_dog.svg';
 import StruggleSvg from '../../assets/struggle.svg';
@@ -61,6 +63,15 @@ const ques = [
     max: {value: 4, label: 'Intense'},
     values: ['Not much', 'Moderate', 'Average', 'Intense', 'Very intense'],
   },
+  {
+    answered: false,
+    bgColor: '#3259CB',
+    question: 'Do you regularly enagage in physical activities?',
+    helperText: '',
+    svg: false,
+    animationName: 'basketBallPlaying',
+    type: 'yes/no',
+  },
 ];
 
 const ans = [
@@ -78,6 +89,10 @@ const ans = [
     question: 'How much effort do you believe you normally put in?',
     answer: 3,
   },
+  {
+    question: 'Do you regularly enagage in physical activities?',
+    answer: 'Yes',
+  },
 ];
 
 const Questionnaire = ({navigation}) => {
@@ -85,7 +100,11 @@ const Questionnaire = ({navigation}) => {
   const [questions, setQuestions] = useState(ques);
   const [questionIndex, setQuestionIndex] = useState(0);
 
-  const [value, setValue] = useState(0);
+  const animation = useRef(null);
+
+  useEffect(() => {
+    animation?.current?.play();
+  }, [questionIndex]);
 
   const offset = useSharedValue(0.8);
   const animatedStyles = useAnimatedStyle(() => {
@@ -255,6 +274,53 @@ const Questionnaire = ({navigation}) => {
                 5
               </Text>
             </Pressable>
+          </View>
+        </View>
+      );
+    } else if (question.type === 'yes/no') {
+      const handleChange = value => {
+        setAnswers(
+          answers.map(item =>
+            item.question === questions[questionIndex].question
+              ? {
+                  ...item,
+                  answer: value,
+                }
+              : item,
+          ),
+        );
+      };
+      return (
+        <View style={styles.content}>
+          {!questions[questionIndex].svg ? (
+            <View style={{height: 150, width: 150}}>
+              <LottieView
+                ref={animation}
+                autoplay={true}
+                loop={true}
+                source={
+                  assets.lottieFiles[questions[questionIndex].animationName]
+                }
+              />
+            </View>
+          ) : (
+            <View style={{height: 150, width: 100}}>
+              {questions[questionIndex]?.svg}
+            </View>
+          )}
+          <View style={styles.yes_no_container}>
+            <TouchableOpacity
+              style={styles.no}
+              onPress={() => handleChange('No')}>
+              <MaterialIcons name="close" size={24} color="#ffffff" />
+              <Text style={styles.yes_no_text}>No</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.yes}
+              onPress={() => handleChange('Yes')}>
+              <MaterialIcons name="check" size={24} color="#ffffff" />
+              <Text style={styles.yes_no_text}>Yes</Text>
+            </TouchableOpacity>
           </View>
         </View>
       );
@@ -473,6 +539,38 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     position: 'absolute',
     bottom: -30,
+  },
+  yes_no_container: {
+    marginTop: 40,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 60,
+  },
+  no: {
+    backgroundColor: '#F64072',
+    width: 50,
+    height: 50,
+    borderRadius: 200,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+  },
+  yes: {
+    backgroundColor: '#71CD74',
+    width: 50,
+    height: 50,
+    borderRadius: 200,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+  },
+  yes_no_text: {
+    color: '#323232',
+    fontWeight: '700',
+    fontFamily: 'Poppins',
+    position: 'absolute',
+    bottom: -25,
   },
 });
 
