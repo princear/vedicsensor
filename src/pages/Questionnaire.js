@@ -4,6 +4,7 @@ import LottieView from 'lottie-react-native';
 import SittingSvg from '../../assets/sitting.svg';
 import WalkingDog from '../../assets/walking_my_dog.svg';
 import StruggleSvg from '../../assets/struggle.svg';
+import Eyes from '../../assets/eyes.svg';
 import Slider from '@react-native-community/slider';
 import LinearGradient from 'react-native-linear-gradient';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -14,12 +15,14 @@ import {
   TouchableOpacity,
   View,
   Pressable,
+  Image,
 } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
+import {RadioButton} from 'react-native-paper';
 
 // question types - slider, tap, yes/no, select, multi select,
 
@@ -72,6 +75,84 @@ const ques = [
     animationName: 'basketBallPlaying',
     type: 'yes/no',
   },
+  {
+    answered: false,
+    bgColor: '#3259CB',
+    question: 'What color is the white part of your eye?',
+    helperText: '',
+    svg: false,
+    type: 'select',
+    options: [
+      {
+        label: 'Dry, non lustrous, cracked skin',
+        value: 'Dry, non lustrous, cracked skin',
+        img: false,
+      },
+      {
+        label: 'Smooth & clear skin without moles, freckles & dryness',
+        value: 'Smooth & clear skin without moles, freckles & dryness',
+        img: false,
+      },
+      {
+        label: 'Presence of moles, pimples, freckles',
+        value: 'Presence of moles, pimples, freckles',
+        img: false,
+      },
+    ],
+  },
+  {
+    answered: false,
+    bgColor: '#087C53',
+    question: 'What eye size do you possess?',
+    helperText: '',
+    svg: <Eyes height={100} width={100} />,
+    type: 'select',
+    options: [
+      {
+        label: 'Small eyes',
+        value: 'Small eyes',
+        img: false,
+      },
+      {
+        label: 'Medium eyes',
+        value: 'Medium eyes',
+        img: false,
+      },
+      {
+        label: 'Big eyes',
+        value: 'Big eyes',
+        img: false,
+      },
+    ],
+  },
+  {
+    answered: false,
+    bgColor: '#087C53',
+    question: 'What color is the white part of your eye?',
+    helperText: '',
+    svg: false,
+    type: 'select',
+    options: [
+      {
+        label: 'Dull or dusky',
+        value: 'Dull or dusky',
+        image_url:
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT35CdN_4kgwnFEp7p9j-MOqyTZ7vpvcQtCwg&usqp=CAU',
+      },
+      {
+        label: 'Coppery eyes',
+        value: 'Coppery eyes',
+        image_url:
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS39nMxRdl2Xu8fK0FmH1HfsRVcjdb2mOSyyw&usqp=CAU',
+      },
+      {
+        label: 'Milky white eyes',
+        value: 'Milky white eyes',
+        image_url:
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT41Scnys7uiVc_vtDPtx2bC9aMmacKlHYwwQ&usqp=CAU',
+      },
+    ],
+  },
 ];
 
 const ans = [
@@ -93,23 +174,37 @@ const ans = [
     question: 'Do you regularly enagage in physical activities?',
     answer: 'Yes',
   },
+  {
+    question: 'What color is the white part of your eye?',
+    answer: 'Dry, non lustrous, cracked skin',
+  },
+  {
+    question: 'What eye size do you possess?',
+    answer: 'Medium eyes',
+  },
+  {
+    question: 'What color is the white part of your eye?',
+    answer: 'Milky white eyes',
+  },
 ];
 
 const Questionnaire = ({navigation}) => {
   const [answers, setAnswers] = useState(ans);
   const [questions, setQuestions] = useState(ques);
-  const [questionIndex, setQuestionIndex] = useState(0);
+  const [questionIndex, setQuestionIndex] = useState(1);
 
   const animation = useRef(null);
 
   useEffect(() => {
-    animation?.current?.play();
+    if (!questions[questionIndex].svg) {
+      animation?.current?.play();
+    }
   }, [questionIndex]);
 
   const offset = useSharedValue(0.8);
   const animatedStyles = useAnimatedStyle(() => {
     return {
-      transform: [{scale: withSpring(offset.value)}],
+      transform: [{scale: withSpring(offset?.value)}],
     };
   });
 
@@ -321,6 +416,64 @@ const Questionnaire = ({navigation}) => {
               <MaterialIcons name="check" size={24} color="#ffffff" />
               <Text style={styles.yes_no_text}>Yes</Text>
             </TouchableOpacity>
+          </View>
+        </View>
+      );
+    } else if (question.type === 'select') {
+      return (
+        <View style={[styles.content, {paddingTop: 10}]}>
+          {questions[questionIndex]?.svg && (
+            <View style={{marginVertical: 20}}>
+              {questions[questionIndex]?.svg}
+            </View>
+          )}
+          <View
+            style={{
+              marginTop: 30,
+              paddingLeft: 20,
+              width: '100%',
+            }}>
+            <RadioButton.Group
+              onValueChange={value =>
+                setAnswers(
+                  answers.map(item =>
+                    item.question === questions[questionIndex].question
+                      ? {
+                          ...item,
+                          answer: value,
+                        }
+                      : item,
+                  ),
+                )
+              }
+              value={answers[questionIndex]?.answer}>
+              {questions[questionIndex]?.options?.map(item => (
+                <View style={styles.radio_row}>
+                  <RadioButton
+                    value={item?.value}
+                    color="#4789C7"
+                    uncheckedColor="#4789C7"
+                  />
+                  <Text
+                    style={[
+                      styles.radio_text,
+                      {width: item?.image_url ? '30%' : '63%'},
+                    ]}>
+                    {item?.label}
+                  </Text>
+                  {/* {item?.img && ( */}
+                  <Image
+                    style={{width: 100, height: 50, borderRadius: 10}}
+                    source={{
+                      uri: item.image_url,
+
+                      //  uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT35CdN_4kgwnFEp7p9j-MOqyTZ7vpvcQtCwg&usqp=CAU',
+                    }}
+                  />
+                  {/* )} */}
+                </View>
+              ))}
+            </RadioButton.Group>
           </View>
         </View>
       );
@@ -571,6 +724,20 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins',
     position: 'absolute',
     bottom: -25,
+  },
+  radio_row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  radio_text: {
+    fontFamily: 'Poppins',
+    fontSize: 15,
+    fontWeight: '600',
+    lineHeight: 25,
+    color: '#323232',
+    width: '63%',
+    marginHorizontal: 10,
   },
 });
 
