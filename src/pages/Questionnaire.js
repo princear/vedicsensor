@@ -5,6 +5,7 @@ import SittingSvg from '../../assets/sitting.svg';
 import WalkingDog from '../../assets/walking_my_dog.svg';
 import StruggleSvg from '../../assets/struggle.svg';
 import Eyes from '../../assets/eyes.svg';
+import HairsLess from '../../assets/hairs_dense.svg';
 import Slider from '@react-native-community/slider';
 import LinearGradient from 'react-native-linear-gradient';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -153,6 +154,63 @@ const ques = [
       },
     ],
   },
+  {
+    answered: false,
+    bgColor: '#087C53',
+    question:
+      'Choose the appropriate options for your hair type and condition.',
+    helperText: '',
+    svg: false,
+    type: 'multi-select',
+    options: [
+      {
+        label: 'Less dense hair',
+        value: 'Less dense hair',
+        image_url: <HairsLess />,
+      },
+      {
+        label: 'Dense hair',
+        value: 'Dense hair',
+        image_url: <HairsLess />,
+      },
+      {
+        label: 'Curly hair',
+        value: 'Curly hair',
+        image_url: <HairsLess />,
+      },
+      {
+        label: 'Grey hair before 35 years',
+        helper_label: '(more than 20%)',
+        value: 'Grey hair before 35 years',
+        image_url: <HairsLess />,
+      },
+    ],
+  },
+  {
+    answered: false,
+    bgColor: '#087C53',
+    question: 'How would you describe the size and texture of your teeth?',
+    helperText: '',
+    svg: false,
+    type: 'multi-select',
+    options: [
+      {
+        label: 'Dry/rough',
+        value: 'Dry/rough',
+        image_url: false,
+      },
+      {
+        label: 'Small size',
+        value: 'Small size',
+        image_url: false,
+      },
+      {
+        label: 'Big size',
+        value: 'Big size',
+        image_url: false,
+      },
+    ],
+  },
 ];
 
 const ans = [
@@ -186,19 +244,27 @@ const ans = [
     question: 'What color is the white part of your eye?',
     answer: 'Milky white eyes',
   },
+  {
+    question:
+      'Choose the appropriate options for your hair type and condition.',
+    answer: ['Dense hair'],
+  },
+  {
+    question: 'How would you describe the size and texture of your teeth?',
+    answer: ['Dry/rough'],
+  },
 ];
 
 const Questionnaire = ({navigation}) => {
   const [answers, setAnswers] = useState(ans);
   const [questions, setQuestions] = useState(ques);
-  const [questionIndex, setQuestionIndex] = useState(1);
+  const [questionIndex, setQuestionIndex] = useState(8);
 
   const animation = useRef(null);
 
   useEffect(() => {
-    if (!questions[questionIndex].svg) {
-      animation?.current?.play();
-    }
+    if (!Object.hasOwn(questions[questionIndex], 'animationName')) return;
+    animation?.current?.play();
   }, [questionIndex]);
 
   const offset = useSharedValue(0.8);
@@ -218,7 +284,7 @@ const Questionnaire = ({navigation}) => {
   }, [answers[questionIndex].valueIndex]);
 
   const renderQuestion = question => {
-    if (question.type === 'slider') {
+    if (false) {
       return (
         <View style={styles.content}>
           <Animated.View style={[{width: 100, height: 100}, animatedStyles]}>
@@ -272,7 +338,7 @@ const Questionnaire = ({navigation}) => {
           </View>
         </View>
       );
-    } else if (question.type === 'scale') {
+    } else if (false) {
       let value = answers[questionIndex].answer;
       const handleChange = newValue => {
         setAnswers(
@@ -372,7 +438,7 @@ const Questionnaire = ({navigation}) => {
           </View>
         </View>
       );
-    } else if (question.type === 'yes/no') {
+    } else if (false) {
       const handleChange = value => {
         setAnswers(
           answers.map(item =>
@@ -419,7 +485,7 @@ const Questionnaire = ({navigation}) => {
           </View>
         </View>
       );
-    } else if (question.type === 'select') {
+    } else if (false) {
       return (
         <View style={[styles.content, {paddingTop: 10}]}>
           {questions[questionIndex]?.svg && (
@@ -475,6 +541,63 @@ const Questionnaire = ({navigation}) => {
               ))}
             </RadioButton.Group>
           </View>
+        </View>
+      );
+    } else {
+      const handleChange = item => {
+        setAnswers(
+          answers.map(ans =>
+            ans.question === questions[questionIndex].question
+              ? {
+                  ...ans,
+                  answer: ans.answer.includes(item.value)
+                    ? ans.answer.filter(e => e !== item.value)
+                    : [...ans.answer, item.value],
+                }
+              : item,
+          ),
+        );
+      };
+      return (
+        <View style={[styles.content, {paddingHorizontal: 20}]}>
+          {questions[questionIndex]?.options.map(item => {
+            return (
+              <Pressable
+                style={styles.select_option}
+                onPress={() => handleChange(item)}>
+                {item.image_url && (
+                  <View style={{marginRight: 14}}>{item.image_url}</View>
+                )}
+                <View style={{flex: 1, justifyContent: 'center'}}>
+                  <Text style={styles.select_option_text}>{item?.label}</Text>
+                  {item.helper_label && (
+                    <Text style={[styles.select_option_text, {fontSize: 14}]}>
+                      {item?.helper_label}
+                    </Text>
+                  )}
+                </View>
+                {!answers[questionIndex]?.answer?.includes(item?.value) ? (
+                  <View
+                    style={{
+                      backgroundColor: '#3259CB',
+                      borderRadius: 50,
+                      padding: 4,
+                    }}>
+                    <MaterialIcons name="add" size={18} color="#C8EBFF" />
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      backgroundColor: '#087c52',
+                      borderRadius: 50,
+                      padding: 4,
+                    }}>
+                    <MaterialIcons name="check" size={18} color="#f2f2f2" />
+                  </View>
+                )}
+              </Pressable>
+            );
+          })}
         </View>
       );
     }
@@ -738,6 +861,25 @@ const styles = StyleSheet.create({
     color: '#323232',
     width: '63%',
     marginHorizontal: 10,
+  },
+  select_option: {
+    borderWidth: 0.5,
+    borderColor: '#000000',
+    borderRadius: 8,
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    backgroundColor: '#C8EBFF',
+    marginVertical: 4,
+    height: 70,
+  },
+  select_option_text: {
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'Poppins',
+    color: '#1C1B1F',
   },
 });
 
