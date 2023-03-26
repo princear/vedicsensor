@@ -23,7 +23,6 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import {RadioButton} from 'react-native-paper';
 
 // question types - slider, tap, yes/no, select, multi select,
 
@@ -32,7 +31,8 @@ const ques = [
     answered: false,
     bgColor: '#3259CB',
     question: 'How many hours a day do you spend sitting?',
-    helperText: 'Like sitting on a chair etc',
+    helperText: false,
+    helperSvg: false,
     svg: <SittingSvg width={'100%'} height={'100%'} />, // or svg_url
     type: 'slider',
     min: {value: 0, label: '< 2 Hours'},
@@ -75,31 +75,6 @@ const ques = [
     svg: false,
     animationName: 'basketBallPlaying',
     type: 'yes/no',
-  },
-  {
-    answered: false,
-    bgColor: '#3259CB',
-    question: 'What color is the white part of your eye?',
-    helperText: '',
-    svg: false,
-    type: 'select',
-    options: [
-      {
-        label: 'Dry, non lustrous, cracked skin',
-        value: 'Dry, non lustrous, cracked skin',
-        img: false,
-      },
-      {
-        label: 'Smooth & clear skin without moles, freckles & dryness',
-        value: 'Smooth & clear skin without moles, freckles & dryness',
-        img: false,
-      },
-      {
-        label: 'Presence of moles, pimples, freckles',
-        value: 'Presence of moles, pimples, freckles',
-        img: false,
-      },
-    ],
   },
   {
     answered: false,
@@ -186,31 +161,6 @@ const ques = [
       },
     ],
   },
-  {
-    answered: false,
-    bgColor: '#087C53',
-    question: 'How would you describe the size and texture of your teeth?',
-    helperText: '',
-    svg: false,
-    type: 'multi-select',
-    options: [
-      {
-        label: 'Dry/rough',
-        value: 'Dry/rough',
-        image_url: false,
-      },
-      {
-        label: 'Small size',
-        value: 'Small size',
-        image_url: false,
-      },
-      {
-        label: 'Big size',
-        value: 'Big size',
-        image_url: false,
-      },
-    ],
-  },
 ];
 
 const ans = [
@@ -233,10 +183,6 @@ const ans = [
     answer: 'Yes',
   },
   {
-    question: 'What color is the white part of your eye?',
-    answer: 'Dry, non lustrous, cracked skin',
-  },
-  {
     question: 'What eye size do you possess?',
     answer: 'Medium eyes',
   },
@@ -249,21 +195,20 @@ const ans = [
       'Choose the appropriate options for your hair type and condition.',
     answer: ['Dense hair'],
   },
-  {
-    question: 'How would you describe the size and texture of your teeth?',
-    answer: ['Dry/rough'],
-  },
+  //   {
+  //     question: 'How would you describe the size and texture of your teeth?',
+  //     answer: ['Small size'],
+  //   },
 ];
 
 const Questionnaire = ({navigation}) => {
   const [answers, setAnswers] = useState(ans);
   const [questions, setQuestions] = useState(ques);
-  const [questionIndex, setQuestionIndex] = useState(8);
+  const [questionIndex, setQuestionIndex] = useState(0);
 
   const animation = useRef(null);
 
   useEffect(() => {
-    if (!Object.hasOwn(questions[questionIndex], 'animationName')) return;
     animation?.current?.play();
   }, [questionIndex]);
 
@@ -281,15 +226,17 @@ const Questionnaire = ({navigation}) => {
     else if (answers[questionIndex].valueIndex == 2) offset.value = 1.8;
     else if (answers[questionIndex].valueIndex == 3) offset.value = 2.3;
     else if (answers[questionIndex].valueIndex == 4) offset.value = 2.8;
-  }, [answers[questionIndex].valueIndex]);
+  }, [answers[questionIndex]?.valueIndex]);
 
   const renderQuestion = question => {
-    if (false) {
+    if (question.type === 'slider') {
       return (
         <View style={styles.content}>
-          <Animated.View style={[{width: 100, height: 100}, animatedStyles]}>
-            {questions[questionIndex]?.svg}
-          </Animated.View>
+          <View>
+            <Animated.View style={[{width: 100, height: 100}, animatedStyles]}>
+              {questions[questionIndex]?.svg}
+            </Animated.View>
+          </View>
           <View style={{width: '100%', alignItems: 'center', marginTop: 80}}>
             <Text
               style={{
@@ -338,7 +285,7 @@ const Questionnaire = ({navigation}) => {
           </View>
         </View>
       );
-    } else if (false) {
+    } else if (question.type === 'scale') {
       let value = answers[questionIndex].answer;
       const handleChange = newValue => {
         setAnswers(
@@ -438,7 +385,7 @@ const Questionnaire = ({navigation}) => {
           </View>
         </View>
       );
-    } else if (false) {
+    } else if (question.type === 'yes/no') {
       const handleChange = value => {
         setAnswers(
           answers.map(item =>
@@ -485,7 +432,19 @@ const Questionnaire = ({navigation}) => {
           </View>
         </View>
       );
-    } else if (false) {
+    } else if (question.type === 'select') {
+      const handleChange = value => {
+        setAnswers(
+          answers.map(item =>
+            item.question === questions[questionIndex].question
+              ? {
+                  ...item,
+                  answer: value,
+                }
+              : item,
+          ),
+        );
+      };
       return (
         <View style={[styles.content, {paddingTop: 10}]}>
           {questions[questionIndex]?.svg && (
@@ -499,58 +458,44 @@ const Questionnaire = ({navigation}) => {
               paddingLeft: 20,
               width: '100%',
             }}>
-            <RadioButton.Group
-              onValueChange={value =>
-                setAnswers(
-                  answers.map(item =>
-                    item.question === questions[questionIndex].question
-                      ? {
-                          ...item,
-                          answer: value,
-                        }
-                      : item,
-                  ),
-                )
-              }
-              value={answers[questionIndex]?.answer}>
-              {questions[questionIndex]?.options?.map(item => (
-                <View style={styles.radio_row}>
-                  <RadioButton
-                    value={item?.value}
-                    color="#4789C7"
-                    uncheckedColor="#4789C7"
-                  />
-                  <Text
-                    style={[
-                      styles.radio_text,
-                      {width: item?.image_url ? '30%' : '63%'},
-                    ]}>
-                    {item?.label}
-                  </Text>
-                  {/* {item?.img && ( */}
+            {questions[questionIndex]?.options?.map(item => (
+              <View style={styles.radio_row}>
+                <TouchableOpacity
+                  style={styles.radio}
+                  onPress={() => handleChange(item.value)}>
+                  {answers[questionIndex].answer === item.value && (
+                    <View style={styles.radio_selected} />
+                  )}
+                </TouchableOpacity>
+                <Pressable
+                  onPress={() => handleChange(item.value)}
+                  style={[
+                    styles.radio_text,
+                    {width: item?.image_url ? '30%' : '63%'},
+                  ]}>
+                  <Text>{item?.label}</Text>
+                </Pressable>
+                {item?.image_url && (
                   <Image
                     style={{width: 100, height: 50, borderRadius: 10}}
                     source={{
                       uri: item.image_url,
-
-                      //  uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT35CdN_4kgwnFEp7p9j-MOqyTZ7vpvcQtCwg&usqp=CAU',
                     }}
                   />
-                  {/* )} */}
-                </View>
-              ))}
-            </RadioButton.Group>
+                )}
+              </View>
+            ))}
           </View>
         </View>
       );
-    } else {
+    } else if (question.type === 'multi-select') {
       const handleChange = item => {
         setAnswers(
           answers.map(ans =>
             ans.question === questions[questionIndex].question
               ? {
                   ...ans,
-                  answer: ans.answer.includes(item.value)
+                  answer: ans?.answer?.includes(item.value)
                     ? ans.answer.filter(e => e !== item.value)
                     : [...ans.answer, item.value],
                 }
@@ -620,7 +565,10 @@ const Questionnaire = ({navigation}) => {
             Physical Activity
           </Text>
           <TouchableOpacity
-            onPress={() => console.log(answers)}
+            onPress={() => {
+              //   console.warn(questionIndex);
+              console.log(answers[questionIndex]);
+            }}
             style={{position: 'absolute', right: 10}}>
             <MaterialIcons name="close" size={20} color="white" />
           </TouchableOpacity>
@@ -632,9 +580,16 @@ const Questionnaire = ({navigation}) => {
           <Text style={styles.question}>
             {questions[questionIndex].question}
           </Text>
-          <Text style={styles.info}>
-            {questions[questionIndex]?.helperText}
-          </Text>
+          {questions[questionIndex]?.helperText && (
+            <Text style={styles.info}>
+              {questions[questionIndex]?.helperText}
+            </Text>
+          )}
+          {questions[questionIndex]?.helperSvg && (
+            <View style={{alignItems: 'center', marginTop: 20}}>
+              {questions[questionIndex]?.helperSvg}
+            </View>
+          )}
         </View>
       </View>
       {renderQuestion(questions[questionIndex])}
@@ -852,6 +807,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 10,
+  },
+  radio: {
+    height: 20,
+    width: 20,
+    borderWidth: 1,
+    borderColor: '#4789C7',
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radio_selected: {
+    backgroundColor: '#4789C7',
+    height: '75%',
+    width: '75%',
+    borderRadius: 20,
   },
   radio_text: {
     fontFamily: 'Poppins',
