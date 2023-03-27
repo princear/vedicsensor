@@ -5,7 +5,6 @@
  * @format
  * @flow strict-local
  */
-
 import React, {useState, useEffect} from 'react';
 import type {Node} from 'react';
 import {

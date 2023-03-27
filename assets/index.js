@@ -8,6 +8,7 @@ const assets = {
     male: require('./male.json'),
     female: require('./female.json'),
     rollingCheck: require('./rolling-check-mark.json'),
+    basketBallPlaying: require('./basket-ball-playing.json'),
   },
   png: {
     boy: require('./boy.png'),
