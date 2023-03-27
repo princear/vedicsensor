@@ -458,8 +458,8 @@ const Questionnaire = ({navigation}) => {
               paddingLeft: 20,
               width: '100%',
             }}>
-            {questions[questionIndex]?.options?.map(item => (
-              <View style={styles.radio_row}>
+            {questions[questionIndex]?.options?.map((item, idx) => (
+              <View style={styles.radio_row} key={idx}>
                 <TouchableOpacity
                   style={styles.radio}
                   onPress={() => handleChange(item.value)}>
@@ -505,9 +505,10 @@ const Questionnaire = ({navigation}) => {
       };
       return (
         <View style={[styles.content, {paddingHorizontal: 20}]}>
-          {questions[questionIndex]?.options.map(item => {
+          {questions[questionIndex]?.options.map((item, idx) => {
             return (
               <Pressable
+                key={idx}
                 style={styles.select_option}
                 onPress={() => handleChange(item)}>
                 {item.image_url && (
