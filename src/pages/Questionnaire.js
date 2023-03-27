@@ -195,10 +195,6 @@ const ans = [
       'Choose the appropriate options for your hair type and condition.',
     answer: ['Dense hair'],
   },
-  //   {
-  //     question: 'How would you describe the size and texture of your teeth?',
-  //     answer: ['Small size'],
-  //   },
 ];
 
 const Questionnaire = ({navigation}) => {
@@ -227,6 +223,12 @@ const Questionnaire = ({navigation}) => {
     else if (answers[questionIndex].valueIndex == 3) offset.value = 2.3;
     else if (answers[questionIndex].valueIndex == 4) offset.value = 2.8;
   }, [answers[questionIndex]?.valueIndex]);
+
+  const targetIndex = answers.findIndex(
+    item => item.question === questions[questionIndex].question,
+  );
+
+  //   console.warn(answers);
 
   const renderQuestion = question => {
     if (question.type === 'slider') {
@@ -489,20 +491,25 @@ const Questionnaire = ({navigation}) => {
         </View>
       );
     } else if (question.type === 'multi-select') {
-      const handleChange = item => {
-        setAnswers(
-          answers.map(ans =>
-            ans.question === questions[questionIndex].question
-              ? {
-                  ...ans,
-                  answer: ans?.answer?.includes(item.value)
-                    ? ans.answer.filter(e => e !== item.value)
-                    : [...ans.answer, item.value],
-                }
-              : item,
-          ),
-        );
+      const handleChange = (question, newValue) => {
+        const index = answers.findIndex(obj => obj.question === question);
+        const foundObj = answers[index];
+        const foundItemIndex = foundObj.answer.indexOf(newValue);
+        if (foundItemIndex === -1) {
+          const updatedItems = [...foundObj.answer, newValue];
+          const updatedObj = {...foundObj, answer: updatedItems};
+          const updatedAnswer = [...answers];
+          updatedAnswer[index] = updatedObj;
+          setAnswers(updatedAnswer);
+        } else {
+          const updatedItems = foundObj.answer.filter(i => i !== newValue);
+          const updatedObj = {...foundObj, answer: updatedItems};
+          const updatedAnswer = [...answers];
+          updatedAnswer[index] = updatedObj;
+          setAnswers(updatedAnswer);
+        }
       };
+
       return (
         <View style={[styles.content, {paddingHorizontal: 20}]}>
           {questions[questionIndex]?.options.map((item, idx) => {
@@ -510,7 +517,9 @@ const Questionnaire = ({navigation}) => {
               <Pressable
                 key={idx}
                 style={styles.select_option}
-                onPress={() => handleChange(item)}>
+                onPress={() => {
+                  handleChange(questions[questionIndex].question, item.value);
+                }}>
                 {item.image_url && (
                   <View style={{marginRight: 14}}>{item.image_url}</View>
                 )}
