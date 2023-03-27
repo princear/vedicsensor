@@ -24,16 +24,16 @@ import Map from '../components/Map';
 const OnBoardingScreen = ({navigation}) => {
   const [onBoardingStep, setOnBoardingStep] = useState(1);
   const [onBoardingDetails, setOnBoardingDetails] = useState({
-    first_name: 'rohaan',
-    last_name: 'ansari',
-    email: 'rohaan@dataorc.in',
-    dob: '10/07/2001',
-    tob: '15:21', // 24 hrs format
+    first_name: '',
+    last_name: '',
+    email: '',
+    dob: '',
+    tob: '', // 24 hrs format
     pob: {
       latitude: 28.62243758781894,
       longitude: 77.2031226195395,
     },
-    gender: 'male',
+    gender: '',
     height: {
       unit: 'ft/in',
       value: '5.7',
