@@ -8,7 +8,6 @@ import {
   View,
   Text,
   SafeAreaView,
-  Image,
   Dimensions,
   ScrollView,
 } from 'react-native';
@@ -35,6 +34,7 @@ const HealthScreen = ({navigation}) => {
             <MaterialCommunityIcons name="menu" size={24} color="#1C1B1F" />
           </TouchableOpacity>
           <TouchableOpacity
+            onPress={() => navigation.navigate('DeviceListScreen')}
             style={{flexDirection: 'row', alignItems: 'center'}}>
             <Devices style={{marginRight: 8}} height={17} width={17} />
             <Text style={{color: '#3460D7', fontWeight: '500'}}>

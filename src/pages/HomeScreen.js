@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {createContext} from 'react';
 import {Box, NativeBaseProvider} from 'native-base';
 import RNBluetoothClassic from 'react-native-bluetooth-classic';
 //import getTheme from './native-base-theme/components';
@@ -16,6 +16,7 @@ import LoginScreen from './LoginScreen.js';
 import IntroScreen from './IntroScreen.js';
 import OnBoardingScreen from './OnBoardingScreen';
 import Questionnaire from './Questionnaire';
+import {BluetoothContext, AuthContext} from '../context';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -25,32 +26,17 @@ export default class HomeScreen extends React.Component {
     super(props);
 
     this.state = {
-      signedin: false,
+      isAuthenticated: false,
       device: undefined,
       bluetoothEnabled: true,
     };
   }
 
-  /**
-   * Sets the current device to the application state.  This is super basic
-   * and should be updated to allow for things like:
-   * - multiple devices
-   * - more advanced state management (redux)
-   * - etc
-   *
-   * @param device the BluetoothDevice selected or connected
-   */
   selectDevice = device => {
     console.log('App::selectDevice() called with: ', device);
     this.setState({device});
   };
 
-  /**
-   * On mount:
-   *
-   * - setup the connect and disconnect listeners
-   * - determine if bluetooth is enabled (may be redundant with listener)
-   */
   async componentDidMount() {
     console.log(
       'App::componentDidMount adding listeners: onBluetoothEnabled and onBluetoothDistabled',
@@ -68,10 +54,6 @@ export default class HomeScreen extends React.Component {
     this.checkBluetootEnabled();
   }
 
-  /**
-   * Performs check on bluetooth being enabled.  This removes the `setState()`
-   * from `componentDidMount()` and clears up lint issues.
-   */
   async checkBluetootEnabled() {
     try {
       console.log('App::componentDidMount Checking bluetooth status');
@@ -85,9 +67,6 @@ export default class HomeScreen extends React.Component {
     }
   }
 
-  /**
-   * Clear subscriptions
-   */
   componentWillUnmount() {
     console.log(
       'App:componentWillUnmount removing subscriptions: enabled and distabled',
@@ -99,11 +78,6 @@ export default class HomeScreen extends React.Component {
     this.disabledSubscription.remove();
   }
 
-  /**
-   * Handle state change events.
-   *
-   * @param stateChangedEvent event sent from Native side during state change
-   */
   onStateChanged(stateChangedEvent) {
     console.log(
       'App::onStateChanged event used for onBluetoothEnabled and onBluetoothDisabled',
@@ -115,9 +89,6 @@ export default class HomeScreen extends React.Component {
     });
   }
 
-  //   NutritionStack
-  // Notification
-  // Profile
   tabBarIcon(route, {focused, color, size}) {
     let iconName;
     if (route.name === 'HomeStack') {
@@ -135,30 +106,14 @@ export default class HomeScreen extends React.Component {
     return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
   }
 
-  renderHealthScreen() {
-    return (
-      <DeviceListScreen
-        bluetoothEnabled={this.state.bluetoothEnabled}
-        selectDevice={this.selectDevice}
-      />
-    );
-  }
-
-  renderSettingsScreen() {
-    return (
-      <ConnectionScreen
-        device={this.state.device}
-        onBack={() => this.setState({device: undefined})}
-      />
-    );
-  }
-
   HealthStack() {
     return (
       <Stack.Navigator
         initialRouteName="Health"
         screenOptions={{headerShown: false}}>
         <Stack.Screen name="Health" component={HealthScreen} />
+        <Stack.Screen name="DeviceListScreen" component={DeviceListScreen} />
+        <Stack.Screen name="ConnectionScreen" component={ConnectionScreen} />
       </Stack.Navigator>
     );
   }
@@ -248,30 +203,26 @@ export default class HomeScreen extends React.Component {
     );
   }
 
+  onBack() {
+    this.setState({device: undefined});
+  }
+
   render() {
     return (
-      <NativeBaseProvider>
-        <NavigationContainer>
-          {this.state.signedin ? this.tabStack() : this.authStack()}
-        </NavigationContainer>
-      </NativeBaseProvider>
-    );
-    return (
-      <NativeBaseProvider>
-        <Box>
-          {!this.state.device ? (
-            <DeviceListScreen
-              bluetoothEnabled={this.state.bluetoothEnabled}
-              selectDevice={this.selectDevice}
-            />
-          ) : (
-            <ConnectionScreen
-              device={this.state.device}
-              onBack={() => this.setState({device: undefined})}
-            />
-          )}
-        </Box>
-      </NativeBaseProvider>
+      <AuthContext.Provider
+        value={{isAuthenticated: this.state.isAuthenticated}}>
+        <BluetoothContext.Provider
+          value={{
+            selectDevice: this.selectDevice,
+            onBack: this.onBack,
+          }}>
+          <NativeBaseProvider>
+            <NavigationContainer>
+              {!this.state.isAuthenticated ? this.tabStack() : this.authStack()}
+            </NavigationContainer>
+          </NativeBaseProvider>
+        </BluetoothContext.Provider>
+      </AuthContext.Provider>
     );
   }
 }
