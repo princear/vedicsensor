@@ -1,12 +1,13 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Dimensions, TouchableOpacity} from 'react-native';
-import {Image, StyleSheet, Text, View} from 'react-native';
+import {Image, StyleSheet, View} from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import assets from '../../assets';
 import LottieView from 'lottie-react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import MyText from '../components/MyText';
 
 const data = [
   {
@@ -122,10 +123,10 @@ const IntroScreen = ({navigation}) => {
                 </View>
                 <View style={styles.content}>
                   <View style={styles.alignCenter}>
-                    <Text style={styles.title}>{data[index].heading}</Text>
-                    <Text style={styles.subtitle}>
+                    <MyText style={styles.title}>{data[index].heading}</MyText>
+                    <MyText style={styles.subtitle}>
                       {data[index].subHeading}
-                    </Text>
+                    </MyText>
                   </View>
                 </View>
               </>
@@ -161,7 +162,7 @@ const IntroScreen = ({navigation}) => {
         ]}>
         {introStep < 2 && (
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={{fontWeight: '300', color: '#000000'}}>Skip</Text>
+            <MyText style={{fontWeight: '300', color: '#000000'}}>Skip</MyText>
           </TouchableOpacity>
         )}
 
@@ -197,7 +198,7 @@ const IntroScreen = ({navigation}) => {
           <TouchableOpacity
             style={styles.button_blue}
             onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.button_blue_text}>Get Started</Text>
+            <MyText style={styles.button_blue_text}>Get Started</MyText>
           </TouchableOpacity>
         )}
       </View>
