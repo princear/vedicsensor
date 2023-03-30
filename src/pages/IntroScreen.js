@@ -1,10 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {TouchableOpacity} from 'react-native';
+import {Dimensions, TouchableOpacity} from 'react-native';
 import {Image, StyleSheet, Text, View} from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import assets from '../../assets';
 import LottieView from 'lottie-react-native';
+import Carousel from 'react-native-reanimated-carousel';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 const data = [
   {
@@ -25,16 +27,18 @@ const data = [
 ];
 
 const IntroScreen = ({navigation}) => {
+  const width = Dimensions.get('window').width;
   const animation = useRef(null);
   const basePath = '../../assets/';
-  const [introStep, setIntroStep] = useState(1);
+  const [introStep, setIntroStep] = useState(0);
 
   useEffect(() => {
     animation?.current?.play();
   }, [introStep]);
 
-  const renderAnimation = () => {
-    if (introStep == 1) {
+  const renderAnimation = index => {
+    animation?.current?.play();
+    if (index == 0) {
       return (
         <View
           style={{
@@ -52,7 +56,7 @@ const IntroScreen = ({navigation}) => {
           />
         </View>
       );
-    } else if (introStep == 2) {
+    } else if (index == 1) {
       return (
         <View
           style={{
@@ -70,7 +74,7 @@ const IntroScreen = ({navigation}) => {
           />
         </View>
       );
-    } else if (introStep == 3) {
+    } else if (index == 2) {
       return (
         <View style={{position: 'absolute', height: 300, width: '100%'}}>
           <LottieView
@@ -85,45 +89,83 @@ const IntroScreen = ({navigation}) => {
   };
 
   return (
-    <View style={{height: '100%'}}>
-      <View style={styles.imageContainer}>
-        {introStep > 1 && (
-          <TouchableOpacity onPress={() => setIntroStep(introStep - 1)}>
-            <MaterialIcons name="arrow-back" style={styles.arrow_back} />
+    <View style={{height: '100%', alignItems: 'center'}}>
+      {/* {introStep > 1 && (
+        <TouchableOpacity
+          onPress={() => {
+            setIntroStep(introStep - 1);
+            console.warn('TAPPED');
+          }}>
+          <MaterialIcons name="arrow-back" style={styles.arrow_back} />
+        </TouchableOpacity>
+      )} */}
+      <GestureHandlerRootView>
+        <Carousel
+          loop={false}
+          autoPlay={false}
+          width={width}
+          data={data}
+          scrollAnimationDuration={600}
+          onSnapToItem={index => {
+            setIntroStep(index);
+            animation?.current?.play();
+          }}
+          renderItem={({index, item}) => {
+            return (
+              <>
+                <View style={styles.imageContainer}>
+                  <Image
+                    style={styles.cloud}
+                    source={require(basePath + 'bg-blue.png')}
+                  />
+                  {renderAnimation(index)}
+                </View>
+                <View style={styles.content}>
+                  <View style={styles.alignCenter}>
+                    <Text style={styles.title}>{data[index].heading}</Text>
+                    <Text style={styles.subtitle}>
+                      {data[index].subHeading}
+                    </Text>
+                  </View>
+                </View>
+              </>
+            );
+          }}
+        />
+      </GestureHandlerRootView>
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+
+          position: 'absolute',
+          bottom: 160,
+        }}>
+        {[1, 2, 3].map((_, i) => {
+          return (
+            <View
+              key={i}
+              style={
+                introStep == i
+                  ? styles.active__bluedot
+                  : styles.inactive__bluedot
+              }
+            />
+          );
+        })}
+      </View>
+      <View
+        style={[
+          styles.footer_container,
+          {justifyContent: introStep == 2 ? 'flex-end' : 'space-between'},
+        ]}>
+        {introStep < 2 && (
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={{fontWeight: '300', color: '#000000'}}>Skip</Text>
           </TouchableOpacity>
         )}
-        <Image
-          style={styles.cloud}
-          source={require(basePath + 'bg-blue.png')}
-        />
-        {renderAnimation()}
-      </View>
-      <View style={styles.content}>
-        <View style={styles.alignCenter}>
-          <Text style={styles.title}>{data[introStep - 1].heading}</Text>
-          <Text style={styles.subtitle}>{data[introStep - 1].subHeading}</Text>
-          <View style={{display: 'flex', flexDirection: 'row', marginTop: 40}}>
-            {[1, 2, 3].map((item, i) => {
-              let activeIdx = introStep - 1;
-              return (
-                <View
-                  key={i}
-                  style={
-                    activeIdx == i
-                      ? styles.active__bluedot
-                      : styles.inactive__bluedot
-                  }
-                />
-              );
-            })}
-          </View>
-        </View>
-      </View>
-      <View style={styles.footer_container}>
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-          <Text style={{fontWeight: '300', color: '#000000'}}>Skip</Text>
-        </TouchableOpacity>
-        {introStep < 3 && (
+
+        {/* {introStep < 3 && (
           <TouchableOpacity onPress={() => setIntroStep(introStep + 1)}>
             <View
               style={{
@@ -133,7 +175,11 @@ const IntroScreen = ({navigation}) => {
                 justifyContent: 'space-between',
               }}>
               <Text
-                style={{fontWeight: '400', color: '#000000', marginBottom: 3}}>
+                style={{
+                  fontWeight: '400',
+                  color: '#000000',
+                  marginBottom: 3,
+                }}>
                 Next
               </Text>
               <Entypo
@@ -146,8 +192,8 @@ const IntroScreen = ({navigation}) => {
               />
             </View>
           </TouchableOpacity>
-        )}
-        {introStep == 3 && (
+        )} */}
+        {introStep == 2 && (
           <TouchableOpacity
             style={styles.button_blue}
             onPress={() => navigation.navigate('Login')}>
@@ -168,8 +214,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: '#1C1B1F',
     position: 'absolute',
-    top: -24,
-    left: 10,
+    top: 26,
+    left: 20,
   },
   cloud: {
     width: '100%',

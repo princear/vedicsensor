@@ -72,7 +72,7 @@ const HealthScreen = ({navigation}) => {
               style={{
                 position: 'relative',
                 alignItems: 'center',
-                width: 140,
+                width: 120,
                 height: 130,
               }}>
               <View style={styles.radial_container}>
@@ -127,8 +127,8 @@ const HealthScreen = ({navigation}) => {
                 </Text>
               </View>
             </View>
-            <View style={{justifyContent: 'center', marginLeft: 10}}>
-              <Text style={{width: 200, fontWeight: '400'}}>
+            <View style={{justifyContent: 'center', flex: 1}}>
+              <Text style={{width: '90%', fontWeight: '400'}}>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
                 eiusmod tempor..
               </Text>
@@ -179,6 +179,7 @@ const HealthScreen = ({navigation}) => {
 
 const Metrics = () => {
   const windowDimensions = Dimensions.get('window');
+
   return (
     <>
       <View
@@ -205,7 +206,7 @@ const Metrics = () => {
           justifyContent: 'space-between',
           marginBottom: 20,
         }}>
-        <View style={[styles.square, {width: windowDimensions.width - 235}]}>
+        <View style={[styles.square, {width: windowDimensions.width - 205}]}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <MaterialCommunityIcons
               name="cards-heart-outline"
@@ -238,7 +239,7 @@ const Metrics = () => {
             </Text>
           </View>
         </View>
-        <View style={[styles.square, {width: windowDimensions.width - 235}]}>
+        <View style={[styles.square, {width: windowDimensions.width - 205}]}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <O2 style={{marginRight: 10}} />
             <Text style={{fontSize: 12, color: '#323232'}}>Oxygen</Text>
@@ -268,7 +269,7 @@ const Metrics = () => {
         </View>
       </View>
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-        <View style={[styles.square, {width: windowDimensions.width - 235}]}>
+        <View style={[styles.square, {width: windowDimensions.width - 205}]}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <GlucosePoint style={{marginRight: 10}} />
             <Text style={{fontSize: 12, color: '#323232'}}>Blood glucose</Text>
@@ -297,7 +298,7 @@ const Metrics = () => {
           </View>
         </View>
 
-        <View style={[styles.square, {width: windowDimensions.width - 235}]}>
+        <View style={[styles.square, {width: windowDimensions.width - 205}]}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <FootPrint style={{marginRight: 10}} />
             <Text style={{fontSize: 12, color: '#323232'}}>Steps</Text>
@@ -338,7 +339,7 @@ const Card = ({title, details, Svg}) => {
             position: 'relative',
             alignItems: 'center',
             justifyContent: 'center',
-            width: 140,
+            width: 100,
             height: 90,
           }}>
           <Svg />
@@ -380,7 +381,7 @@ const styles = StyleSheet.create({
   container_blue_heading: {
     marginTop: 12,
     marginBottom: 6,
-    marginLeft: 30,
+    marginLeft: 20,
     fontSize: 20,
     fontWeight: '700',
     color: '#323232',

@@ -218,7 +218,7 @@ export default class HomeScreen extends React.Component {
           }}>
           <NativeBaseProvider>
             <NavigationContainer>
-              {!this.state.isAuthenticated ? this.tabStack() : this.authStack()}
+              {this.state.isAuthenticated ? this.tabStack() : this.authStack()}
             </NavigationContainer>
           </NativeBaseProvider>
         </BluetoothContext.Provider>
