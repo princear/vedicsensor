@@ -175,7 +175,7 @@ const Step2 = props => {
   } = props;
 
   const [loading, setLoading] = useState(false);
-  const [timer, setTimer] = useState(59);
+  const [timer, setTimer] = useState(30);
   const [otp, setOtp] = useState('');
 
   const interval = setInterval(() => {
@@ -231,7 +231,7 @@ const Step2 = props => {
     <SafeAreaView style={styles.container}>
       <View style={{flex: 1}}>
         <Text style={styles.heading}>Verify phone</Text>
-        <Text style={styles.subHeading}>Code is sent to {phone}</Text>
+        <Text style={styles.subHeading}>Code is sent to +91 {phone}</Text>
 
         <View
           style={{
@@ -248,15 +248,16 @@ const Step2 = props => {
         </View>
         <View style={{alignItems: 'center'}}>
           <OTPInputView
+            autoFocusOnLoad={false}
             code={otp}
             onCodeChanged={e => setOtp(e)}
-            pinCount={6}
+            pinCount={4}
             style={{width: '98%', height: 60}}
             codeInputFieldStyle={{borderColor: '#49454F', color: '#323232'}}
             codeInputHighlightStyle={{borderColor: '#3460D7'}}
           />
           {timer == 0 ? (
-            <TouchableOpacity onPress={() => setTimer(5)}>
+            <TouchableOpacity onPress={() => setTimer(30)}>
               <Text
                 style={{marginTop: 10, fontWeight: '500', color: '#3460D7'}}>
                 Resend OTP
