@@ -8,12 +8,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Slider from '@react-native-community/slider';
 import {RadialSlider} from 'react-native-radial-slider';
 import {
-  Text,
   StyleSheet,
   TouchableOpacity,
   View,
   TextInput,
-  Image,
   Modal,
   Dimensions,
 } from 'react-native';
@@ -148,7 +146,7 @@ const Step1 = props => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={{flex: 1}}>
-        <Text style={styles.heading}>Enter your details</Text>
+        <MyText style={styles.heading}>Enter your details</MyText>
         <View style={styles.inputContainer}>
           <MaterialIcons name="person-outline" size={26} color="#1C1B1F" />
           <TextInput
@@ -263,7 +261,7 @@ const Step2 = props => {
         </TouchableOpacity>
       )}
       <View style={{flex: 1}}>
-        <Text style={styles.heading}>Enter your details</Text>
+        <MyText style={styles.heading}>Enter your details</MyText>
         <View style={{flexDirection: 'row'}}>
           <MaterialIcons name="redeem" size={24} color="black" />
           <View style={{width: '95%'}}>
@@ -275,7 +273,9 @@ const Step2 = props => {
               onBlur={() => setIsCalenderModalOpen(false)}
               onFocus={() => setIsCalenderModalOpen(true)}
             />
-            <Text style={{marginLeft: 20, marginBottom: 20}}>dd/mm/yyyy</Text>
+            <MyText style={{marginLeft: 20, marginBottom: 20}}>
+              dd/mm/yyyy
+            </MyText>
             <TouchableOpacity
               onPress={() => setIsCalenderModalOpen(true)}
               style={{position: 'absolute', top: 11, right: 25}}>
@@ -299,9 +299,9 @@ const Step2 = props => {
               onBlur={() => setIsMapModalOpen(false)}
               onFocus={() => setIsMapModalOpen(true)}
             />
-            <Text style={{marginLeft: 20, marginBottom: 20}}>
+            <MyText style={{marginLeft: 20, marginBottom: 20}}>
               Enter the place where you were born.
-            </Text>
+            </MyText>
             <TouchableOpacity
               onPress={() => setIsMapModalOpen(true)}
               style={{position: 'absolute', top: 11, right: 25}}>
@@ -324,12 +324,12 @@ const Step2 = props => {
               onBlur={() => setIsTimeModalOpen(false)}
               onFocus={() => setIsTimeModalOpen(true)}
             />
-            <Text style={{marginLeft: 20}}>
+            <MyText style={{marginLeft: 20}}>
               Enter if you are sure of the time.
-            </Text>
-            <Text style={{marginLeft: 20, marginBottom: 20}}>
+            </MyText>
+            <MyText style={{marginLeft: 20, marginBottom: 20}}>
               Note: Ask your parents.
-            </Text>
+            </MyText>
           </View>
         </View>
       </View>
@@ -348,14 +348,14 @@ const Step2 = props => {
             });
             setOnBoardingStep(3);
           }}>
-          <Text
+          <MyText
             style={
               disabled
                 ? styles.button_blue_text_disabled
                 : styles.button_blue_text
             }>
             Continue
-          </Text>
+          </MyText>
         </TouchableOpacity>
       </View>
 
@@ -392,14 +392,16 @@ const Step2 = props => {
                 flexDirection: 'row',
               }}>
               <TouchableOpacity onPress={() => setIsCalenderModalOpen(false)}>
-                <Text style={{color: '#3460D7', fontWeight: '500'}}>
+                <MyText style={{color: '#3460D7', fontWeight: '500'}}>
                   Cancel
-                </Text>
+                </MyText>
               </TouchableOpacity>
               <TouchableOpacity
                 style={{marginLeft: 40}}
                 onPress={() => setIsCalenderModalOpen(false)}>
-                <Text style={{color: '#3460D7', fontWeight: '500'}}>Ok</Text>
+                <MyText style={{color: '#3460D7', fontWeight: '500'}}>
+                  Ok
+                </MyText>
               </TouchableOpacity>
             </View>
           </View>
@@ -475,8 +477,8 @@ const Step3 = props => {
         </TouchableOpacity>
       )}
       <View style={{flex: 1}}>
-        <Text style={styles.heading}>Hello Vikalp,</Text>
-        <Text style={styles.subHeading}>Which one are you?</Text>
+        <MyText style={styles.heading}>Hello Vikalp,</MyText>
+        <MyText style={styles.subHeading}>Which one are you?</MyText>
 
         <View
           style={{
@@ -504,7 +506,7 @@ const Step3 = props => {
                 loop={true}
                 source={assets.lottieFiles.male}
               />
-              <Text style={styles.gender_text}>Male</Text>
+              <MyText style={styles.gender_text}>Male</MyText>
             </View>
           </Pressable>
 
@@ -530,12 +532,12 @@ const Step3 = props => {
                 loop={true}
                 source={assets.lottieFiles.female}
               />
-              <Text style={styles.gender_text}>Female</Text>
+              <MyText style={styles.gender_text}>Female</MyText>
             </View>
           </Pressable>
         </View>
         <View style={{alignItems: 'center', marginTop: 22}}>
-          <Text
+          <MyText
             style={{
               paddingHorizontal: 30,
               textAlign: 'center',
@@ -544,7 +546,7 @@ const Step3 = props => {
               letterSpacing: 1,
             }}>
             To give you customized experience we need to know your gender.
-          </Text>
+          </MyText>
         </View>
       </View>
 
@@ -555,14 +557,14 @@ const Step3 = props => {
             : styles.button_blue
         }
         onPress={() => onBoardingDetails.gender !== '' && setOnBoardingStep(4)}>
-        <Text
+        <MyText
           style={
             onBoardingDetails.gender === ''
               ? styles.button_blue_text_disabled
               : styles.button_blue_text
           }>
           Continue
-        </Text>
+        </MyText>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -596,8 +598,10 @@ const Step4 = props => {
         </TouchableOpacity>
       )}
       <View style={{flex: 1}}>
-        <Text style={styles.heading}>Hello Vikalp,</Text>
-        <Text style={styles.subHeading}>We need your height and weight.</Text>
+        <MyText style={styles.heading}>Hello Vikalp,</MyText>
+        <MyText style={styles.subHeading}>
+          We need your height and weight.
+        </MyText>
 
         <View style={{alignItems: 'center'}}>
           <TextInput
@@ -623,10 +627,10 @@ const Step4 = props => {
                     unit.height == 'ft/in' ? '#FF8B8B' : '#DCDCDC',
                 },
               ]}>
-              <Text
+              <MyText
                 style={{textAlign: 'center', color: '#323232', fontSize: 12}}>
                 Ft/in
-              </Text>
+              </MyText>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setUnit({...unit, height: 'cm'})}
@@ -636,10 +640,10 @@ const Step4 = props => {
                   backgroundColor: unit.height == 'cm' ? '#FF8B8B' : '#DCDCDC',
                 },
               ]}>
-              <Text
+              <MyText
                 style={{textAlign: 'center', color: '#323232', fontSize: 12}}>
                 Cm
-              </Text>
+              </MyText>
             </TouchableOpacity>
           </View>
         </View>
@@ -762,10 +766,10 @@ const Step4 = props => {
                   backgroundColor: unit.weight == 'kg' ? '#FF8B8B' : '#DCDCDC',
                 },
               ]}>
-              <Text
+              <MyText
                 style={{textAlign: 'center', color: '#323232', fontSize: 12}}>
                 Kg
-              </Text>
+              </MyText>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setUnit({...unit, weight: 'lbs'})}
@@ -775,10 +779,10 @@ const Step4 = props => {
                   backgroundColor: unit.weight == 'lbs' ? '#FF8B8B' : '#DCDCDC',
                 },
               ]}>
-              <Text
+              <MyText
                 style={{textAlign: 'center', color: '#323232', fontSize: 12}}>
                 Lbs
-              </Text>
+              </MyText>
             </TouchableOpacity>
           </View>
         </View>
@@ -797,7 +801,7 @@ const Step4 = props => {
           });
           setOnBoardingStep(5);
         }}>
-        <Text style={styles.button_blue_text}>Done</Text>
+        <MyText style={styles.button_blue_text}>Done</MyText>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -829,7 +833,7 @@ const Step5 = props => {
             loop={false}
           />
         </View>
-        <Text
+        <MyText
           style={{
             fontSize: 20,
             color: '#323232',
@@ -837,8 +841,8 @@ const Step5 = props => {
             marginBottom: 6,
           }}>
           Great!
-        </Text>
-        <Text
+        </MyText>
+        <MyText
           style={{
             fontSize: 18,
             color: '#323232',
@@ -847,12 +851,12 @@ const Step5 = props => {
             textAlign: 'center',
           }}>
           We are happy to welcome you onboard.
-        </Text>
+        </MyText>
       </View>
       <TouchableOpacity
         style={[styles.button_blue]}
         onPress={() => navigation.navigate('Questionnaire')}>
-        <Text style={styles.button_blue_text}>Continue</Text>
+        <MyText style={styles.button_blue_text}>Continue</MyText>
       </TouchableOpacity>
     </SafeAreaView>
   );
