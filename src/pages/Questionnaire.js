@@ -7,7 +7,6 @@ import StruggleSvg from '../../assets/struggle.svg';
 import Eyes from '../../assets/eyes.svg';
 import HairsLess from '../../assets/hairs_dense.svg';
 import Slider from '@react-native-community/slider';
-import LinearGradient from 'react-native-linear-gradient';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {
@@ -17,6 +16,9 @@ import {
   View,
   Pressable,
   Image,
+  Dimensions,
+  ScrollView,
+  FlatList,
 } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -198,6 +200,7 @@ const ans = [
 ];
 
 const Questionnaire = ({navigation}) => {
+  const windowDimensions = Dimensions.get('window');
   const [answers, setAnswers] = useState(ans);
   const [questions, setQuestions] = useState(ques);
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -223,12 +226,6 @@ const Questionnaire = ({navigation}) => {
     else if (answers[questionIndex].valueIndex == 3) offset.value = 2.3;
     else if (answers[questionIndex].valueIndex == 4) offset.value = 2.8;
   }, [answers[questionIndex]?.valueIndex]);
-
-  const targetIndex = answers.findIndex(
-    item => item.question === questions[questionIndex].question,
-  );
-
-  //   console.warn(answers);
 
   const renderQuestion = question => {
     if (question.type === 'slider') {
@@ -301,11 +298,18 @@ const Questionnaire = ({navigation}) => {
       return (
         <View style={styles.content}>
           <StruggleSvg width={100} height={100} />
-          <View style={{marginTop: 30, flexDirection: 'row'}}>
+          <View
+            style={{
+              marginTop: 30,
+              flexDirection: 'row',
+              paddingHorizontal: 10,
+              justifyContent: 'center',
+            }}>
             <Pressable
               style={[
                 styles.left_rounded_box,
                 {
+                  width: windowDimensions.width - 300,
                   backgroundColor: value >= 1 ? '#FFB8B2' : '#D9D9D9',
                 },
               ]}
@@ -324,6 +328,7 @@ const Questionnaire = ({navigation}) => {
               style={[
                 styles.square_box,
                 {
+                  width: windowDimensions.width - 300,
                   backgroundColor: value >= 2 ? '#FF9D95' : '#D9D9D9',
                 },
               ]}
@@ -342,6 +347,7 @@ const Questionnaire = ({navigation}) => {
               style={[
                 styles.square_box,
                 {
+                  width: windowDimensions.width - 300,
                   backgroundColor: value >= 3 ? '#FF857B' : '#D9D9D9',
                 },
               ]}
@@ -359,7 +365,11 @@ const Questionnaire = ({navigation}) => {
             <Pressable
               style={[
                 styles.square_box,
-                {backgroundColor: value >= 4 ? '#FF6D61' : '#D9D9D9'},
+
+                {
+                  width: windowDimensions.width - 300,
+                  backgroundColor: value >= 4 ? '#FF6D61' : '#D9D9D9',
+                },
               ]}
               onPress={() => handleChange(4)}>
               <Text
@@ -373,7 +383,10 @@ const Questionnaire = ({navigation}) => {
             <Pressable
               style={[
                 styles.right_rounded_box,
-                {backgroundColor: value >= 5 ? '#F94F41' : '#D9D9D9'},
+                {
+                  width: windowDimensions.width - 300,
+                  backgroundColor: value >= 5 ? '#F94F41' : '#D9D9D9',
+                },
               ]}
               onPress={() => handleChange(5)}>
               <Text
@@ -389,6 +402,7 @@ const Questionnaire = ({navigation}) => {
       );
     } else if (question.type === 'yes/no') {
       const handleChange = value => {
+        setQuestionIndex(questionIndex + 1);
         setAnswers(
           answers.map(item =>
             item.question === questions[questionIndex].question
@@ -510,49 +524,74 @@ const Questionnaire = ({navigation}) => {
         }
       };
 
+      const windowHeight = Number.parseInt(windowDimensions.height);
+
       return (
-        <View style={[styles.content, {paddingHorizontal: 20}]}>
-          {questions[questionIndex]?.options.map((item, idx) => {
-            return (
-              <Pressable
-                key={idx}
-                style={styles.select_option}
-                onPress={() => {
-                  handleChange(questions[questionIndex].question, item.value);
-                }}>
-                {item.image_url && (
-                  <View style={{marginRight: 14}}>{item.image_url}</View>
-                )}
-                <View style={{flex: 1, justifyContent: 'center'}}>
-                  <Text style={styles.select_option_text}>{item?.label}</Text>
-                  {item.helper_label && (
-                    <Text style={[styles.select_option_text, {fontSize: 14}]}>
-                      {item?.helper_label}
-                    </Text>
-                  )}
-                </View>
-                {!answers[questionIndex]?.answer?.includes(item?.value) ? (
-                  <View
-                    style={{
-                      backgroundColor: '#3259CB',
-                      borderRadius: 50,
-                      padding: 4,
+        <View
+          style={[
+            styles.content,
+            {paddingHorizontal: 20, paddingTop: 0, marignTop: 0},
+          ]}>
+          <View
+            style={{
+              marginTop: 40,
+              width: '100%',
+              justifyContent: 'flex-end',
+              height: '78%',
+            }}>
+            <ScrollView>
+              {questions[questionIndex]?.options.map((item, idx) => {
+                return (
+                  <Pressable
+                    key={idx}
+                    style={[
+                      styles.select_option,
+                      {height: windowHeight * 0.0971},
+                    ]}
+                    onPress={() => {
+                      handleChange(
+                        questions[questionIndex].question,
+                        item.value,
+                      );
                     }}>
-                    <MaterialIcons name="add" size={18} color="#C8EBFF" />
-                  </View>
-                ) : (
-                  <View
-                    style={{
-                      backgroundColor: '#087c52',
-                      borderRadius: 50,
-                      padding: 4,
-                    }}>
-                    <MaterialIcons name="check" size={18} color="#f2f2f2" />
-                  </View>
-                )}
-              </Pressable>
-            );
-          })}
+                    {item.image_url && (
+                      <View style={{marginRight: 14}}>{item.image_url}</View>
+                    )}
+                    <View style={{flex: 1, justifyContent: 'center'}}>
+                      <Text style={styles.select_option_text}>
+                        {item?.label}
+                      </Text>
+                      {item.helper_label && (
+                        <Text
+                          style={[styles.select_option_text, {fontSize: 14}]}>
+                          {item?.helper_label}
+                        </Text>
+                      )}
+                    </View>
+                    {!answers[questionIndex]?.answer?.includes(item?.value) ? (
+                      <View
+                        style={{
+                          backgroundColor: '#3259CB',
+                          borderRadius: 50,
+                          padding: 4,
+                        }}>
+                        <MaterialIcons name="add" size={18} color="#C8EBFF" />
+                      </View>
+                    ) : (
+                      <View
+                        style={{
+                          backgroundColor: '#087c52',
+                          borderRadius: 50,
+                          padding: 4,
+                        }}>
+                        <MaterialIcons name="check" size={18} color="#f2f2f2" />
+                      </View>
+                    )}
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          </View>
         </View>
       );
     }
@@ -576,14 +615,13 @@ const Questionnaire = ({navigation}) => {
           </Text>
           <TouchableOpacity
             onPress={() => {
-              //   console.warn(questionIndex);
               console.log(answers[questionIndex]);
             }}
             style={{position: 'absolute', right: 10}}>
             <MaterialIcons name="close" size={20} color="white" />
           </TouchableOpacity>
         </View>
-        <View style={{marginTop: 24, marginBottom: 60}}>
+        <View style={{marginTop: 0, marginBottom: 40}}>
           {/* <Text>Progress bar</Text> */}
         </View>
         <View style={{width: '50%'}}>
@@ -632,73 +670,15 @@ const Questionnaire = ({navigation}) => {
   );
 };
 
-const PurpleUi = () => {
-  const [value, setValue] = useState(0);
-
-  const renderValue = () => {
-    if (value == 0) return 0;
-    else if (value == 1) return 'low';
-    else if (value == 2) return 'medium';
-    else if (value == 3) return 'high';
-  };
-  return (
-    <LinearGradient
-      colors={['#C65267', '#B05376', '#9B5483', '#805696', '#6F57A2']}>
-      <SafeAreaView style={styles.container}>
-        <TouchableOpacity onPress={() => {}}>
-          <MaterialIcons name="arrow-back" style={styles.arrow_back} />
-        </TouchableOpacity>
-        <View style={{flex: 1, alignItems: 'center'}}>
-          <View style={styles.ques_container}>
-            <Text style={styles.ques_no}>1</Text>
-          </View>
-          <Text style={styles.heading}>
-            My skin remains rough most of the time.
-          </Text>
-          <Text style={styles.subHeading}>
-            Questionnaire subheading extra info
-          </Text>
-          <View style={{position: 'relative', marginTop: 30, marginBottom: 60}}>
-            <Slider
-              style={{width: 400, height: 40, marginTop: 20}}
-              minimumValue={0}
-              maximumValue={3}
-              step={1}
-              thumbTintColor="#3460D7"
-              minimumTrackTintColor="rgba(52, 96, 215, 0.5)"
-              maximumTrackTintColor="#E6EAF3"
-              value={value}
-              onValueChange={val => setValue(val)}
-            />
-            <Text style={styles.zero}>0</Text>
-            <Text style={styles.low}>Low</Text>
-            <Text style={styles.medium}>Medium</Text>
-            <Text style={styles.high}>High</Text>
-          </View>
-
-          <TouchableOpacity style={styles.option}>
-            <Text style={{fontSize: 12, fontWeight: '500', color: '#ffffff'}}>
-              I usually have {renderValue()} skin dryness.
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity style={styles.btn}>
-          <Text style={styles.btn_text}>Done</Text>
-        </TouchableOpacity>
-      </SafeAreaView>
-    </LinearGradient>
-  );
-};
-
 const styles = StyleSheet.create({
   blue_curve: {
     width: '120%',
-    height: 300,
+    height: 250,
     backgroundColor: '#3259CB',
     borderBottomLeftRadius: 250,
     borderBottomRightRadius: 250,
     alignItems: 'center',
-    paddingTop: 30,
+    paddingTop: 20,
   },
   question: {
     fontSize: 18,
@@ -742,7 +722,7 @@ const styles = StyleSheet.create({
   },
   bottom_buttons: {
     width: '100%',
-    height: 80,
+    height: 60,
     position: 'absolute',
     bottom: 0,
     flexDirection: 'row',
@@ -862,96 +842,5 @@ const styles = StyleSheet.create({
     color: '#1C1B1F',
   },
 });
-
-// styles for purple UI
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     paddingHorizontal: 20,
-//     paddingVertical: 30,
-//   },
-//   arrow_back: {
-//     color: '#FFFFFF',
-//     fontSize: 24,
-//   },
-//   btn: {
-//     height: 40,
-//     width: '100%',
-//     paddingVertical: 4,
-//     paddingHorizontal: 10,
-//     borderRadius: 50,
-//     backgroundColor: '#FFFFFF',
-//     justifyContent: 'center',
-//   },
-//   btn_text: {textAlign: 'center', color: '#6D56A1', fontWeight: '500'},
-//   btn_disabled: {},
-//   btn_text_disabled: {},
-//   ques_container: {
-//     marginTop: 40,
-//     height: 50,
-//     width: 50,
-//     borderWidth: 4,
-//     borderRadius: 100,
-//     borderColor: '#FFFFFF',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-//   ques_no: {
-//     color: '#FFFFFF',
-//     fontSize: 16,
-//     fontWeight: '700',
-//   },
-//   heading: {
-//     width: 300,
-//     marginTop: 30,
-//     color: '#FFFFFF',
-//     fontSize: 20,
-//     fontWeight: '600',
-//     textAlign: 'center',
-//   },
-//   subHeading: {
-//     color: '#D3A9BD',
-//     marginTop: 20,
-//     fontSize: 15,
-//     fontWeight: '500',
-//     textAlign: 'center',
-//   },
-//   option: {
-//     width: '100%',
-//     paddingVertical: 10,
-//     paddingHorizontal: 10,
-//     borderRadius: 5,
-//     borderWidth: 1,
-//     borderColor: 'rgba(255, 255, 255, 0.5)',
-//   },
-//   zero: {
-//     fontWeight: '500',
-//     color: '#ffffff',
-//     position: 'absolute',
-//     left: 16,
-//     bottom: -20,
-//   },
-//   low: {
-//     fontWeight: '500',
-//     color: '#ffffff',
-//     position: 'absolute',
-//     left: 125,
-//     bottom: -20,
-//   },
-//   medium: {
-//     fontWeight: '500',
-//     color: '#ffffff',
-//     position: 'absolute',
-//     right: 110,
-//     bottom: -20,
-//   },
-//   high: {
-//     fontWeight: '500',
-//     color: '#ffffff',
-//     position: 'absolute',
-//     right: 5,
-//     bottom: -20,
-//   },
-// });
 
 export default Questionnaire;
