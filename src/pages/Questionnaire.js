@@ -10,7 +10,6 @@ import Slider from '@react-native-community/slider';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {
-  Text,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -18,13 +17,13 @@ import {
   Image,
   Dimensions,
   ScrollView,
-  FlatList,
 } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
+import MyText from '../components/MyText';
 
 // question types - slider, tap, yes/no, select, multi select,
 
@@ -237,7 +236,7 @@ const Questionnaire = ({navigation}) => {
             </Animated.View>
           </View>
           <View style={{width: '100%', alignItems: 'center', marginTop: 80}}>
-            <Text
+            <MyText
               style={{
                 color: '#3259CB',
                 fontWeight: '700',
@@ -249,7 +248,7 @@ const Questionnaire = ({navigation}) => {
                   answers[questionIndex]?.valueIndex
                 ]
               }
-            </Text>
+            </MyText>
             <View style={{width: '80%', alignItems: 'center'}}>
               <Slider
                 style={{width: '80%'}}
@@ -274,12 +273,12 @@ const Questionnaire = ({navigation}) => {
                 minimumTrackTintColor="#F94F41"
                 maximumTrackTintColor="#67160F"
               />
-              <Text style={styles.label_left}>
+              <MyText style={styles.label_left}>
                 {questions[questionIndex]?.min?.label}
-              </Text>
-              <Text style={styles.label_right}>
+              </MyText>
+              <MyText style={styles.label_right}>
                 {questions[questionIndex]?.max?.label}
-              </Text>
+              </MyText>
             </View>
           </View>
         </View>
@@ -314,7 +313,7 @@ const Questionnaire = ({navigation}) => {
                 },
               ]}
               onPress={() => handleChange(1)}>
-              <Text
+              <MyText
                 style={[
                   styles.box_text,
                   {
@@ -322,7 +321,7 @@ const Questionnaire = ({navigation}) => {
                   },
                 ]}>
                 1
-              </Text>
+              </MyText>
             </Pressable>
             <Pressable
               style={[
@@ -333,7 +332,7 @@ const Questionnaire = ({navigation}) => {
                 },
               ]}
               onPress={() => handleChange(2)}>
-              <Text
+              <MyText
                 style={[
                   styles.box_text,
                   {
@@ -341,7 +340,7 @@ const Questionnaire = ({navigation}) => {
                   },
                 ]}>
                 2
-              </Text>
+              </MyText>
             </Pressable>
             <Pressable
               style={[
@@ -352,7 +351,7 @@ const Questionnaire = ({navigation}) => {
                 },
               ]}
               onPress={() => handleChange(3)}>
-              <Text
+              <MyText
                 style={[
                   styles.box_text,
                   {
@@ -360,7 +359,7 @@ const Questionnaire = ({navigation}) => {
                   },
                 ]}>
                 3
-              </Text>
+              </MyText>
             </Pressable>
             <Pressable
               style={[
@@ -372,13 +371,13 @@ const Questionnaire = ({navigation}) => {
                 },
               ]}
               onPress={() => handleChange(4)}>
-              <Text
+              <MyText
                 style={[
                   styles.box_text,
                   {color: value >= 4 ? '#3259CB' : '#BFBFBF'},
                 ]}>
                 4
-              </Text>
+              </MyText>
             </Pressable>
             <Pressable
               style={[
@@ -389,13 +388,13 @@ const Questionnaire = ({navigation}) => {
                 },
               ]}
               onPress={() => handleChange(5)}>
-              <Text
+              <MyText
                 style={[
                   styles.box_text,
                   {color: value >= 5 ? '#3259CB' : '#BFBFBF'},
                 ]}>
                 5
-              </Text>
+              </MyText>
             </Pressable>
           </View>
         </View>
@@ -437,13 +436,13 @@ const Questionnaire = ({navigation}) => {
               style={styles.no}
               onPress={() => handleChange('No')}>
               <MaterialIcons name="close" size={24} color="#ffffff" />
-              <Text style={styles.yes_no_text}>No</Text>
+              <MyText style={styles.yes_no_text}>No</MyText>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.yes}
               onPress={() => handleChange('Yes')}>
               <MaterialIcons name="check" size={24} color="#ffffff" />
-              <Text style={styles.yes_no_text}>Yes</Text>
+              <MyText style={styles.yes_no_text}>Yes</MyText>
             </TouchableOpacity>
           </View>
         </View>
@@ -489,7 +488,7 @@ const Questionnaire = ({navigation}) => {
                     styles.radio_text,
                     {width: item?.image_url ? '30%' : '63%'},
                   ]}>
-                  <Text>{item?.label}</Text>
+                  <MyText>{item?.label}</MyText>
                 </Pressable>
                 {item?.image_url && (
                   <Image
@@ -558,14 +557,14 @@ const Questionnaire = ({navigation}) => {
                       <View style={{marginRight: 14}}>{item.image_url}</View>
                     )}
                     <View style={{flex: 1, justifyContent: 'center'}}>
-                      <Text style={styles.select_option_text}>
+                      <MyText style={styles.select_option_text}>
                         {item?.label}
-                      </Text>
+                      </MyText>
                       {item.helper_label && (
-                        <Text
+                        <MyText
                           style={[styles.select_option_text, {fontSize: 14}]}>
                           {item?.helper_label}
-                        </Text>
+                        </MyText>
                       )}
                     </View>
                     {!answers[questionIndex]?.answer?.includes(item?.value) ? (
@@ -609,10 +608,10 @@ const Questionnaire = ({navigation}) => {
             width: '80%',
             justifyContent: 'center',
           }}>
-          <Text
+          <MyText
             style={{color: 'white', fontWeight: '600', fontFamily: 'poppins'}}>
             Physical Activity
-          </Text>
+          </MyText>
           <TouchableOpacity
             onPress={() => {
               console.log(answers[questionIndex]);
@@ -622,16 +621,16 @@ const Questionnaire = ({navigation}) => {
           </TouchableOpacity>
         </View>
         <View style={{marginTop: 0, marginBottom: 40}}>
-          {/* <Text>Progress bar</Text> */}
+          {/* <MyText>Progress bar</MyText> */}
         </View>
-        <View style={{width: '50%'}}>
-          <Text style={styles.question}>
+        <View style={{width: '60%'}}>
+          <MyText style={styles.question}>
             {questions[questionIndex].question}
-          </Text>
+          </MyText>
           {questions[questionIndex]?.helperText && (
-            <Text style={styles.info}>
+            <MyText style={styles.info}>
               {questions[questionIndex]?.helperText}
-            </Text>
+            </MyText>
           )}
           {questions[questionIndex]?.helperSvg && (
             <View style={{alignItems: 'center', marginTop: 20}}>
@@ -651,7 +650,9 @@ const Questionnaire = ({navigation}) => {
             style={{flexDirection: 'row', alignItems: 'center'}}
             onPress={() => setQuestionIndex(questionIndex - 1)}>
             <MaterialIcons name="chevron-left" size={28} color="black" />
-            <Text style={{color: '#1C1B1F', fontWeight: '500'}}>Previous</Text>
+            <MyText style={{color: '#1C1B1F', fontWeight: '500'}}>
+              Previous
+            </MyText>
           </TouchableOpacity>
         )}
 
@@ -661,7 +662,7 @@ const Questionnaire = ({navigation}) => {
             onPress={() => {
               setQuestionIndex(questionIndex + 1);
             }}>
-            <Text style={{color: '#1C1B1F', fontWeight: '500'}}>Next</Text>
+            <MyText style={{color: '#1C1B1F', fontWeight: '500'}}>Next</MyText>
             <MaterialIcons name="chevron-right" size={28} color="black" />
           </TouchableOpacity>
         )}
