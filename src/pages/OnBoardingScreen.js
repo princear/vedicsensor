@@ -15,11 +15,17 @@ import {
   TextInput,
   Image,
   Modal,
+  Dimensions,
 } from 'react-native';
 import CalendarPicker from 'react-native-calendar-picker';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import Map from '../components/Map';
+import MyText from '../components/MyText';
+import {Pressable} from 'react-native';
+import {isEmailValid} from '../utils/validations';
+import Boy from '../../assets/boy.svg';
+import Girl from '../../assets/girl.svg';
 
 const OnBoardingScreen = ({navigation}) => {
   const [onBoardingStep, setOnBoardingStep] = useState(1);
@@ -120,9 +126,25 @@ const OnBoardingScreen = ({navigation}) => {
 
 const Step1 = props => {
   const {setOnBoardingStep, onBoardingDetails, setOnBoardingDetails} = props;
+  const [disabled, setDisabled] = useState(true);
+  const ref_last_name = useRef();
+  const ref_email = useRef();
+
   const handleChange = (k, v) => {
     setOnBoardingDetails({...onBoardingDetails, [k]: v});
   };
+
+  useEffect(() => {
+    if (
+      onBoardingDetails?.first_name === '' ||
+      onBoardingDetails?.last_name === '' ||
+      onBoardingDetails?.email === '' ||
+      isEmailValid(onBoardingDetails?.email) === false
+    ) {
+      setDisabled(true);
+    } else setDisabled(false);
+  }, [onBoardingDetails]);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={{flex: 1}}>
@@ -134,14 +156,23 @@ const Step1 = props => {
             placeholder="First name"
             value={onBoardingDetails.first_name}
             onChangeText={val => handleChange('first_name', val)}
+            returnKeyType={'next'}
+            onSubmitEditing={() => {
+              ref_last_name?.current?.focus();
+            }}
           />
         </View>
         <View style={styles.inputContainer}>
           <TextInput
+            ref={ref_last_name}
             style={styles.textField}
             placeholder="Last name"
             value={onBoardingDetails.last_name}
             onChangeText={val => handleChange('last_name', val)}
+            returnKeyType={'next'}
+            onSubmitEditing={() => {
+              ref_email?.current?.focus();
+            }}
           />
         </View>
         <View style={styles.inputContainer}>
@@ -151,6 +182,7 @@ const Step1 = props => {
             color="black"
           />
           <TextInput
+            ref={ref_email}
             style={styles.textField}
             placeholder="E mail-id"
             value={onBoardingDetails.email}
@@ -161,9 +193,18 @@ const Step1 = props => {
 
       <View>
         <TouchableOpacity
-          style={styles.button_blue}
-          onPress={() => setOnBoardingStep(2)}>
-          <Text style={styles.button_blue_text}>Continue</Text>
+          style={disabled ? styles.button_blue_disabled : styles.button_blue}
+          onPress={() => {
+            !disabled && setOnBoardingStep(2);
+          }}>
+          <MyText
+            style={
+              disabled
+                ? styles.button_blue_text_disabled
+                : styles.button_blue_text
+            }>
+            Continue
+          </MyText>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -204,12 +245,21 @@ const Step2 = props => {
   const [isCalenderModalOpen, setIsCalenderModalOpen] = useState(false);
   const [isTimeModalOpen, setIsTimeModalOpen] = useState(false);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+  const [disabled, setDisabled] = useState(true);
+
+  useEffect(() => {
+    if (false) {
+      setDisabled(true);
+    } else setDisabled(false);
+  }, [onBoardingDetails]);
 
   return (
     <SafeAreaView style={styles.container}>
       {onBoardingStep > 1 && (
-        <TouchableOpacity onPress={() => setOnBoardingStep(onBoardingStep - 1)}>
-          <MaterialIcons name="arrow-back" style={styles.arrow_back} />
+        <TouchableOpacity
+          onPress={() => setOnBoardingStep(onBoardingStep - 1)}
+          style={styles.arrow_back}>
+          <MaterialIcons name="arrow-back" color="#1C1B1F" size={22} />
         </TouchableOpacity>
       )}
       <View style={{flex: 1}}>
@@ -222,6 +272,8 @@ const Step2 = props => {
               value={dateOfBirth}
               onChangeText={e => setDateOfBirth(e)}
               placeholder="Date of birth"
+              onBlur={() => setIsCalenderModalOpen(false)}
+              onFocus={() => setIsCalenderModalOpen(true)}
             />
             <Text style={{marginLeft: 20, marginBottom: 20}}>dd/mm/yyyy</Text>
             <TouchableOpacity
@@ -244,6 +296,8 @@ const Step2 = props => {
               value={`Lat: ${markerLatLng.latitude.toFixed(
                 4,
               )}, Lng: ${markerLatLng.longitude.toFixed(4)}`}
+              onBlur={() => setIsMapModalOpen(false)}
+              onFocus={() => setIsMapModalOpen(true)}
             />
             <Text style={{marginLeft: 20, marginBottom: 20}}>
               Enter the place where you were born.
@@ -264,6 +318,7 @@ const Step2 = props => {
           <View style={{width: '95%'}}>
             <TextInput
               value={timeOfBirth}
+              onChangeText={val => setTimeOfBirth(val)}
               style={styles.textField}
               placeholder="Time of birth"
               onBlur={() => setIsTimeModalOpen(false)}
@@ -280,7 +335,7 @@ const Step2 = props => {
       </View>
       <View>
         <TouchableOpacity
-          style={styles.button_blue}
+          style={disabled ? styles.button_blue_disabled : styles.button_blue}
           onPress={() => {
             setOnBoardingDetails({
               ...onBoardingDetails,
@@ -293,7 +348,14 @@ const Step2 = props => {
             });
             setOnBoardingStep(3);
           }}>
-          <Text style={styles.button_blue_text}>Continue</Text>
+          <Text
+            style={
+              disabled
+                ? styles.button_blue_text_disabled
+                : styles.button_blue_text
+            }>
+            Continue
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -394,55 +456,66 @@ const Step3 = props => {
     setOnBoardingStep,
   } = props;
 
-  const animation = useRef(null);
+  const windowDimensions = Dimensions.get('window');
+  const animation_male = useRef(null);
+  const animation_female = useRef(null);
 
   useEffect(() => {
-    animation?.current?.play();
+    animation_male?.current?.play();
+    animation_female?.current?.play();
   }, []);
 
   return (
     <SafeAreaView style={styles.container}>
       {onBoardingStep > 1 && (
-        <TouchableOpacity onPress={() => setOnBoardingStep(onBoardingStep - 1)}>
-          <MaterialIcons name="arrow-back" style={styles.arrow_back} />
+        <TouchableOpacity
+          onPress={() => setOnBoardingStep(onBoardingStep - 1)}
+          style={styles.arrow_back}>
+          <MaterialIcons name="arrow-back" color="#1C1B1F" size={22} />
         </TouchableOpacity>
       )}
       <View style={{flex: 1}}>
         <Text style={styles.heading}>Hello Vikalp,</Text>
         <Text style={styles.subHeading}>Which one are you?</Text>
 
-        <TouchableOpacity
-          onPress={() =>
-            setOnBoardingDetails({...onBoardingDetails, gender: 'male'})
-          }
-          style={{marginTop: 16, flexDirection: 'row'}}>
-          <View
+        <View
+          style={{
+            marginTop: 16,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}>
+          <Pressable
             style={[
               styles.box_outside,
               {
+                width: windowDimensions.width - 205,
                 borderColor:
                   onBoardingDetails.gender == 'male' ? '#3460D7' : '#6750A40D',
               },
-            ]}>
+            ]}
+            onPress={() =>
+              setOnBoardingDetails({...onBoardingDetails, gender: 'male'})
+            }>
             <View style={styles.box_inside}>
               <LottieView
                 style={styles.gender_animation}
-                ref={animation}
+                ref={animation_male}
                 autoplay={true}
                 loop={true}
                 source={assets.lottieFiles.male}
               />
               <Text style={styles.gender_text}>Male</Text>
             </View>
-          </View>
+          </Pressable>
 
-          <TouchableOpacity
+          <Pressable
             onPress={() =>
               setOnBoardingDetails({...onBoardingDetails, gender: 'female'})
             }
             style={[
               styles.box_outside,
               {
+                width: windowDimensions.width - 205,
                 borderColor:
                   onBoardingDetails.gender == 'female'
                     ? '#3460D7'
@@ -452,15 +525,15 @@ const Step3 = props => {
             <View style={styles.box_inside}>
               <LottieView
                 style={styles.gender_animation}
-                ref={animation}
+                ref={animation_female}
                 autoplay={true}
                 loop={true}
                 source={assets.lottieFiles.female}
               />
               <Text style={styles.gender_text}>Female</Text>
             </View>
-          </TouchableOpacity>
-        </TouchableOpacity>
+          </Pressable>
+        </View>
         <View style={{alignItems: 'center', marginTop: 22}}>
           <Text
             style={{
@@ -476,9 +549,20 @@ const Step3 = props => {
       </View>
 
       <TouchableOpacity
-        style={[styles.button_blue]}
-        onPress={() => setOnBoardingStep(4)}>
-        <Text style={styles.button_blue_text}>Continue</Text>
+        style={
+          onBoardingDetails.gender === ''
+            ? styles.button_blue_disabled
+            : styles.button_blue
+        }
+        onPress={() => onBoardingDetails.gender !== '' && setOnBoardingStep(4)}>
+        <Text
+          style={
+            onBoardingDetails.gender === ''
+              ? styles.button_blue_text_disabled
+              : styles.button_blue_text
+          }>
+          Continue
+        </Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -505,8 +589,10 @@ const Step4 = props => {
   return (
     <SafeAreaView style={styles.container}>
       {onBoardingStep > 1 && (
-        <TouchableOpacity onPress={() => setOnBoardingStep(onBoardingStep - 1)}>
-          <MaterialIcons name="arrow-back" style={styles.arrow_back} />
+        <TouchableOpacity
+          onPress={() => setOnBoardingStep(onBoardingStep - 1)}
+          style={styles.arrow_back}>
+          <MaterialIcons name="arrow-back" color="#1C1B1F" size={22} />
         </TouchableOpacity>
       )}
       <View style={{flex: 1}}>
@@ -587,16 +673,9 @@ const Step4 = props => {
           </View>
           <View>
             {onBoardingDetails.gender == 'male' ? (
-              <Image
-                source={assets.png.boy}
-                style={{
-                  width: 115,
-                  height: 265,
-                }}
-              />
+              <Boy width={200} height={240} />
             ) : (
-              <Image
-                source={assets.png.girl}
+              <Girl
                 style={{
                   width: 100,
                   height: 250,
@@ -637,6 +716,8 @@ const Step4 = props => {
           alignItems: 'center',
           justifyContent: 'center',
           position: 'relative',
+          paddingTop: 20,
+          height: 160,
         }}>
         <RadialSlider
           isHideLines={true}
@@ -645,20 +726,20 @@ const Step4 = props => {
           isHideCenterContent={true}
           isHideTailText={true}
           sliderTrackColor="#D9D9D9"
-          sliderWidth={30}
-          thumbRadius={18}
+          sliderWidth={16}
+          thumbRadius={12}
           thumbColor="#FF8B8B"
           thumbBorderWidth={2}
           //  linearGradient={{offset: '0%', color: '#ffaca6'}}
           value={weight}
           min={0}
           max={200}
-          radius={110}
+          radius={80}
           markerCircleColor="#FF8B8B"
           onChange={wt => setWeight(wt)}
         />
 
-        <View style={{alignItems: 'center', position: 'absolute', bottom: 60}}>
+        <View style={{alignItems: 'center', position: 'absolute', bottom: 20}}>
           <TextInput
             style={styles.tab_text}
             keyboardType="numeric"
@@ -818,11 +899,9 @@ const styles = StyleSheet.create({
     bottom: 18,
   },
   arrow_back: {
-    fontSize: 20,
-    color: '#1C1B1F',
     position: 'absolute',
-    top: -35,
-    left: -4,
+    top: 20,
+    left: 20,
   },
   slider_container: {
     marginTop: 20,
@@ -865,7 +944,7 @@ const styles = StyleSheet.create({
     color: '#323232',
   },
   box_outside: {
-    marginRight: 20,
+    //  marginRight: 20,
     alignItems: 'center',
     width: 170,
     height: 190,
@@ -910,7 +989,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#f2f2f2',
     height: '100%',
-    paddingTop: 50,
+    paddingTop: 55,
     paddingHorizontal: 20,
     paddingVertical: 30,
   },
@@ -949,12 +1028,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 20,
     justifyContent: 'flex-end',
+    alignItems: 'center',
   },
   textField: {
     borderColor: '#49454F',
     borderWidth: 1,
     borderRadius: 8,
-    marginLeft: 20,
+    marginLeft: 14,
     paddingLeft: 10,
     width: '90%',
   },

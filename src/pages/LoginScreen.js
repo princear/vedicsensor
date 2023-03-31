@@ -220,6 +220,7 @@ const Step2 = props => {
       const res = await confirmation.confirm(otp);
       console.log(res);
       navigation.navigate('OnBoarding');
+      setError('');
     } catch (error) {
       setError('Invalid OTP');
       console.log('Invalid code.', error);
@@ -296,7 +297,7 @@ const Step2 = props => {
         </TouchableOpacity>
         <TouchableOpacity
           style={[
-            otp.length < 4 || loading
+            otp.length < 6 || loading
               ? styles.button_blue_disabled
               : styles.button_blue,
             {flex: 1},

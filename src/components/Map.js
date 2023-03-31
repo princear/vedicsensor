@@ -38,7 +38,7 @@ const Map = props => {
     <View style={styles.map_container}>
       <TouchableOpacity
         onPress={getCurrentLocation}
-        style={{position: 'absolute', bottom: 40, right: 24, zIndex: 2}}>
+        style={{position: 'absolute', bottom: 52, right: 24, zIndex: 2}}>
         <MaterialIcons name="my-location" size={20} color="#3460D7" />
       </TouchableOpacity>
       <GooglePlacesAutocomplete
@@ -90,8 +90,8 @@ const styles = StyleSheet.create({
   },
   search_container: {
     position: 'absolute',
-    bottom: 16,
-    width: '98%',
+    bottom: 30,
+    width: '94%',
     padding: 8,
     paddingBottom: 6,
     backgroundColor: '#FFFFFF',
