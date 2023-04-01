@@ -1,16 +1,6 @@
 import React from 'react';
 import RNBluetoothClassic from 'react-native-bluetooth-classic';
-import {
-  Container,
-  Text,
-  HStack,
-  Button,
-  Icon,
-  Box,
-  Heading,
-  IconButton,
-  Toast,
-} from 'native-base';
+import {Text, HStack, Icon, Box, IconButton, Toast} from 'native-base';
 import {
   FlatList,
   View,
@@ -18,17 +8,12 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import { Buffer } from 'buffer';
+import {Buffer} from 'buffer';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {BluetoothContext} from '../context';
 
-/**
- * Manages a selected device connection.  The selected Device should
- * be provided as {@code props.device}, the device will be connected
- * to and processed as such.
- *
- * @author kendavidson
- */
 export default class ConnectionScreen extends React.Component {
+  static contextType = BluetoothContext;
   constructor(props) {
     super(props);
 
@@ -42,6 +27,7 @@ export default class ConnectionScreen extends React.Component {
       },
     };
   }
+
   /**
    * Removes the current subscriptions and disconnects the specified
    * device.  It could be possible to maintain the connection across
@@ -51,7 +37,7 @@ export default class ConnectionScreen extends React.Component {
   async componentWillUnmount() {
     if (this.state.connection) {
       try {
-        await this.props.device.disconnect();
+        await this.context.state.device.disconnect();
       } catch (error) {
         // Unable to disconnect from device
       }
@@ -95,7 +81,7 @@ export default class ConnectionScreen extends React.Component {
         });
       }
 
-      this.setState({ connection });
+      this.setState({connection});
       this.initializeRead();
     } catch (error) {
       this.addData({
@@ -118,7 +104,7 @@ export default class ConnectionScreen extends React.Component {
         type: 'info',
       });
 
-      this.setState({ connection: !disconnected });
+      this.setState({connection: !disconnected});
     } catch (error) {
       this.addData({
         data: `Disconnect failed: ${error.message}`,
@@ -132,13 +118,15 @@ export default class ConnectionScreen extends React.Component {
   }
 
   initializeRead() {
-    this.disconnectSubscription = RNBluetoothClassic.onDeviceDisconnected(() => this.disconnect(true));
+    this.disconnectSubscription = RNBluetoothClassic.onDeviceDisconnected(() =>
+      this.disconnect(true),
+    );
 
     if (this.state.polling) {
       this.readInterval = setInterval(() => this.performRead(), 5000);
     } else {
       this.readSubscription = this.props.device.onDataReceived(data =>
-        this.onReceivedData(data)
+        this.onReceivedData(data),
       );
     }
   }
@@ -157,23 +145,22 @@ export default class ConnectionScreen extends React.Component {
 
   postMetricData(data) {
     const json_data = JSON.stringify({pulses: data});
-    fetch("https://madmachines.datasyndicate.in/v1/api/pulse-data",
-          {
-            method: "POST",
-            body: json_data,
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-            },
-          })
+    fetch('https://madmachines.datasyndicate.in/v1/api/pulse-data', {
+      method: 'POST',
+      body: json_data,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
       .then(resp => {
-        console.log("Data pushed successfully!");
+        console.log('Data pushed successfully!');
       })
       .catch(error => {
         Toast.show({
           description: JSON.stringify(error),
           duration: 5000,
-      });
+        });
       });
   }
 
@@ -193,13 +180,13 @@ export default class ConnectionScreen extends React.Component {
             metric_amount = parseFloat(amount[0]);
           }
           metricData.push({
-            "metric_name": "kaf",
-            "amount": metric_amount,
-            "timestamp": new Date().getTime()
-          })
+            metric_name: 'kaf',
+            amount: metric_amount,
+            timestamp: new Date().getTime(),
+          });
           console.log(`Read data ${data}`);
           console.log(data);
-          this.onReceivedData({ data });
+          this.onReceivedData({data});
         }
         this.postMetricData(metricData);
       }
@@ -215,8 +202,10 @@ export default class ConnectionScreen extends React.Component {
    * @param {ReadEvent} event
    */
   async onReceivedData(event) {
-    const metrics = JSON.parse(event?.data.split(":")[1]);
-    const event_ts = event?.timestamp ? new Date(event?.timestamp).getTime() : new Date().getTime();
+    const metrics = JSON.parse(event?.data.split(':')[1]);
+    const event_ts = event?.timestamp
+      ? new Date(event?.timestamp).getTime()
+      : new Date().getTime();
     let amount = event?.data.match(/[+-]?\d+(\.\d+)?/g);
     let metric_amount = 0;
     if (amount && amount.length > 0) {
@@ -224,20 +213,21 @@ export default class ConnectionScreen extends React.Component {
     }
     let metric_data = [
       {
-        metric_name: "vat",
+        metric_name: 'vat',
         amount: parseFloat(metrics[0]),
-        timestamp: event_ts
+        timestamp: event_ts,
       },
       {
-        metric_name: "pit",
+        metric_name: 'pit',
         amount: parseFloat(metrics[1]),
         timestamp: event_ts,
       },
       {
-        metric_name: "kaf",
+        metric_name: 'kaf',
         amount: parseFloat(metrics[2]),
         timestamp: event_ts,
-      }];
+      },
+    ];
     this.addData({
       ...event,
       timestamp: new Date(),
@@ -247,7 +237,7 @@ export default class ConnectionScreen extends React.Component {
   }
 
   async addData(message) {
-    this.setState({ data: [message, ...this.state.data] });
+    this.setState({data: [message, ...this.state.data]});
   }
 
   /**
@@ -260,7 +250,7 @@ export default class ConnectionScreen extends React.Component {
       let message = this.state.text + '\r';
       await RNBluetoothClassic.writeToDevice(
         this.props.device.address,
-        message
+        message,
       );
 
       this.addData({
@@ -269,7 +259,7 @@ export default class ConnectionScreen extends React.Component {
         type: 'sent',
       });
 
-      let data = Buffer.alloc(10, 0xEF);
+      let data = Buffer.alloc(10, 0xef);
       await this.props.device.write(data);
 
       this.addData({
@@ -278,7 +268,7 @@ export default class ConnectionScreen extends React.Component {
         type: 'sent',
       });
 
-      this.setState({ text: undefined });
+      this.setState({text: undefined});
     } catch (error) {
       console.log(error);
     }
@@ -293,60 +283,84 @@ export default class ConnectionScreen extends React.Component {
   }
 
   render() {
-    let toggleIcon = this.state.connection
-      ? 'toggle-on'
-      : 'toggle-off';
+    let toggleIcon = this.state.connection ? 'toggle-on' : 'toggle-off';
 
     return (
       <>
-        <HStack bg="violet.800" px="1" py="3" justifyContent="space-between" alignItems="center" w="100%" h="10%">
-          <IconButton onPress={this.props.onBack}
-                      icon={<Icon size="24px" as={MaterialIcons} name="arrow-back" color="white" />} />
+        <HStack
+          bg="violet.800"
+          px="1"
+          py="3"
+          justifyContent="space-between"
+          alignItems="center"
+          w="100%"
+          h="10%">
+          <IconButton
+            onPress={this.props.onBack}
+            icon={
+              <Icon
+                size="24px"
+                as={MaterialIcons}
+                name="arrow-back"
+                color="white"
+              />
+            }
+          />
 
           <Box>
             <Text color="white" fontSize="16" fontWeight="bold">
-              {this.props.device.name}
+              {this.context.state.device.name}
             </Text>
             <Text color="white" fontSize="16" fontWeight="bold">
               {this.props.device.address}
             </Text>
           </Box>
-          <IconButton onPress={() => this.toggleConnection()}
-                      icon={<Icon size="24px" as={MaterialIcons} name={toggleIcon} color="white" />} />
+          <IconButton
+            onPress={() => this.toggleConnection()}
+            icon={
+              <Icon
+                size="24px"
+                as={MaterialIcons}
+                name={toggleIcon}
+                color="white"
+              />
+            }
+          />
         </HStack>
         <HStack bg="white" h="82%" w="100%">
           <FlatList
             style={styles.connectionScreenOutput}
-            contentContainerStyle={{ justifyContent: 'flex-end' }}
+            contentContainerStyle={{justifyContent: 'flex-end'}}
             inverted
             ref="scannedDataList"
             data={this.state.data}
-            keyExtractor={(item) => item.timestamp.toISOString()}
-            renderItem={({ item }) => (
+            keyExtractor={item => item.timestamp.toISOString()}
+            renderItem={({item}) => (
               <View
                 id={item.timestamp.toISOString()}
-                flexDirection={'row'} justifyContent={'flex-start'}>
+                flexDirection={'row'}
+                justifyContent={'flex-start'}>
                 <Text>{item.timestamp.toISOString()}</Text>
                 <Text>{item.type === 'sent' ? ' < ' : ' > '}</Text>
                 <Text flexShrink={1}>{item.data.trim()}</Text>
               </View>
             )}
-        />
+          />
         </HStack>
-        <HStack  bg="white" h="8%" w="100%">
+        <HStack bg="white" h="8%" w="100%">
           <InputArea
             text={this.state.text}
-            onChangeText={text => this.setState({ text })}
+            onChangeText={text => this.setState({text})}
             onSend={() => this.sendData()}
             disabled={!this.state.connection}
           />
         </HStack>
-     </>
+      </>
     );
   }
 }
 
-const InputArea = ({ text, onChangeText, onSend, disabled }) => {
+const InputArea = ({text, onChangeText, onSend, disabled}) => {
   let style = disabled ? styles.inputArea : styles.inputAreaConnected;
   return (
     <View style={style}>
@@ -393,7 +407,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignContent: 'stretch',
     backgroundColor: '#90EE90',
-    width: "100%"
+    width: '100%',
   },
   inputAreaTextInput: {
     flex: 1,

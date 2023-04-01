@@ -1,12 +1,10 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {
-  Text,
   StyleSheet,
   TouchableOpacity,
   View,
   TextInput,
   ActivityIndicator,
-  TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
 import assets from '../../assets';
@@ -14,6 +12,7 @@ import LottieView from 'lottie-react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
 import auth from '@react-native-firebase/auth';
+import MyText from '../components/MyText';
 
 const LoginScreen = ({navigation}) => {
   const animation = useRef(null);
@@ -95,7 +94,7 @@ const Step1 = props => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={{flex: 1}}>
-        <Text style={styles.heading}>Continue with phone</Text>
+        <MyText style={styles.heading}>Continue with phone</MyText>
 
         <View
           style={{
@@ -111,13 +110,13 @@ const Step1 = props => {
           />
         </View>
 
-        <Text style={styles.infoText}>
+        <MyText style={styles.infoText}>
           You’ll receive a 4 digit OTP to verify next
-        </Text>
+        </MyText>
 
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <View ref={inputRef} style={styles.input_small}>
-            <Text>+91</Text>
+            <MyText>+91</MyText>
           </View>
           <TextInput
             style={styles.input}
@@ -131,10 +130,10 @@ const Step1 = props => {
         </View>
 
         <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
-          <Text style={styles.terms}>By continuing, you agree to our </Text>
-          <Text style={styles.link}>Terms & conditions </Text>
-          <Text style={styles.terms}>and </Text>
-          <Text style={styles.link}>Privacy policy.</Text>
+          <MyText style={styles.terms}>By continuing, you agree to our </MyText>
+          <MyText style={styles.link}>Terms & conditions </MyText>
+          <MyText style={styles.terms}>and </MyText>
+          <MyText style={styles.link}>Privacy policy.</MyText>
         </View>
       </View>
       <View>
@@ -148,14 +147,14 @@ const Step1 = props => {
                 : styles.button_blue_disabled
             }
             onPress={handleSignin}>
-            <Text
+            <MyText
               style={
                 phone.length == 10
                   ? styles.button_blue_text
                   : styles.button_blue_text_disabled
               }>
               Get OTP
-            </Text>
+            </MyText>
           </TouchableOpacity>
         )}
       </View>
@@ -175,8 +174,9 @@ const Step2 = props => {
   } = props;
 
   const [loading, setLoading] = useState(false);
-  const [timer, setTimer] = useState(59);
+  const [timer, setTimer] = useState(30);
   const [otp, setOtp] = useState('');
+  const [error, setError] = useState('');
 
   const interval = setInterval(() => {
     if (timer > 0) {
@@ -220,7 +220,9 @@ const Step2 = props => {
       const res = await confirmation.confirm(otp);
       console.log(res);
       navigation.navigate('OnBoarding');
+      setError('');
     } catch (error) {
+      setError('Invalid OTP');
       console.log('Invalid code.', error);
     } finally {
       setLoading(false);
@@ -230,8 +232,8 @@ const Step2 = props => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={{flex: 1}}>
-        <Text style={styles.heading}>Verify phone</Text>
-        <Text style={styles.subHeading}>Code is sent to {phone}</Text>
+        <MyText style={styles.heading}>Verify phone</MyText>
+        <MyText style={styles.subHeading}>Code is sent to +91 {phone}</MyText>
 
         <View
           style={{
@@ -247,7 +249,16 @@ const Step2 = props => {
           />
         </View>
         <View style={{alignItems: 'center'}}>
+          <View style={{width: '100%', marginLeft: 10}}>
+            {error != '' && (
+              <MyText style={{fontSize: 12, color: 'red', fontWeight: '600'}}>
+                {error}
+              </MyText>
+            )}
+          </View>
+
           <OTPInputView
+            autoFocusOnLoad={false}
             code={otp}
             onCodeChanged={e => setOtp(e)}
             pinCount={6}
@@ -256,16 +267,17 @@ const Step2 = props => {
             codeInputHighlightStyle={{borderColor: '#3460D7'}}
           />
           {timer == 0 ? (
-            <TouchableOpacity onPress={() => setTimer(5)}>
-              <Text
+            <TouchableOpacity onPress={() => setTimer(30)}>
+              <MyText
                 style={{marginTop: 10, fontWeight: '500', color: '#3460D7'}}>
                 Resend OTP
-              </Text>
+              </MyText>
             </TouchableOpacity>
           ) : (
-            <Text style={{marginTop: 10, fontWeight: '500', color: '#828282'}}>
+            <MyText
+              style={{marginTop: 10, fontWeight: '500', color: '#828282'}}>
               RESEND OTP IN {timer} SECONDS
-            </Text>
+            </MyText>
           )}
         </View>
       </View>
@@ -279,13 +291,13 @@ const Step2 = props => {
             marginRight: 10,
           }}
           onPress={() => !loading && setStep(1)}>
-          <Text style={{color: '#3460D7', textAlign: 'center'}}>
+          <MyText style={{color: '#3460D7', textAlign: 'center'}}>
             Edit number
-          </Text>
+          </MyText>
         </TouchableOpacity>
         <TouchableOpacity
           style={[
-            otp.length < 4 || loading
+            otp.length < 6 || loading
               ? styles.button_blue_disabled
               : styles.button_blue,
             {flex: 1},
@@ -294,14 +306,14 @@ const Step2 = props => {
           {loading ? (
             <ActivityIndicator color="#3460D7" />
           ) : (
-            <Text
+            <MyText
               style={
                 otp.length == 6
                   ? styles.button_blue_text
                   : styles.button_blue_text_disabled
               }>
               Verify
-            </Text>
+            </MyText>
           )}
         </TouchableOpacity>
       </View>

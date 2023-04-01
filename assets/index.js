@@ -11,8 +11,6 @@ const assets = {
     basketBallPlaying: require('./basket-ball-playing.json'),
   },
   png: {
-    boy: require('./boy.png'),
-    girl: require('./girl.png'),
     devices: require('./devices_wearables.png'),
   },
 };

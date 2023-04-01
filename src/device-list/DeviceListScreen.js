@@ -1,78 +1,27 @@
 import React from 'react';
-import { Platform } from 'react-native';
 import {
   Box,
-  Container,
   Button,
   Text,
   Icon,
   Toast,
   HStack,
-  Heading,
   StatusBar,
   IconButton,
   Center,
   ScrollView,
 } from 'native-base';
 import RNBluetoothClassic from 'react-native-bluetooth-classic';
-import {
-  PermissionsAndroid,
-  View,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+import {View, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {
+  requestAccessFineLocationPermission,
+  requestBluetoothPermission,
+} from '../utils/permissions';
+import {BluetoothContext} from '../context';
 
-/**
- * See https://reactnative.dev/docs/permissionsandroid for more information
- * on why this is required (dangerous permissions).
- */
-const requestAccessFineLocationPermission = async () => {
-  const granted = await PermissionsAndroid.request(
-    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    {
-      title: 'Access fine location required for discovery',
-      message:
-        'In order to perform discovery, you must enable/allow ' +
-        'fine location access.',
-      buttonNeutral: 'Ask Me Later',
-      buttonNegative: 'Cancel',
-      buttonPositive: 'OK',
-    }
-  );
-  return granted === PermissionsAndroid.RESULTS.GRANTED;
-};
-
-const requestBluetoothPermission = async () => {
-  const granted = await PermissionsAndroid.request(
-    PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
-    {
-      title: 'VedicSensor app needs access for bluetooth',
-      message:
-        'In order to perform discovery, you must enable/allow ' +
-        'bluetooth access.',
-      buttonNeutral: 'Ask Me Later',
-      buttonNegative: 'Cancel',
-      buttonPositive: 'OK',
-    }
-  );
-  return granted === PermissionsAndroid.RESULTS.GRANTED;
-};
-
-/**
- * Displays the device list and manages user interaction.  Initially
- * the NativeDevice[] contains a list of the bonded devices.  By using
- * the Discover Devices action the list will be updated with unpaired
- * devices.
- *
- * From here:
- * - unpaired devices can be paired
- * - paired devices can be connected
- *
- * @author kendavidson
- */
 export default class DeviceListScreen extends React.Component {
+  static contextType = BluetoothContext;
   constructor(props) {
     super(props);
 
@@ -97,10 +46,7 @@ export default class DeviceListScreen extends React.Component {
     }
   }
 
-  /**
-   * Gets the currently bonded devices.
-   */
-  getBondedDevices = async (unloading) => {
+  getBondedDevices = async unloading => {
     console.log('DeviceListScreen::getBondedDevices');
     let granted = await requestBluetoothPermission();
 
@@ -113,10 +59,10 @@ export default class DeviceListScreen extends React.Component {
       console.log('DeviceListScreen::getBondedDevices found', bonded);
 
       if (!unloading) {
-        this.setState({ devices: bonded });
+        this.setState({devices: bonded});
       }
     } catch (error) {
-      this.setState({ devices: [] });
+      this.setState({devices: []});
 
       Toast.show({
         description: error.message,
@@ -125,10 +71,6 @@ export default class DeviceListScreen extends React.Component {
     }
   };
 
-  /**
-   * Starts attempting to accept a connection.  If a device was accepted it will
-   * be passed to the application context as the current device.
-   */
   acceptConnections = async () => {
     if (this.state.accepting) {
       Toast.show({
@@ -139,12 +81,12 @@ export default class DeviceListScreen extends React.Component {
       return;
     }
 
-    this.setState({ accepting: true });
+    this.setState({accepting: true});
 
     try {
-      let device = await RNBluetoothClassic.accept({ delimiter: '\r' });
+      let device = await RNBluetoothClassic.accept({delimiter: '\r'});
       if (device) {
-        this.props.selectDevice(device);
+        this.context.selectDevice(device);
       }
     } catch (error) {
       // If we're not in an accepting state, then chances are we actually
@@ -157,14 +99,10 @@ export default class DeviceListScreen extends React.Component {
         });
       }
     } finally {
-      this.setState({ accepting: false });
+      this.setState({accepting: false});
     }
   };
 
-  /**
-   * Cancels the current accept - might be wise to check accepting state prior
-   * to attempting.
-   */
   cancelAcceptConnections = async () => {
     if (!this.state.accepting) {
       return;
@@ -172,7 +110,7 @@ export default class DeviceListScreen extends React.Component {
 
     try {
       let cancelled = await RNBluetoothClassic.cancelAccept();
-      this.setState({ accepting: !cancelled });
+      this.setState({accepting: !cancelled});
     } catch (error) {
       Toast.show({
         description: 'Unable to cancel accept connection',
@@ -189,7 +127,7 @@ export default class DeviceListScreen extends React.Component {
         throw new Error('Access fine location was not granted');
       }
 
-      this.setState({ discovering: true });
+      this.setState({discovering: true});
 
       let devices = [...this.state.devices];
 
@@ -197,15 +135,18 @@ export default class DeviceListScreen extends React.Component {
         let unpaired = await RNBluetoothClassic.startDiscovery();
 
         let index = devices.findIndex(d => !d.bonded);
-        if (index >= 0) { devices.splice(index, devices.length - index, ...unpaired); }
-        else { devices.push(...unpaired); }
+        if (index >= 0) {
+          devices.splice(index, devices.length - index, ...unpaired);
+        } else {
+          devices.push(...unpaired);
+        }
 
         Toast.show({
           description: `Found ${unpaired.length} unpaired devices.`,
           duration: 2000,
         });
       } finally {
-        this.setState({ devices, discovering: false });
+        this.setState({devices, discovering: false});
       }
     } catch (err) {
       Toast.show({
@@ -219,7 +160,8 @@ export default class DeviceListScreen extends React.Component {
     try {
     } catch (error) {
       Toast.show({
-        description: 'Error occurred while attempting to cancel discover devices',
+        description:
+          'Error occurred while attempting to cancel discover devices',
         duration: 2000,
       });
     }
@@ -248,59 +190,60 @@ export default class DeviceListScreen extends React.Component {
       <Box>
         <StatusBar bg="#3700B3" barStyle="light-content" />
         <Box safeAreaTop bg="violet.600" />
-        <HStack bg="violet.800" px="1" py="3" justifyContent="space-between" alignItems="center" w="100%">
+        <HStack
+          bg="violet.800"
+          px="1"
+          py="3"
+          justifyContent="space-between"
+          alignItems="center"
+          w="100%">
           <HStack alignItems="center">
-            <IconButton icon={<Icon size="sm" as={MaterialIcons} name="menu" color="white" />} />
+            <IconButton
+              icon={
+                <Icon size="sm" as={MaterialIcons} name="menu" color="white" />
+              }
+            />
             <Text color="white" fontSize="20" fontWeight="bold">
               Devices
             </Text>
           </HStack>
           <HStack>
-            {this.props.bluetoothEnabled ? (
-              <IconButton transparent onPress={this.getBondedDevices}
-                          icon={<Icon as={MaterialIcons} name="cached" />}>
-              </IconButton>
-            ) : (
-              undefined
-            )}
+            {this.context.bluetoothEnabled ? (
+              <IconButton
+                transparent
+                onPress={this.getBondedDevices}
+                icon={<Icon as={MaterialIcons} name="cached" />}></IconButton>
+            ) : undefined}
           </HStack>
         </HStack>
         <HStack bg="white" px="1" w="100%" minH="100%">
-        <ScrollView h="100%">
-        {this.props.bluetoothEnabled ? (
-          <>
-              <DeviceList
-                devices={this.state.devices}
-                onPress={this.props.selectDevice}
+          <ScrollView h="100%">
+            {this.context.bluetoothEnabled ? (
+              <>
+                <DeviceList
+                  devices={this.state.devices}
+                  onPress={this.context.selectDevice}
                 />
-          </>
-        ) : (
-          <View>
-            <Center>
-              <Text>Bluetooth is OFF</Text>
-              <Button onPress={() => this.requestEnabled()}>
-                Enable Bluetooth
-              </Button>
-              </Center>
-          </View>
-        )}
-      </ScrollView>
-</HStack>
+              </>
+            ) : (
+              <View>
+                <Center>
+                  <Text>Bluetooth is OFF</Text>
+                  <Button onPress={() => this.requestEnabled()}>
+                    Enable Bluetooth
+                  </Button>
+                </Center>
+              </View>
+            )}
+          </ScrollView>
+        </HStack>
       </Box>
     );
   }
-
 }
 
-/**
- * Displays a list of Bluetooth devices.
- *
- * @param {NativeDevice[]} devices
- * @param {function} onPress
- * @param {function} onLongPress
- */
-export const DeviceList = ({ devices, onPress, onLongPress }) => {
-  const renderItem = ({ item }) => {
+export const DeviceList = ({devices, onPress, onLongPress}) => {
+  const renderItem = ({item}) => {
     return (
       <DeviceListItem
         device={item}
@@ -319,7 +262,7 @@ export const DeviceList = ({ devices, onPress, onLongPress }) => {
   );
 };
 
-export const DeviceListItem = ({ device, onPress, onLongPress }) => {
+export const DeviceListItem = ({device, onPress, onLongPress}) => {
   let bgColor = device.connected ? '#0f0' : '#fff';
   let icon = device.bonded ? 'ios-bluetooth' : 'ios-cellular';
 
