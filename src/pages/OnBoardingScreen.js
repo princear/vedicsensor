@@ -58,8 +58,14 @@ const OnBoardingScreen = ({navigation}) => {
   const [region, setRegion] = useState({
     latitude: 28.62243758781894,
     longitude: 77.2031226195395,
-    latitudeDelta: 0.822,
-    longitudeDelta: 0.621,
+    latitudeDelta: 0.92,
+    longitudeDelta: 0.851,
+  });
+
+  const [address, setAddress] = useState({
+    city: '',
+    state: '',
+    country: '',
   });
 
   const renderOnBoadingSteps = () => {
@@ -87,6 +93,8 @@ const OnBoardingScreen = ({navigation}) => {
           setMarkerLatLng={setMarkerLatLng}
           region={region}
           setRegion={setRegion}
+          address={address}
+          setAddress={setAddress}
         />
       );
     else if (onBoardingStep == 3)
@@ -223,6 +231,8 @@ const Step2 = props => {
     setRegion,
     onBoardingDetails,
     setOnBoardingDetails,
+    address,
+    setAddress,
   } = props;
   const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   const months = [
@@ -293,9 +303,7 @@ const Step2 = props => {
             <TextInput
               style={styles.textField}
               placeholder="Place of birth"
-              value={`Lat: ${markerLatLng.latitude.toFixed(
-                4,
-              )}, Lng: ${markerLatLng.longitude.toFixed(4)}`}
+              value={`${address.city}${address.state}${address.country}`}
               onBlur={() => setIsMapModalOpen(false)}
               onFocus={() => setIsMapModalOpen(true)}
             />
@@ -437,6 +445,7 @@ const Step2 = props => {
               setMarkerLatLng={setMarkerLatLng}
               region={region}
               setRegion={setRegion}
+              setAddress={setAddress}
             />
             <TouchableOpacity
               style={{position: 'absolute', top: 12, right: 16}}
