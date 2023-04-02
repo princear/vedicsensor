@@ -13,6 +13,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
 import auth from '@react-native-firebase/auth';
 import MyText from '../components/MyText';
+import Statusbar from '../components/Statusbar';
 
 const LoginScreen = ({navigation}) => {
   const animation = useRef(null);
@@ -91,11 +92,20 @@ const Step1 = props => {
       }
     }
   };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={{flex: 1}}>
-        <MyText style={styles.heading}>Continue with phone</MyText>
-
+        <View>
+          <View style={{marginTop: 10, marginBottom: 30}}>
+            <Statusbar
+              numberOfBars={5}
+              partiallyCompleted={1}
+              completedBars={0}
+            />
+          </View>
+          <MyText style={styles.heading}>Continue with phone</MyText>
+        </View>
         <View
           style={{
             height: 350,
@@ -232,6 +242,9 @@ const Step2 = props => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={{flex: 1}}>
+        <View style={{marginTop: 10, marginBottom: 30}}>
+          <Statusbar numberOfBars={5} completedBars={1} />
+        </View>
         <MyText style={styles.heading}>Verify phone</MyText>
         <MyText style={styles.subHeading}>Code is sent to +91 {phone}</MyText>
 

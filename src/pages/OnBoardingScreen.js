@@ -24,6 +24,7 @@ import {Pressable} from 'react-native';
 import {isEmailValid} from '../utils/validations';
 import Boy from '../../assets/boy.svg';
 import Girl from '../../assets/girl.svg';
+import Statusbar from '../components/Statusbar';
 
 const OnBoardingScreen = ({navigation}) => {
   const [onBoardingStep, setOnBoardingStep] = useState(1);
@@ -154,6 +155,9 @@ const Step1 = props => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={{flex: 1}}>
+        <View style={{marginBottom: 30}}>
+          <Statusbar numberOfBars={5} completedBars={2} />
+        </View>
         <MyText style={styles.heading}>Enter your details</MyText>
         <View style={styles.inputContainer}>
           <MaterialIcons name="person-outline" size={26} color="#1C1B1F" />
@@ -271,6 +275,9 @@ const Step2 = props => {
         </TouchableOpacity>
       )}
       <View style={{flex: 1}}>
+        <View style={{marginBottom: 30}}>
+          <Statusbar numberOfBars={5} completedBars={3} />
+        </View>
         <MyText style={styles.heading}>Enter your details</MyText>
         <View style={{flexDirection: 'row'}}>
           <MaterialIcons name="redeem" size={24} color="black" />
@@ -486,6 +493,9 @@ const Step3 = props => {
         </TouchableOpacity>
       )}
       <View style={{flex: 1}}>
+        <View style={{marginBottom: 30}}>
+          <Statusbar numberOfBars={5} completedBars={4} />
+        </View>
         <MyText style={styles.heading}>Hello Vikalp,</MyText>
         <MyText style={styles.subHeading}>Which one are you?</MyText>
 
@@ -607,6 +617,9 @@ const Step4 = props => {
         </TouchableOpacity>
       )}
       <View style={{flex: 1}}>
+        <View style={{marginBottom: 30}}>
+          <Statusbar numberOfBars={5} completedBars={5} />
+        </View>
         <MyText style={styles.heading}>Hello Vikalp,</MyText>
         <MyText style={styles.subHeading}>
           We need your height and weight.
@@ -715,7 +728,7 @@ const Step4 = props => {
                   style={[styles.dash_right, {left: 15.5 + idx * 22}]}
                 />
                 <View
-                  key={`${idx}small`}
+                  key={`${idx * 0.002}small`}
                   style={[styles.dash_sm_right, {left: 26.5 + idx * 22}]}
                 />
               </>
