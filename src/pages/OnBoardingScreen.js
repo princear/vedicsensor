@@ -134,6 +134,7 @@ const OnBoardingScreen = ({navigation}) => {
 const Step1 = props => {
   const {setOnBoardingStep, onBoardingDetails, setOnBoardingDetails} = props;
   const [disabled, setDisabled] = useState(true);
+  const [error, setError] = useState(null);
   const ref_last_name = useRef();
   const ref_email = useRef();
 
@@ -142,6 +143,14 @@ const Step1 = props => {
   };
 
   useEffect(() => {
+    if (
+      onBoardingDetails?.email !== '' &&
+      isEmailValid(onBoardingDetails?.email) === false
+    ) {
+      setError('Please provide a valid email');
+    } else {
+      setError(false);
+    }
     if (
       onBoardingDetails?.first_name === '' ||
       onBoardingDetails?.last_name === '' ||
@@ -198,6 +207,18 @@ const Step1 = props => {
             value={onBoardingDetails.email}
             onChangeText={val => handleChange('email', val)}
           />
+          {error && (
+            <MyText
+              style={{
+                position: 'absolute',
+                left: 40,
+                bottom: -22,
+                color: '#F94F41',
+                fontSize: 12,
+              }}>
+              {error}
+            </MyText>
+          )}
         </View>
       </View>
 
