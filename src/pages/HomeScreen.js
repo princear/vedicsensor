@@ -1,4 +1,4 @@
-import React, {createContext} from 'react';
+import React, {createContext, useState} from 'react';
 import {Box, NativeBaseProvider} from 'native-base';
 import RNBluetoothClassic from 'react-native-bluetooth-classic';
 //import getTheme from './native-base-theme/components';
@@ -32,9 +32,11 @@ export default class HomeScreen extends React.Component {
     };
   }
 
-  selectDevice = device => {
+  selectDevice = (device, navigation) => {
     console.log('App::selectDevice() called with: ', device);
-    this.setState({device});
+    this.setState({device}, () => {
+      navigation.navigate('ConnectionScreen');
+    });
   };
 
   async componentDidMount() {
@@ -203,8 +205,8 @@ export default class HomeScreen extends React.Component {
     );
   }
 
-  onBack() {
-    this.setState({device: undefined});
+  onBack(navigation, screen) {
+    navigation.navigate(screen);
   }
 
   render() {
@@ -215,10 +217,12 @@ export default class HomeScreen extends React.Component {
           value={{
             selectDevice: this.selectDevice,
             onBack: this.onBack,
+            bluetoothEnabled: this.state.bluetoothEnabled,
+            device: this.state.device,
           }}>
           <NativeBaseProvider>
             <NavigationContainer>
-              {this.state.isAuthenticated ? this.tabStack() : this.authStack()}
+              {!this.state.isAuthenticated ? this.tabStack() : this.authStack()}
             </NavigationContainer>
           </NativeBaseProvider>
         </BluetoothContext.Provider>

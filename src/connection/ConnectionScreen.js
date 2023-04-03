@@ -57,16 +57,16 @@ export default class ConnectionScreen extends React.Component {
 
   async connect() {
     try {
-      let connection = await this.props.device.isConnected();
+      let connection = await this.context.device.isConnected();
       if (!connection) {
         this.addData({
-          data: `Attempting connection to ${this.props.device.address}`,
+          data: `Attempting connection to ${this.context.device.address}`,
           timestamp: new Date(),
           type: 'error',
         });
 
         console.log(this.state.connectionOptions);
-        connection = await this.props.device.connect();
+        connection = await this.context.device.connect();
 
         this.addData({
           data: 'Connection successful',
@@ -75,7 +75,7 @@ export default class ConnectionScreen extends React.Component {
         });
       } else {
         this.addData({
-          data: `Connected to ${this.props.device.address}`,
+          data: `Connected to ${this.context.device.address}`,
           timestamp: new Date(),
           type: 'error',
         });
@@ -95,7 +95,7 @@ export default class ConnectionScreen extends React.Component {
   async disconnect(disconnected) {
     try {
       if (!disconnected) {
-        disconnected = await this.props.device.disconnect();
+        disconnected = await this.context.device.disconnect();
       }
 
       this.addData({
@@ -125,7 +125,7 @@ export default class ConnectionScreen extends React.Component {
     if (this.state.polling) {
       this.readInterval = setInterval(() => this.performRead(), 5000);
     } else {
-      this.readSubscription = this.props.device.onDataReceived(data =>
+      this.readSubscription = this.context.device.onDataReceived(data =>
         this.onReceivedData(data),
       );
     }
@@ -167,13 +167,13 @@ export default class ConnectionScreen extends React.Component {
   async performRead() {
     try {
       console.log('Polling for available messages');
-      let available = await this.props.device.available();
+      let available = await this.context.device.available();
       console.log(`There is data available [${available}], attempting read`);
       if (available > 0) {
         let metricData = [];
         for (let i = 0; i < available; i++) {
           console.log(`reading ${i}th time`);
-          let data = await this.props.device.read();
+          let data = await this.context.device.read();
           let amount = data.match(/[+-]?\d+(\.\d+)?/g);
           let metric_amount = 0;
           if (amount && amount.length > 0) {
@@ -249,7 +249,7 @@ export default class ConnectionScreen extends React.Component {
       console.log(`Attempting to send data ${this.state.text}`);
       let message = this.state.text + '\r';
       await RNBluetoothClassic.writeToDevice(
-        this.props.device.address,
+        this.context.device.address,
         message,
       );
 
@@ -260,7 +260,7 @@ export default class ConnectionScreen extends React.Component {
       });
 
       let data = Buffer.alloc(10, 0xef);
-      await this.props.device.write(data);
+      await this.context.device.write(data);
 
       this.addData({
         timestamp: new Date(),
@@ -296,7 +296,9 @@ export default class ConnectionScreen extends React.Component {
           w="100%"
           h="10%">
           <IconButton
-            onPress={this.props.onBack}
+            onPress={() =>
+              this.context?.onBack(this.props.navigation, 'DeviceListScreen')
+            }
             icon={
               <Icon
                 size="24px"
@@ -309,10 +311,10 @@ export default class ConnectionScreen extends React.Component {
 
           <Box>
             <Text color="white" fontSize="16" fontWeight="bold">
-              {this.context.state.device.name}
+              {this.context?.device?.name}
             </Text>
             <Text color="white" fontSize="16" fontWeight="bold">
-              {this.props.device.address}
+              {this.context?.device?.address}
             </Text>
           </Box>
           <IconButton
