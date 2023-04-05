@@ -45,3 +45,19 @@ export const requestBluetoothPermission = async () => {
   );
   return granted === PermissionsAndroid.RESULTS.GRANTED;
 };
+
+export const requestBluetoothScanPermission = async () => {
+  const granted = await PermissionsAndroid.request(
+    PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+    {
+      title: 'Access bluetooth scan required for discovery',
+      message:
+        'In order to perform discovery, you must enable/allow ' +
+        'bluetooth scan.',
+      buttonNeutral: 'Ask Me Later',
+      buttonNegative: 'Cancel',
+      buttonPositive: 'OK',
+    },
+  );
+  return granted === PermissionsAndroid.RESULTS.GRANTED;
+};

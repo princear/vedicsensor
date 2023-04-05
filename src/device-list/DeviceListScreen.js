@@ -18,6 +18,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   requestAccessFineLocationPermission,
   requestBluetoothPermission,
+  requestBluetoothScanPermission,
 } from '../utils/permissions';
 import {BluetoothContext} from '../context';
 
@@ -35,6 +36,7 @@ export default class DeviceListScreen extends React.Component {
 
   componentDidMount() {
     this.getBondedDevices();
+    requestBluetoothScanPermission();
   }
 
   componentWillUnmount() {
@@ -212,7 +214,10 @@ export default class DeviceListScreen extends React.Component {
             {this.context.bluetoothEnabled && (
               <IconButton
                 transparent
-                onPress={this.getBondedDevices}
+                onPress={() => {
+                  this.getBondedDevices();
+                  this.startDiscovery();
+                }}
                 icon={<Icon as={MaterialIcons} name="cached" />}></IconButton>
             )}
           </HStack>
