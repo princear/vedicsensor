@@ -17,6 +17,11 @@ import IntroScreen from './IntroScreen.js';
 import OnBoardingScreen from './OnBoardingScreen';
 import Questionnaire from './Questionnaire';
 import {BluetoothContext, AuthContext} from '../context';
+import ActivityScreen from './ActivityScreen';
+import NutritionScreen from './NutritionScreen';
+import NotificationScreen from './NotificationScreen';
+import ProfileScreen from './ProfileScreen';
+import {View} from 'react-native';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -105,7 +110,11 @@ export default class HomeScreen extends React.Component {
       iconName = focused ? 'person' : 'person-outline';
       return <Ionicons name={iconName} size={size} color={color} />;
     }
-    return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
+    return (
+      <View>
+        <MaterialCommunityIcons name={iconName} size={size} color={color} />
+      </View>
+    );
   }
 
   HealthStack() {
@@ -120,12 +129,42 @@ export default class HomeScreen extends React.Component {
     );
   }
 
-  ManageStack() {
+  ActivityStack() {
     return (
       <Stack.Navigator
-        initialRouteName="Manage"
+        initialRouteName="Activity"
         screenOptions={{headerShown: false}}>
-        <Stack.Screen name="Manage" component={HealthScreen} />
+        <Stack.Screen name="Activity" component={ActivityScreen} />
+      </Stack.Navigator>
+    );
+  }
+
+  NutritionStack() {
+    return (
+      <Stack.Navigator
+        initialRouteName="Activity"
+        screenOptions={{headerShown: false}}>
+        <Stack.Screen name="Activity" component={NutritionScreen} />
+      </Stack.Navigator>
+    );
+  }
+
+  NotificationStack() {
+    return (
+      <Stack.Navigator
+        initialRouteName="Activity"
+        screenOptions={{headerShown: false}}>
+        <Stack.Screen name="Activity" component={NotificationScreen} />
+      </Stack.Navigator>
+    );
+  }
+
+  ProfileStack() {
+    return (
+      <Stack.Navigator
+        initialRouteName="Activity"
+        screenOptions={{headerShown: false}}>
+        <Stack.Screen name="Activity" component={ProfileScreen} />
       </Stack.Navigator>
     );
   }
@@ -146,8 +185,8 @@ export default class HomeScreen extends React.Component {
             height: 60,
           },
           tabBarItemStyle: {
-            margin: 6,
-            borderRadius: 10,
+            marginBottom: 6,
+            borderTopWidth: !true ? 1 : 0,
           },
         })}>
         <Tab.Screen
@@ -160,7 +199,7 @@ export default class HomeScreen extends React.Component {
         />
         <Tab.Screen
           name="ActivityStack"
-          component={this.HealthStack}
+          component={this.ActivityStack}
           options={{
             tabBarLabel: 'Activity',
             title: 'Activity',
@@ -168,7 +207,7 @@ export default class HomeScreen extends React.Component {
         />
         <Tab.Screen
           name="NutritionStack"
-          component={this.ManageStack}
+          component={this.NutritionStack}
           options={{
             tabBarLabel: 'Nutrition',
             title: 'Nutrition',
@@ -176,7 +215,7 @@ export default class HomeScreen extends React.Component {
         />
         <Tab.Screen
           name="Notification"
-          component={this.ManageStack}
+          component={this.NotificationStack}
           options={{
             tabBarLabel: 'Notification',
             title: 'Notification',
@@ -184,7 +223,7 @@ export default class HomeScreen extends React.Component {
         />
         <Tab.Screen
           name="Profile"
-          component={this.ManageStack}
+          component={this.ProfileStack}
           options={{
             tabBarLabel: 'Profile',
             title: 'Profile',

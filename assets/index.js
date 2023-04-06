@@ -9,6 +9,9 @@ const assets = {
     female: require('./female.json'),
     rollingCheck: require('./rolling-check-mark.json'),
     basketBallPlaying: require('./basket-ball-playing.json'),
+    sleepingPanda: require('./panda-sleep.json'),
+    paperPlane: require('./loading-paperplane.json'),
+    snoozeBell: require('./bell-snooze.json'),
   },
   png: {
     devices: require('./devices_wearables.png'),
