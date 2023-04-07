@@ -7,12 +7,6 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {StyleSheet, View, TouchableOpacity} from 'react-native';
 
 const ProfileScreen = ({navigation}) => {
-  React.useEffect(() => {
-    navigation.setOptions({
-      tabBarStyle: {display: 'none'},
-    });
-  }, []);
-
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity

@@ -12,6 +12,8 @@ const assets = {
     sleepingPanda: require('./panda-sleep.json'),
     paperPlane: require('./loading-paperplane.json'),
     snoozeBell: require('./bell-snooze.json'),
+    astronaut: require('./cute-astronaut-floating-with-rocket-on-space-cartoon.json'),
+    confetti: require('./confetti.json'),
   },
   png: {
     devices: require('./devices_wearables.png'),
