@@ -23,6 +23,7 @@ import SunMoon from '../../assets/sun-moon.svg';
 import Calender from '../../assets/calender.svg';
 import Devices from '../../assets/devices.svg';
 import MyText from '../components/MyText';
+import WebView from 'react-native-webview';
 
 const HealthScreen = ({navigation}) => {
   return (
@@ -179,6 +180,14 @@ const HealthScreen = ({navigation}) => {
 const Metrics = () => {
   return (
     <>
+      <View style={{height: 200, flexGrow: 1, marginVertical: 20}}>
+        <WebView
+          source={{
+            uri: 'http://grafana.madmachines.in/d-solo/uHpeypLVz/vat-only?orgId=1&from=1680184189208&to=1680788989208&panelId=2',
+          }}
+          style={{flex: 1}}
+        />
+      </View>
       <View
         style={{
           marginVertical: 24,
