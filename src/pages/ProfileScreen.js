@@ -4,9 +4,15 @@ import MyText from '../components/MyText';
 import assets from '../../assets';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import {StyleSheet, View, TouchableOpacity} from 'react-native';
 
 const ProfileScreen = ({navigation}) => {
+  React.useEffect(() => {
+    navigation.setOptions({
+      tabBarStyle: {display: 'none'},
+    });
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity
@@ -14,7 +20,20 @@ const ProfileScreen = ({navigation}) => {
         onPress={() => navigation.navigate('Health')}>
         <MaterialIcons name="arrow-back" color="#1C1B1F" size={24} />
       </TouchableOpacity>
-      <Text style={{marginTop: 20}}>Profile Page</Text>
+      <MyText style={{marginTop: 20}}>Profile Page</MyText>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('CheckZipCode')}
+        style={{
+          marginTop: 10,
+          backgroundColor: '#3259CB',
+          width: 100,
+          padding: 8,
+          borderRadius: 8,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <MyText style={{color: '#ffffff'}}>Book a test</MyText>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };

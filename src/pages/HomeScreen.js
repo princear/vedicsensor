@@ -22,6 +22,7 @@ import NutritionScreen from './NutritionScreen';
 import NotificationScreen from './NotificationScreen';
 import ProfileScreen from './ProfileScreen';
 import {View} from 'react-native';
+import {CheckZipCode} from './BookTest';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -165,6 +166,7 @@ export default class HomeScreen extends React.Component {
         initialRouteName="Activity"
         screenOptions={{headerShown: false}}>
         <Stack.Screen name="Activity" component={ProfileScreen} />
+        <Stack.Screen name="CheckZipCode" component={CheckZipCode} />
       </Stack.Navigator>
     );
   }
@@ -173,13 +175,13 @@ export default class HomeScreen extends React.Component {
     return (
       <Tab.Navigator
         initialRouteName="Feed"
-        screenOptions={({route}) => ({
+        screenOptions={props => ({
           headerShown: false,
-          headerTintColor: '#fff',
-          headerTitleStyle: {fontWeight: 'bold'},
+          //  headerTintColor: '#fff',
+          //  headerTitleStyle: {fontWeight: 'bold'},
           tabBarActiveTintColor: '#000000',
           tabBarInactiveTintColor: 'gray',
-          tabBarIcon: props => this.tabBarIcon(route, props),
+          tabBarIcon: e => this.tabBarIcon(props.route, e),
           tabBarStyle: {
             backgroundColor: '#ffffff',
             height: 60,
@@ -187,6 +189,9 @@ export default class HomeScreen extends React.Component {
           tabBarItemStyle: {
             marginBottom: 6,
             borderTopWidth: !true ? 1 : 0,
+          },
+          defaultNavigationOptions: {
+            tabBarVisible: false,
           },
         })}>
         <Tab.Screen
