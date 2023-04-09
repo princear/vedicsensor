@@ -16,7 +16,7 @@ const ProfileScreen = ({navigation}) => {
       </TouchableOpacity>
       <MyText style={{marginTop: 20}}>Profile Page</MyText>
       <TouchableOpacity
-        onPress={() => navigation.navigate('MembersList')}
+        onPress={() => navigation.navigate('AddMember')}
         style={{
           marginTop: 10,
           backgroundColor: '#3259CB',

@@ -1,16 +1,18 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import MyText from '../../components/MyText';
 import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-const members = [
+const data = [
   {name: 'Rohaan', gender: 'male', age: 21, relation: 'self'},
   {name: 'Navdeep', gender: 'male', age: 23, relation: 'senior'},
 ];
 
 const MembersList = ({navigation, route}) => {
+  const [members, setMembers] = useState(data);
+
   useEffect(() => {
     navigation.getParent()?.setOptions({
       tabBarStyle: {display: 'none'},

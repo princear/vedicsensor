@@ -22,7 +22,7 @@ import NutritionScreen from './NutritionScreen';
 import NotificationScreen from './NotificationScreen';
 import ProfileScreen from './ProfileScreen';
 import {View} from 'react-native';
-import {CheckZipCode, MembersList} from './BookTest';
+import {AddMember, CheckZipCode, MembersList} from './BookTest';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -168,6 +168,7 @@ export default class HomeScreen extends React.Component {
         <Stack.Screen name="Activity" component={ProfileScreen} />
         <Stack.Screen name="CheckZipCode" component={CheckZipCode} />
         <Stack.Screen name="MembersList" component={MembersList} />
+        <Stack.Screen name="AddMember" component={AddMember} />
       </Stack.Navigator>
     );
   }
