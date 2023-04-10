@@ -42,6 +42,7 @@ export default class HomeScreen extends React.Component {
       device: undefined,
       bluetoothEnabled: true,
     };
+    this.setState = this.setState.bind(this);
   }
 
   selectDevice = (device, navigation) => {
@@ -266,10 +267,18 @@ export default class HomeScreen extends React.Component {
     navigation.navigate(screen);
   }
 
+  authenticate() {
+    this.setState({isAuthenticated: true});
+  }
+
   render() {
     return (
       <AuthContext.Provider
-        value={{isAuthenticated: this.state.isAuthenticated}}>
+        value={{
+          isAuthenticated: this.state.isAuthenticated,
+          setState: this.setState,
+          authenticate: this.authenticate,
+        }}>
         <BluetoothContext.Provider
           value={{
             selectDevice: this.selectDevice,
@@ -279,7 +288,7 @@ export default class HomeScreen extends React.Component {
           }}>
           <NativeBaseProvider>
             <NavigationContainer>
-              {!this.state.isAuthenticated ? this.tabStack() : this.authStack()}
+              {this.state.isAuthenticated ? this.tabStack() : this.authStack()}
             </NavigationContainer>
           </NativeBaseProvider>
         </BluetoothContext.Provider>

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import assets from '../../assets';
 import LottieView from 'lottie-react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -25,6 +25,7 @@ import {isEmailValid} from '../utils/validations';
 import Boy from '../../assets/boy.svg';
 import Girl from '../../assets/girl.svg';
 import Statusbar from '../components/Statusbar';
+import {AuthContext} from '../context';
 
 const OnBoardingScreen = ({navigation}) => {
   const [onBoardingStep, setOnBoardingStep] = useState(1);
@@ -530,7 +531,7 @@ const Step3 = props => {
             style={[
               styles.box_outside,
               {
-                width: windowDimensions.width - 205,
+                marginRight: 8,
                 borderColor:
                   onBoardingDetails.gender == 'male' ? '#3460D7' : '#6750A40D',
               },
@@ -557,7 +558,7 @@ const Step3 = props => {
             style={[
               styles.box_outside,
               {
-                width: windowDimensions.width - 205,
+                marginLeft: 8,
                 borderColor:
                   onBoardingDetails.gender == 'female'
                     ? '#3460D7'
@@ -858,6 +859,8 @@ const Step5 = props => {
     onBoardingDetails,
     setOnBoardingDetails,
   } = props;
+  const authContext = useContext(AuthContext);
+
   const animation = useRef();
 
   useEffect(() => {
@@ -898,7 +901,9 @@ const Step5 = props => {
       </View>
       <TouchableOpacity
         style={[styles.button_blue]}
-        onPress={() => navigation.navigate('Questionnaire')}>
+        onPress={() => {
+          authContext?.authenticate();
+        }}>
         <MyText style={styles.button_blue_text}>Continue</MyText>
       </TouchableOpacity>
     </SafeAreaView>
@@ -991,7 +996,7 @@ const styles = StyleSheet.create({
     color: '#323232',
   },
   box_outside: {
-    //  marginRight: 20,
+    flexGrow: 1,
     alignItems: 'center',
     width: 170,
     height: 190,

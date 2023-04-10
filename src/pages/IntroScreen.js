@@ -106,7 +106,7 @@ const IntroScreen = ({navigation}) => {
           autoPlay={false}
           width={width}
           data={data}
-          scrollAnimationDuration={600}
+          scrollAnimationDuration={200}
           onSnapToItem={index => {
             setIntroStep(index);
             animation?.current?.play();
