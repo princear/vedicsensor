@@ -139,9 +139,9 @@ export default class HomeScreen extends React.Component {
   ActivityStack() {
     return (
       <Stack.Navigator
-        initialRouteName="Activity"
+        initialRouteName="ActivityScreen"
         screenOptions={{headerShown: false}}>
-        <Stack.Screen name="Activity" component={ActivityScreen} />
+        <Stack.Screen name="ActivityScreen" component={ActivityScreen} />
       </Stack.Navigator>
     );
   }
@@ -149,9 +149,9 @@ export default class HomeScreen extends React.Component {
   NutritionStack() {
     return (
       <Stack.Navigator
-        initialRouteName="Activity"
+        initialRouteName="NutritionScreen"
         screenOptions={{headerShown: false}}>
-        <Stack.Screen name="Activity" component={NutritionScreen} />
+        <Stack.Screen name="NutritionScreen" component={NutritionScreen} />
       </Stack.Navigator>
     );
   }
@@ -159,9 +159,12 @@ export default class HomeScreen extends React.Component {
   NotificationStack() {
     return (
       <Stack.Navigator
-        initialRouteName="Activity"
+        initialRouteName="NotificationScreen"
         screenOptions={{headerShown: false}}>
-        <Stack.Screen name="Activity" component={NotificationScreen} />
+        <Stack.Screen
+          name="NotificationScreen"
+          component={NotificationScreen}
+        />
       </Stack.Navigator>
     );
   }
@@ -169,9 +172,9 @@ export default class HomeScreen extends React.Component {
   ProfileStack() {
     return (
       <Stack.Navigator
-        initialRouteName="Activity"
+        initialRouteName="ProfileScreen"
         screenOptions={{headerShown: false}}>
-        <Stack.Screen name="Activity" component={ProfileScreen} />
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
         <Stack.Screen name="CheckZipCode" component={CheckZipCode} />
         <Stack.Screen name="MembersList" component={MembersList} />
         <Stack.Screen name="AddMember" component={AddMember} />

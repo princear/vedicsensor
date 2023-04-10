@@ -54,7 +54,7 @@ const MembersList = ({navigation, route}) => {
         <View style={{flexDirection: 'row', marginBottom: 30}}>
           <TouchableOpacity
             style={{width: 20}}
-            onPress={() => navigation.goBack()}>
+            onPress={() => navigation.navigate('ProfileScreen')}>
             <MaterialIcons name="arrow-back" color="#1C1B1F" size={24} />
           </TouchableOpacity>
           <MyText
@@ -73,7 +73,8 @@ const MembersList = ({navigation, route}) => {
         <View style={{flexShrink: 1}}>
           <View style={{position: 'absolute', right: 0, zIndex: 1}}>
             <TouchableOpacity
-              style={{flexDirection: 'row', alignItems: 'center'}}>
+              style={{flexDirection: 'row', alignItems: 'center'}}
+              onPress={() => navigation.navigate('AddMember')}>
               <MaterialIcons name="add-circle" size={24} color="#3259CB" />
               <MyText
                 style={{color: '#3259CB', marginLeft: 8, fontWeight: '500'}}>
@@ -165,7 +166,9 @@ const MembersList = ({navigation, route}) => {
         </View>
       </View>
       <View style={{marginVertical: 20}}>
-        <TouchableOpacity style={styles.button_blue} onPress={() => {}}>
+        <TouchableOpacity
+          style={styles.button_blue}
+          onPress={() => navigation.navigate('LocateMe')}>
           <MyText style={styles.button_blue_text}>Continue</MyText>
         </TouchableOpacity>
       </View>

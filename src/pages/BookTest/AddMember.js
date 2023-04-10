@@ -236,7 +236,7 @@ const AddMember = ({navigation, route}) => {
               dob: dateOfBirth,
               gender: gender,
             });
-            // console.warn(memberDetails);
+            navigation.navigate('MembersList');
           }}>
           <MyText style={styles.button_blue_text}>Add Member</MyText>
         </TouchableOpacity>

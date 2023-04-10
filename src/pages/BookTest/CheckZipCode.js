@@ -28,6 +28,14 @@ const CheckZipCode = ({navigation, route}) => {
   }, [submitted, success]);
 
   useEffect(() => {
+    if (success) {
+      setTimeout(() => {
+        navigation.navigate('MembersList');
+      }, 2000);
+    }
+  }, [success]);
+
+  useEffect(() => {
     navigation.getParent()?.setOptions({
       tabBarStyle: {display: 'none'},
     });

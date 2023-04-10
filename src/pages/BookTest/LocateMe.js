@@ -139,7 +139,9 @@ const LocateMe = ({navigation, route}) => {
           </Flex>
         </View>
         <View style={{marginBottom: 40}}>
-          <TouchableOpacity style={styles.button_blue}>
+          <TouchableOpacity
+            style={styles.button_blue}
+            onPress={() => navigation.navigate('ScheduleTest')}>
             <MyText style={styles.button_blue_text}>Confirm Location</MyText>
           </TouchableOpacity>
         </View>
@@ -208,9 +210,10 @@ const LocateMe = ({navigation, route}) => {
           </MyText>
 
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            {addressSavingOptions.map(item => {
+            {addressSavingOptions.map((item, idx) => {
               return (
                 <TouchableOpacity
+                  key={idx}
                   style={styles.radio_row}
                   onPress={() => handleChange('addressType', item)}>
                   <View style={styles.radio}>
