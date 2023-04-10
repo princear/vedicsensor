@@ -183,7 +183,7 @@ const Metrics = () => {
       <View style={{height: 200, flexGrow: 1, marginVertical: 20}}>
         <WebView
           source={{
-            uri: 'http://grafana.madmachines.in/d-solo/uHpeypLVz/vat-only?orgId=1&from=1680184189208&to=1680788989208&panelId=2',
+            uri: 'http://grafana.madmachines.in/d-solo/vtJmaDhVk/nadi-monitoring?orgId=1&from=1681103875911&to=1681104085713&panelId=2',
           }}
           style={{flex: 1}}
         />
