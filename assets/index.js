@@ -14,6 +14,8 @@ const assets = {
     snoozeBell: require('./bell-snooze.json'),
     astronaut: require('./cute-astronaut-floating-with-rocket-on-space-cartoon.json'),
     confetti: require('./confetti.json'),
+    success: require('./success-animation.json'),
+    successCalender: require('./calendar-success-add.json'),
   },
   png: {
     devices: require('./devices_wearables.png'),

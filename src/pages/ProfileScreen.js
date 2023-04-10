@@ -16,7 +16,7 @@ const ProfileScreen = ({navigation}) => {
       </TouchableOpacity>
       <MyText style={{marginTop: 20}}>Profile Page</MyText>
       <TouchableOpacity
-        onPress={() => navigation.navigate('LocateMe')}
+        onPress={() => navigation.navigate('ScheduleTest')}
         style={{
           marginTop: 10,
           backgroundColor: '#3259CB',
