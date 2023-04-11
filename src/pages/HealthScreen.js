@@ -6,9 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   View,
-  Text,
   SafeAreaView,
-  Dimensions,
   ScrollView,
 } from 'react-native';
 import {RadialSlider} from 'react-native-radial-slider';
@@ -24,6 +22,8 @@ import Waves from '../../assets/waves.svg';
 import SunMoon from '../../assets/sun-moon.svg';
 import Calender from '../../assets/calender.svg';
 import Devices from '../../assets/devices.svg';
+import MyText from '../components/MyText';
+import WebView from 'react-native-webview';
 
 const HealthScreen = ({navigation}) => {
   return (
@@ -37,9 +37,9 @@ const HealthScreen = ({navigation}) => {
             onPress={() => navigation.navigate('DeviceListScreen')}
             style={{flexDirection: 'row', alignItems: 'center'}}>
             <Devices style={{marginRight: 8}} height={17} width={17} />
-            <Text style={{color: '#3460D7', fontWeight: '500'}}>
+            <MyText style={{color: '#3460D7', fontWeight: '500'}}>
               Connect device
-            </Text>
+            </MyText>
           </TouchableOpacity>
         </View>
         <View style={{flex: 1, padding: 20}}>
@@ -55,13 +55,13 @@ const HealthScreen = ({navigation}) => {
               color="#C4B000"
               style={{marginRight: 6}}
             />
-            <Text style={{color: '#3460D7', fontSize: 10, fontWeight: '500'}}>
+            <MyText style={{color: '#3460D7', fontSize: 10, fontWeight: '500'}}>
               TUESDAY 21 FEB
-            </Text>
+            </MyText>
           </View>
-          <Text style={{color: '#323232', fontWeight: '700', fontSize: 20}}>
+          <MyText style={{color: '#323232', fontWeight: '700', fontSize: 20}}>
             Hello Vikalp,
-          </Text>
+          </MyText>
 
           <View
             style={[
@@ -112,11 +112,11 @@ const HealthScreen = ({navigation}) => {
                   position: 'absolute',
                   bottom: -2,
                 }}>
-                <Text
+                <MyText
                   style={{fontWeight: '400', fontSize: 12, color: '#323232'}}>
                   Your Score
-                </Text>
-                <Text
+                </MyText>
+                <MyText
                   style={{
                     fontWeight: '800',
                     marginTop: -5,
@@ -124,19 +124,19 @@ const HealthScreen = ({navigation}) => {
                     color: '#323232',
                   }}>
                   80
-                </Text>
+                </MyText>
               </View>
             </View>
             <View style={{justifyContent: 'center', flex: 1}}>
-              <Text style={{width: '90%', fontWeight: '400'}}>
+              <MyText style={{width: '90%', fontWeight: '400'}}>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
                 eiusmod tempor..
-              </Text>
+              </MyText>
               <TouchableOpacity style={{marignTop: 20}}>
-                <Text
+                <MyText
                   style={{color: '#3460D7', fontWeight: '500', marginTop: 10}}>
                   View More
-                </Text>
+                </MyText>
               </TouchableOpacity>
             </View>
           </View>
@@ -148,13 +148,13 @@ const HealthScreen = ({navigation}) => {
               justifyContent: 'space-between',
               alignItems: 'center',
             }}>
-            <Text style={{fontWeight: '400', color: '#323232', width: 180}}>
+            <MyText style={{fontWeight: '400', color: '#323232', width: 180}}>
               Last Nadi collection time was at 06:14 am, today
-            </Text>
+            </MyText>
             <TouchableOpacity style={{marignTop: 20}}>
-              <Text style={{color: '#3460D7', fontWeight: '500'}}>
+              <MyText style={{color: '#3460D7', fontWeight: '500'}}>
                 Check Now
-              </Text>
+              </MyText>
             </TouchableOpacity>
           </View>
 
@@ -178,10 +178,16 @@ const HealthScreen = ({navigation}) => {
 };
 
 const Metrics = () => {
-  const windowDimensions = Dimensions.get('window');
-
   return (
     <>
+      <View style={{height: 200, flexGrow: 1, marginVertical: 20}}>
+        <WebView
+          source={{
+            uri: 'http://grafana.madmachines.in/d-solo/vtJmaDhVk/nadi-monitoring?orgId=1&from=1681131684285&to=1681139825402&var-device_name=device1&panelId=2',
+          }}
+          style={{flex: 1}}
+        />
+      </View>
       <View
         style={{
           marginVertical: 24,
@@ -189,9 +195,9 @@ const Metrics = () => {
           justifyContent: 'space-between',
           alignItems: 'center',
         }}>
-        <Text style={{fontSize: 18, fontWeight: '700', color: '#323232'}}>
+        <MyText style={{fontSize: 18, fontWeight: '700', color: '#323232'}}>
           Metrics
-        </Text>
+        </MyText>
         <TouchableOpacity>
           <MaterialCommunityIcons
             name="dots-horizontal"
@@ -204,9 +210,9 @@ const Metrics = () => {
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
-          marginBottom: 20,
+          marginBottom: 10,
         }}>
-        <View style={[styles.square, {width: windowDimensions.width - 205}]}>
+        <View style={styles.square}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <MaterialCommunityIcons
               name="cards-heart-outline"
@@ -214,16 +220,16 @@ const Metrics = () => {
               color="#E82927"
               style={{marginRight: 10}}
             />
-            <Text style={{fontSize: 12, color: '#323232'}}>Heart</Text>
+            <MyText style={{fontSize: 12, color: '#323232'}}>Heart</MyText>
           </View>
           <View style={{marginTop: 12, alignItems: 'center'}}>
             <HeartBeat width={120} height={50} />
           </View>
-          <View style={{marginTop: 16}}>
-            <Text style={{fontSize: 26, color: '#323232', fontWeight: '500'}}>
+          <View style={{marginTop: 10}}>
+            <MyText style={{fontSize: 26, color: '#323232', fontWeight: '500'}}>
               92
-            </Text>
-            <Text
+            </MyText>
+            <MyText
               style={{
                 fontSize: 9,
                 color: '#323232',
@@ -233,55 +239,57 @@ const Metrics = () => {
                 top: 4,
               }}>
               BPM
-            </Text>
-            <Text style={{fontSize: 10, color: '#323232', fontWeight: '400'}}>
+            </MyText>
+            <MyText style={{fontSize: 8, color: '#323232', fontWeight: '400'}}>
               Last updated 2 hours ago
-            </Text>
+            </MyText>
           </View>
         </View>
-        <View style={[styles.square, {width: windowDimensions.width - 205}]}>
+        <View style={styles.square}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <O2 style={{marginRight: 10}} />
-            <Text style={{fontSize: 12, color: '#323232'}}>Oxygen</Text>
+            <MyText style={{fontSize: 12, color: '#323232'}}>Oxygen</MyText>
           </View>
           <View style={{marginTop: 12, alignItems: 'center'}}>
             <OxygenLevel width={120} height={50} />
           </View>
-          <View style={{marginTop: 16}}>
-            <Text style={{fontSize: 26, color: '#323232', fontWeight: '500'}}>
-              95
-            </Text>
-            <Text
-              style={{
-                fontSize: 9,
-                color: '#323232',
-                fontWeight: '500',
-                position: 'absolute',
-                left: 34,
-                bottom: 20,
-              }}>
-              %
-            </Text>
-            <Text style={{fontSize: 10, color: '#323232', fontWeight: '400'}}>
+          <View style={{marginTop: 10}}>
+            <MyText style={{fontSize: 26, color: '#323232', fontWeight: '500'}}>
+              99
+              <MyText
+                style={{
+                  fontSize: 9,
+                  color: '#323232',
+                  fontWeight: '500',
+                  position: 'absolute',
+                  left: 34,
+                  bottom: 20,
+                }}>
+                %
+              </MyText>
+            </MyText>
+            <MyText style={{fontSize: 8, color: '#323232', fontWeight: '400'}}>
               Last updated 2 hours ago
-            </Text>
+            </MyText>
           </View>
         </View>
       </View>
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-        <View style={[styles.square, {width: windowDimensions.width - 205}]}>
+        <View style={styles.square}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <GlucosePoint style={{marginRight: 10}} />
-            <Text style={{fontSize: 12, color: '#323232'}}>Blood glucose</Text>
+            <MyText style={{fontSize: 12, color: '#323232'}}>
+              Blood glucose
+            </MyText>
           </View>
           <View style={{marginTop: 12, alignItems: 'center'}}>
             <Glucose width={110} height={40} style={{marginTop: 10}} />
           </View>
-          <View style={{marginTop: 16}}>
-            <Text style={{fontSize: 26, color: '#323232', fontWeight: '500'}}>
+          <View style={{marginTop: 10}}>
+            <MyText style={{fontSize: 26, color: '#323232', fontWeight: '500'}}>
               106
-            </Text>
-            <Text
+            </MyText>
+            <MyText
               style={{
                 fontSize: 9,
                 color: '#323232',
@@ -291,17 +299,17 @@ const Metrics = () => {
                 top: 2,
               }}>
               mg/dl
-            </Text>
-            <Text style={{fontSize: 10, color: '#323232', fontWeight: '400'}}>
+            </MyText>
+            <MyText style={{fontSize: 8, color: '#323232', fontWeight: '400'}}>
               Last updated 2 hours ago
-            </Text>
+            </MyText>
           </View>
         </View>
 
-        <View style={[styles.square, {width: windowDimensions.width - 205}]}>
+        <View style={styles.square}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <FootPrint style={{marginRight: 10}} />
-            <Text style={{fontSize: 12, color: '#323232'}}>Steps</Text>
+            <MyText style={{fontSize: 12, color: '#323232'}}>Steps</MyText>
           </View>
           <View
             style={{
@@ -310,19 +318,19 @@ const Metrics = () => {
               justifyContent: 'center',
               flex: 1,
             }}>
-            <Text style={{fontSize: 26, color: '#323232', fontWeight: '500'}}>
+            <MyText style={{fontSize: 26, color: '#323232', fontWeight: '500'}}>
               9,586
-            </Text>
+            </MyText>
           </View>
-          <Text
+          <MyText
             style={{
               marginTop: 16,
-              fontSize: 10,
+              fontSize: 8,
               color: '#323232',
               fontWeight: '400',
             }}>
             Last updated 2 hours ago
-          </Text>
+          </MyText>
         </View>
       </View>
     </>
@@ -332,7 +340,7 @@ const Metrics = () => {
 const Card = ({title, details, Svg}) => {
   return (
     <View style={styles.container_blue}>
-      <Text style={styles.container_blue_heading}>{title}</Text>
+      <MyText style={styles.container_blue_heading}>{title}</MyText>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <View
           style={{
@@ -345,16 +353,16 @@ const Card = ({title, details, Svg}) => {
           <Svg />
         </View>
         <View style={{justifyContent: 'center'}}>
-          <Text style={{width: 200, fontWeight: '400'}}>{details}</Text>
+          <MyText style={{width: 200, fontWeight: '400'}}>{details}</MyText>
           <TouchableOpacity style={{marignTop: 20}}>
-            <Text
+            <MyText
               style={{
                 color: '#3460D7',
                 fontWeight: '500',
                 marginTop: 10,
               }}>
               View More
-            </Text>
+            </MyText>
           </TouchableOpacity>
         </View>
       </View>
@@ -402,7 +410,10 @@ const styles = StyleSheet.create({
     borderWidth: 0.2,
     borderRadius: 12,
     borderColor: '#323232',
-    height: 180,
+    height: 170,
+    flex: 1,
+    flexGrow: 1,
+    marginRight: 8,
   },
 });
 export default HealthScreen;

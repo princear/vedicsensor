@@ -6,10 +6,21 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Dimensions, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import {GOOGLE_MAP_API_KEY} from '@env';
+import MyText from './MyText';
 
 const Map = props => {
-  const {height, markerLatLng, setMarkerLatLng, region, setRegion, setAddress} =
-    props;
+  const {
+    height,
+    markerLatLng,
+    setMarkerLatLng,
+    region,
+    setRegion,
+    setAddress,
+    hidePlacesAutoComplete = false,
+    showLocateMeButton,
+    locateMeButtonStyles,
+    locateMeButtonText,
+  } = props;
   const {width} = Dimensions.get('window');
 
   const getCurrentLocation = () => {
@@ -44,12 +55,25 @@ const Map = props => {
     )
       .then(res => res.json())
       .then(response => {
+        const formatted_address = response.results[0].formatted_address;
+        const locality = getLocality(response) + ', ';
         const city = getCityName(response) + ', ';
         const state = getStateName(response) + ' ';
         const country = getCountryName(response);
 
-        setAddress({city, state, country});
+        setAddress({locality, city, state, country, formatted_address});
       });
+  };
+
+  const getLocality = data => {
+    const localityComponent = data.results[0].address_components.find(
+      component => {
+        return component.types.includes('sublocality_level_1');
+      },
+    );
+    const locality = localityComponent ? localityComponent.long_name : '';
+    return locality;
+    //  console.warn(cityComponent);
   };
 
   const getCityName = data => {
@@ -89,35 +113,38 @@ const Map = props => {
 
   return (
     <View style={styles.map_container}>
-      <TouchableOpacity
-        onPress={getCurrentLocation}
-        style={{position: 'absolute', bottom: 52, right: 24, zIndex: 10}}>
-        <MaterialIcons name="my-location" size={20} color="#3460D7" />
-      </TouchableOpacity>
-      <GooglePlacesAutocomplete
-        styles={{
-          container: styles.search_container,
-          textInput: styles.text_input,
-        }}
-        fetchDetails={true}
-        placeholder="Search"
-        onPress={(data, details = null) => {
-          setMarkerLatLng({
-            latitude: details?.geometry?.location?.lat,
-            longitude: details?.geometry?.location?.lng,
-          });
-          setRegion({
-            ...region,
-            latitude: details?.geometry?.location?.lat,
-            longitude: details?.geometry?.location?.lng,
-          });
-        }}
-        query={{
-          key: GOOGLE_MAP_API_KEY,
-          language: 'en',
-        }}
-      />
-
+      {!hidePlacesAutoComplete && (
+        <>
+          <TouchableOpacity
+            onPress={getCurrentLocation}
+            style={{position: 'absolute', bottom: 53, right: 30, zIndex: 100}}>
+            <MaterialIcons name="my-location" size={20} color="#3460D7" />
+          </TouchableOpacity>
+          <GooglePlacesAutocomplete
+            styles={{
+              container: styles.search_container,
+              textInput: styles.text_input,
+            }}
+            fetchDetails={true}
+            placeholder="Search"
+            onPress={(data, details = null) => {
+              setMarkerLatLng({
+                latitude: details?.geometry?.location?.lat,
+                longitude: details?.geometry?.location?.lng,
+              });
+              setRegion({
+                ...region,
+                latitude: details?.geometry?.location?.lat,
+                longitude: details?.geometry?.location?.lng,
+              });
+            }}
+            query={{
+              key: GOOGLE_MAP_API_KEY,
+              language: 'en',
+            }}
+          />
+        </>
+      )}
       <MaterialIcons
         name="location-pin"
         size={50}
@@ -138,6 +165,19 @@ const Map = props => {
         }}>
         {/* <Marker coordinate={markerLatLng} /> */}
       </MapView>
+
+      {showLocateMeButton && (
+        <TouchableOpacity
+          style={
+            locateMeButtonStyles ? locateMeButtonStyles : styles.locateMeButton
+          }
+          onPress={getCurrentLocation}>
+          <MaterialIcons name="my-location" size={20} color="#3460D7" />
+          <MyText style={styles.locateMeButtonText}>
+            {locateMeButtonText}
+          </MyText>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -167,5 +207,21 @@ const styles = StyleSheet.create({
     borderColor: '#dfdfdf',
     paddingRight: 40,
     zIndex: 10,
+  },
+  locateMeButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    position: 'absolute',
+    backgroundColor: '#ffffff',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    borderRadius: 40,
+    bottom: 10,
+  },
+  locateMeButtonText: {
+    color: '#3259CB',
+    marginLeft: 6,
+    fontSize: 15,
+    fontWeight: '700',
   },
 });

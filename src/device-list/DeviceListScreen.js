@@ -14,9 +14,11 @@ import {
 import RNBluetoothClassic from 'react-native-bluetooth-classic';
 import {View, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   requestAccessFineLocationPermission,
   requestBluetoothPermission,
+  requestBluetoothScanPermission,
 } from '../utils/permissions';
 import {BluetoothContext} from '../context';
 
@@ -34,6 +36,7 @@ export default class DeviceListScreen extends React.Component {
 
   componentDidMount() {
     this.getBondedDevices();
+    requestBluetoothScanPermission();
   }
 
   componentWillUnmount() {
@@ -172,7 +175,7 @@ export default class DeviceListScreen extends React.Component {
     } catch (error) {
       Toast.show({
         description: `Error occurred while enabling bluetooth: ${error.message}`,
-        duration: 200,
+        duration: 2000,
       });
     }
   };
@@ -208,23 +211,25 @@ export default class DeviceListScreen extends React.Component {
             </Text>
           </HStack>
           <HStack>
-            {this.context.bluetoothEnabled ? (
+            {this.context.bluetoothEnabled && (
               <IconButton
                 transparent
-                onPress={this.getBondedDevices}
+                onPress={() => {
+                  this.getBondedDevices();
+                  this.startDiscovery();
+                }}
                 icon={<Icon as={MaterialIcons} name="cached" />}></IconButton>
-            ) : undefined}
+            )}
           </HStack>
         </HStack>
         <HStack bg="white" px="1" w="100%" minH="100%">
-          <ScrollView h="100%">
+          <View>
             {this.context.bluetoothEnabled ? (
-              <>
-                <DeviceList
-                  devices={this.state.devices}
-                  onPress={this.context.selectDevice}
-                />
-              </>
+              <DeviceList
+                devices={this.state.devices}
+                onPress={this.context.selectDevice}
+                navigation={this.props.navigation}
+              />
             ) : (
               <View>
                 <Center>
@@ -235,19 +240,19 @@ export default class DeviceListScreen extends React.Component {
                 </Center>
               </View>
             )}
-          </ScrollView>
+          </View>
         </HStack>
       </Box>
     );
   }
 }
 
-export const DeviceList = ({devices, onPress, onLongPress}) => {
+export const DeviceList = ({devices, onPress, onLongPress, navigation}) => {
   const renderItem = ({item}) => {
     return (
       <DeviceListItem
         device={item}
-        onPress={onPress}
+        onPress={() => onPress(item, navigation)}
         onLongPress={onLongPress}
       />
     );
@@ -262,17 +267,17 @@ export const DeviceList = ({devices, onPress, onLongPress}) => {
   );
 };
 
-export const DeviceListItem = ({device, onPress, onLongPress}) => {
-  let bgColor = device.connected ? '#0f0' : '#fff';
+const DeviceListItem = ({device, onPress, onLongPress}) => {
+  let bgColor = device.connected ? '#0f0' : '#000';
   let icon = device.bonded ? 'ios-bluetooth' : 'ios-cellular';
 
   return (
     <TouchableOpacity
+      style={styles.deviceListItem}
       onPress={() => onPress(device)}
-      onLongPress={() => onLongPress(device)}
-      style={styles.deviceListItem}>
+      onLongPress={() => onLongPress(device)}>
       <View style={styles.deviceListItemIcon}>
-        <Icon type="Ionicons" name={icon} color={bgColor} />
+        <Ionicons name={icon} color={bgColor} size={24} />
       </View>
       <View>
         <Text>{device.name}</Text>
@@ -291,8 +296,10 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   deviceListItemIcon: {
-    paddingHorizontal: 16,
     paddingVertical: 8,
+    paddingRight: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   center: {
     flex: 1,

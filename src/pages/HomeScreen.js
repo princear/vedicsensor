@@ -1,4 +1,4 @@
-import React, {createContext} from 'react';
+import React, {createContext, useState} from 'react';
 import {Box, NativeBaseProvider} from 'native-base';
 import RNBluetoothClassic from 'react-native-bluetooth-classic';
 //import getTheme from './native-base-theme/components';
@@ -17,6 +17,18 @@ import IntroScreen from './IntroScreen.js';
 import OnBoardingScreen from './OnBoardingScreen';
 import Questionnaire from './Questionnaire';
 import {BluetoothContext, AuthContext} from '../context';
+import ActivityScreen from './ActivityScreen';
+import NutritionScreen from './NutritionScreen';
+import NotificationScreen from './NotificationScreen';
+import ProfileScreen from './ProfileScreen';
+import {View} from 'react-native';
+import {
+  AddMember,
+  CheckZipCode,
+  LocateMe,
+  MembersList,
+  ScheduleTest,
+} from './BookTest';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -30,11 +42,14 @@ export default class HomeScreen extends React.Component {
       device: undefined,
       bluetoothEnabled: true,
     };
+    this.setState = this.setState.bind(this);
   }
 
-  selectDevice = device => {
+  selectDevice = (device, navigation) => {
     console.log('App::selectDevice() called with: ', device);
-    this.setState({device});
+    this.setState({device}, () => {
+      navigation.navigate('ConnectionScreen');
+    });
   };
 
   async componentDidMount() {
@@ -103,7 +118,11 @@ export default class HomeScreen extends React.Component {
       iconName = focused ? 'person' : 'person-outline';
       return <Ionicons name={iconName} size={size} color={color} />;
     }
-    return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
+    return (
+      <View>
+        <MaterialCommunityIcons name={iconName} size={size} color={color} />
+      </View>
+    );
   }
 
   HealthStack() {
@@ -118,12 +137,50 @@ export default class HomeScreen extends React.Component {
     );
   }
 
-  ManageStack() {
+  ActivityStack() {
     return (
       <Stack.Navigator
-        initialRouteName="Manage"
+        initialRouteName="ActivityScreen"
         screenOptions={{headerShown: false}}>
-        <Stack.Screen name="Manage" component={HealthScreen} />
+        <Stack.Screen name="ActivityScreen" component={ActivityScreen} />
+      </Stack.Navigator>
+    );
+  }
+
+  NutritionStack() {
+    return (
+      <Stack.Navigator
+        initialRouteName="NutritionScreen"
+        screenOptions={{headerShown: false}}>
+        <Stack.Screen name="NutritionScreen" component={NutritionScreen} />
+      </Stack.Navigator>
+    );
+  }
+
+  NotificationStack() {
+    return (
+      <Stack.Navigator
+        initialRouteName="NotificationScreen"
+        screenOptions={{headerShown: false}}>
+        <Stack.Screen
+          name="NotificationScreen"
+          component={NotificationScreen}
+        />
+      </Stack.Navigator>
+    );
+  }
+
+  ProfileStack() {
+    return (
+      <Stack.Navigator
+        initialRouteName="ProfileScreen"
+        screenOptions={{headerShown: false}}>
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+        <Stack.Screen name="CheckZipCode" component={CheckZipCode} />
+        <Stack.Screen name="MembersList" component={MembersList} />
+        <Stack.Screen name="AddMember" component={AddMember} />
+        <Stack.Screen name="LocateMe" component={LocateMe} />
+        <Stack.Screen name="ScheduleTest" component={ScheduleTest} />
       </Stack.Navigator>
     );
   }
@@ -131,21 +188,24 @@ export default class HomeScreen extends React.Component {
   tabStack() {
     return (
       <Tab.Navigator
-        initialRouteName="Feed"
-        screenOptions={({route}) => ({
+        initialRouteName="Home"
+        screenOptions={props => ({
           headerShown: false,
-          headerTintColor: '#fff',
-          headerTitleStyle: {fontWeight: 'bold'},
+          //  headerTintColor: '#fff',
+          //  headerTitleStyle: {fontWeight: 'bold'},
           tabBarActiveTintColor: '#000000',
           tabBarInactiveTintColor: 'gray',
-          tabBarIcon: props => this.tabBarIcon(route, props),
+          tabBarIcon: e => this.tabBarIcon(props.route, e),
           tabBarStyle: {
             backgroundColor: '#ffffff',
             height: 60,
           },
           tabBarItemStyle: {
-            margin: 6,
-            borderRadius: 10,
+            marginBottom: 6,
+            borderTopWidth: !true ? 1 : 0,
+          },
+          defaultNavigationOptions: {
+            tabBarVisible: false,
           },
         })}>
         <Tab.Screen
@@ -158,7 +218,7 @@ export default class HomeScreen extends React.Component {
         />
         <Tab.Screen
           name="ActivityStack"
-          component={this.HealthStack}
+          component={this.ActivityStack}
           options={{
             tabBarLabel: 'Activity',
             title: 'Activity',
@@ -166,7 +226,7 @@ export default class HomeScreen extends React.Component {
         />
         <Tab.Screen
           name="NutritionStack"
-          component={this.ManageStack}
+          component={this.NutritionStack}
           options={{
             tabBarLabel: 'Nutrition',
             title: 'Nutrition',
@@ -174,7 +234,7 @@ export default class HomeScreen extends React.Component {
         />
         <Tab.Screen
           name="Notification"
-          component={this.ManageStack}
+          component={this.NotificationStack}
           options={{
             tabBarLabel: 'Notification',
             title: 'Notification',
@@ -182,7 +242,7 @@ export default class HomeScreen extends React.Component {
         />
         <Tab.Screen
           name="Profile"
-          component={this.ManageStack}
+          component={this.ProfileStack}
           options={{
             tabBarLabel: 'Profile',
             title: 'Profile',
@@ -203,18 +263,28 @@ export default class HomeScreen extends React.Component {
     );
   }
 
-  onBack() {
-    this.setState({device: undefined});
+  onBack(navigation, screen) {
+    navigation.navigate(screen);
+  }
+
+  authenticate() {
+    this.setState({isAuthenticated: true});
   }
 
   render() {
     return (
       <AuthContext.Provider
-        value={{isAuthenticated: this.state.isAuthenticated}}>
+        value={{
+          isAuthenticated: this.state.isAuthenticated,
+          setState: this.setState,
+          authenticate: this.authenticate,
+        }}>
         <BluetoothContext.Provider
           value={{
             selectDevice: this.selectDevice,
             onBack: this.onBack,
+            bluetoothEnabled: this.state.bluetoothEnabled,
+            device: this.state.device,
           }}>
           <NativeBaseProvider>
             <NavigationContainer>
