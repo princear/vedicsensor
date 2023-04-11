@@ -14,6 +14,7 @@ import OTPInputView from '@twotalltotems/react-native-otp-input';
 import auth from '@react-native-firebase/auth';
 import MyText from '../components/MyText';
 import Statusbar from '../components/Statusbar';
+import {storeDataToAsyncStorage} from '../utils/asyncStorage';
 
 const LoginScreen = ({navigation}) => {
   const animation = useRef(null);
@@ -22,7 +23,7 @@ const LoginScreen = ({navigation}) => {
   const [step, setStep] = useState(1);
   const [isAnimationHidden, setIsAnimationHidden] = useState(false);
 
-  //   const [phone, setPhone] = useState('9084112090');
+  //   const [phone, setPhone] = useState('8445666963');
   const [phone, setPhone] = useState('');
   const [confirmation, setConfirmation] = useState();
 
@@ -83,8 +84,6 @@ const Step1 = props => {
         const res = await auth().signInWithPhoneNumber(`+91 ${phone}`);
         setConfirmation(res);
         setStep(2);
-
-        console.log(res);
       } catch (error) {
         console.log(error);
       } finally {
@@ -228,7 +227,11 @@ const Step2 = props => {
     try {
       setLoading(true);
       const res = await confirmation.confirm(otp);
-      console.log(res);
+      const user = res.user;
+      const firebaseToken = await user.getIdToken();
+      // console.log('user:', user);
+      // console.log('Firebase token:', firebaseToken);
+      storeDataToAsyncStorage('token', firebaseToken);
       navigation.navigate('OnBoarding');
       setError('');
     } catch (error) {
