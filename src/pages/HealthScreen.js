@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {useState} from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Feather from 'react-native-vector-icons/Feather';
 import assets from '../../assets';
@@ -24,17 +24,57 @@ import Calender from '../../assets/calender.svg';
 import Devices from '../../assets/devices.svg';
 import MyText from '../components/MyText';
 import WebView from 'react-native-webview';
+import BackgroundTimer from 'react-native-background-timer';
 
 const HealthScreen = ({navigation}) => {
+  const [isRunning, setIsRunning] = useState(false);
+  const [intervalId, setIntervalId] = useState(null);
+
+  const startService = () => {
+    const id = BackgroundTimer.setInterval(() => {
+      console.log('Triggering service');
+      // try calling perform read here
+    }, 1000);
+    console.log('Started service with interval ID:', id);
+    setIntervalId(id);
+    setIsRunning(true);
+  };
+
+  const stopService = () => {
+    console.log('Stopping service with interval ID:', intervalId);
+    BackgroundTimer.clearInterval(intervalId);
+    setIntervalId(null);
+    setIsRunning(false);
+  };
+
   return (
     <SafeAreaView style={{flex: 1}}>
+      <View
+        style={{
+          flexDirection: 'row',
+          marginVertical: 30,
+          justifyContent: 'center',
+        }}>
+        <TouchableOpacity
+          onPress={() => startService()}
+          style={{marginRight: 30, backgroundColor: 'lightblue', padding: 6}}>
+          <MyText>START</MyText>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => stopService()}
+          style={{marginRight: 30, backgroundColor: 'lightblue', padding: 6}}>
+          <MyText>STOP</MyText>
+        </TouchableOpacity>
+      </View>
       <ScrollView>
         <View style={styles.header}>
           <TouchableOpacity>
             <MaterialCommunityIcons name="menu" size={24} color="#1C1B1F" />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => navigation.navigate('DeviceListScreen')}
+            onPress={() => {
+              //   navigation.navigate('DeviceListScreen');
+            }}
             style={{flexDirection: 'row', alignItems: 'center'}}>
             <Devices style={{marginRight: 8}} height={17} width={17} />
             <MyText style={{color: '#3460D7', fontWeight: '500'}}>
