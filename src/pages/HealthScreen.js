@@ -49,7 +49,7 @@ const HealthScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={{flex: 1}}>
-      <View
+      {/* <View
         style={{
           flexDirection: 'row',
           marginVertical: 30,
@@ -65,7 +65,7 @@ const HealthScreen = ({navigation}) => {
           style={{marginRight: 30, backgroundColor: 'lightblue', padding: 6}}>
           <MyText>STOP</MyText>
         </TouchableOpacity>
-      </View>
+      </View> */}
       <ScrollView>
         <View style={styles.header}>
           <TouchableOpacity>

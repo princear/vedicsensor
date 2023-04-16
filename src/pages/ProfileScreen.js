@@ -1,12 +1,17 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useContext} from 'react';
 import LottieView from 'lottie-react-native';
 import MyText from '../components/MyText';
 import assets from '../../assets';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {StyleSheet, View, TouchableOpacity} from 'react-native';
+import {StyleSheet, View, TouchableOpacity, Modal} from 'react-native';
+import {MainContext} from '../context';
+import {Pressable} from 'react-native';
 
 const ProfileScreen = ({navigation}) => {
+  const mainContext = useContext(MainContext);
+  const {isVirtualProfileModalOpen} = mainContext;
+
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity
@@ -28,6 +33,36 @@ const ProfileScreen = ({navigation}) => {
         }}>
         <MyText style={{color: '#ffffff'}}>Book a test</MyText>
       </TouchableOpacity>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isVirtualProfileModalOpen}
+        onRequestClose={() =>
+          mainContext.setState({isVirtualProfileModalOpen: false})
+        }>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            justifyContent: 'flex-end',
+          }}>
+          <Pressable
+            style={{flex: 1}}
+            onPress={() =>
+              mainContext.setState({isVirtualProfileModalOpen: false})
+            }
+          />
+          <View
+            style={{
+              height: 300,
+              backgroundColor: '#ffffff',
+              borderTopLeftRadius: 12,
+              borderTopRightRadius: 12,
+            }}>
+            <MyText>MODAL</MyText>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
