@@ -27,7 +27,7 @@ import Girl from '../../assets/girl.svg';
 import Statusbar from '../components/Statusbar';
 import {AuthContext} from '../context';
 
-const OnBoardingScreen = ({navigation}) => {
+const OnBoardingScreen = ({navigation, route}) => {
   const [onBoardingStep, setOnBoardingStep] = useState(1);
   const [onBoardingDetails, setOnBoardingDetails] = useState({
     first_name: '',
@@ -70,10 +70,19 @@ const OnBoardingScreen = ({navigation}) => {
     country: '',
   });
 
+  //   console.warn(route?.params?.showStatusBar);
+  const [showStatusBar, setShowStatusBar] = useState(true);
+  useEffect(() => {
+    if (route?.params?.showStatusBar != undefined) {
+      setShowStatusBar(route?.params?.showStatusBar);
+    }
+  }, [route]);
+
   const renderOnBoadingSteps = () => {
     if (onBoardingStep == 1)
       return (
         <Step1
+          route={route}
           onBoardingStep={onBoardingStep}
           setOnBoardingStep={setOnBoardingStep}
           onBoardingDetails={onBoardingDetails}
@@ -129,7 +138,23 @@ const OnBoardingScreen = ({navigation}) => {
       );
   };
 
-  return <SafeAreaView>{renderOnBoadingSteps()}</SafeAreaView>;
+  return (
+    <SafeAreaView style={styles.container}>
+      {showStatusBar && onBoardingStep < 5 && (
+        <View style={{marginBottom: 30}}>
+          <Statusbar numberOfBars={5} completedBars={onBoardingStep + 1} />
+        </View>
+      )}
+      {onBoardingStep > 1 && onBoardingStep < 5 && (
+        <TouchableOpacity
+          onPress={() => setOnBoardingStep(onBoardingStep - 1)}
+          style={styles.arrow_back}>
+          <MaterialIcons name="arrow-back" color="#1C1B1F" size={22} />
+        </TouchableOpacity>
+      )}
+      {renderOnBoadingSteps()}
+    </SafeAreaView>
+  );
 };
 
 const Step1 = props => {
@@ -163,11 +188,8 @@ const Step1 = props => {
   }, [onBoardingDetails]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <>
       <View style={{flex: 1}}>
-        <View style={{marginBottom: 30}}>
-          <Statusbar numberOfBars={5} completedBars={2} />
-        </View>
         <MyText style={styles.heading}>Enter your details</MyText>
         <View style={styles.inputContainer}>
           <MaterialIcons name="person-outline" size={26} color="#1C1B1F" />
@@ -239,7 +261,7 @@ const Step1 = props => {
           </MyText>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </>
   );
 };
 
@@ -288,18 +310,8 @@ const Step2 = props => {
   }, [onBoardingDetails]);
 
   return (
-    <SafeAreaView style={styles.container}>
-      {onBoardingStep > 1 && (
-        <TouchableOpacity
-          onPress={() => setOnBoardingStep(onBoardingStep - 1)}
-          style={styles.arrow_back}>
-          <MaterialIcons name="arrow-back" color="#1C1B1F" size={22} />
-        </TouchableOpacity>
-      )}
+    <>
       <View style={{flex: 1}}>
-        <View style={{marginBottom: 30}}>
-          <Statusbar numberOfBars={5} completedBars={3} />
-        </View>
         <MyText style={styles.heading}>Enter your details</MyText>
         <View style={{flexDirection: 'row'}}>
           <MaterialIcons name="redeem" size={24} color="black" />
@@ -477,14 +489,23 @@ const Step2 = props => {
               setAddress={setAddress}
             />
             <TouchableOpacity
-              style={{position: 'absolute', top: 12, right: 16}}
+              style={{
+                position: 'absolute',
+                top: 12,
+                right: 16,
+                backgroundColor: '#3460D7',
+                paddingVertical: 8,
+                paddingHorizontal: 12,
+                borderRadius: 16,
+              }}
               onPress={() => setIsMapModalOpen(false)}>
-              <Ionicons name="close" size={24} color="black" />
+              {/* <Ionicons name="close" size={24} color="black" /> */}
+              <MyText style={{color: '#ffffff'}}> Done</MyText>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </>
   );
 };
 
@@ -506,18 +527,8 @@ const Step3 = props => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
-      {onBoardingStep > 1 && (
-        <TouchableOpacity
-          onPress={() => setOnBoardingStep(onBoardingStep - 1)}
-          style={styles.arrow_back}>
-          <MaterialIcons name="arrow-back" color="#1C1B1F" size={22} />
-        </TouchableOpacity>
-      )}
+    <>
       <View style={{flex: 1}}>
-        <View style={{marginBottom: 30}}>
-          <Statusbar numberOfBars={5} completedBars={4} />
-        </View>
         <MyText style={styles.heading}>Hello Vikalp,</MyText>
         <MyText style={styles.subHeading}>Which one are you?</MyText>
 
@@ -607,7 +618,7 @@ const Step3 = props => {
           Continue
         </MyText>
       </TouchableOpacity>
-    </SafeAreaView>
+    </>
   );
 };
 
@@ -630,18 +641,8 @@ const Step4 = props => {
   const len = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
   return (
-    <SafeAreaView style={styles.container}>
-      {onBoardingStep > 1 && (
-        <TouchableOpacity
-          onPress={() => setOnBoardingStep(onBoardingStep - 1)}
-          style={styles.arrow_back}>
-          <MaterialIcons name="arrow-back" color="#1C1B1F" size={22} />
-        </TouchableOpacity>
-      )}
+    <>
       <View style={{flex: 1}}>
-        <View style={{marginBottom: 30}}>
-          <Statusbar numberOfBars={5} completedBars={5} />
-        </View>
         <MyText style={styles.heading}>Hello Vikalp,</MyText>
         <MyText style={styles.subHeading}>
           We need your height and weight.
@@ -847,7 +848,7 @@ const Step4 = props => {
         }}>
         <MyText style={styles.button_blue_text}>Done</MyText>
       </TouchableOpacity>
-    </SafeAreaView>
+    </>
   );
 };
 
@@ -868,7 +869,7 @@ const Step5 = props => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <>
       <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
         <View>
           <LottieView
@@ -906,7 +907,7 @@ const Step5 = props => {
         }}>
         <MyText style={styles.button_blue_text}>Continue</MyText>
       </TouchableOpacity>
-    </SafeAreaView>
+    </>
   );
 };
 

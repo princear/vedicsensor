@@ -182,6 +182,7 @@ export default class HomeScreen extends React.Component {
         <Stack.Screen name="AddMember" component={AddMember} />
         <Stack.Screen name="LocateMe" component={LocateMe} />
         <Stack.Screen name="ScheduleTest" component={ScheduleTest} />
+        <Stack.Screen name="OnBoarding" component={OnBoardingScreen} />
       </Stack.Navigator>
     );
   }
@@ -307,7 +308,7 @@ export default class HomeScreen extends React.Component {
             }}>
             <NativeBaseProvider>
               <NavigationContainer>
-                {!this.state.isAuthenticated
+                {this.state.isAuthenticated
                   ? this.tabStack()
                   : this.authStack()}
               </NavigationContainer>
