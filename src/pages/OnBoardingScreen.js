@@ -70,13 +70,24 @@ const OnBoardingScreen = ({navigation, route}) => {
     country: '',
   });
 
-  //   console.warn(route?.params?.showStatusBar);
   const [showStatusBar, setShowStatusBar] = useState(true);
   useEffect(() => {
     if (route?.params?.showStatusBar != undefined) {
       setShowStatusBar(route?.params?.showStatusBar);
     }
   }, [route]);
+
+  useEffect(() => {
+    navigation.getParent()?.setOptions({
+      tabBarStyle: {display: 'none'},
+    });
+
+    return () => {
+      navigation.getParent()?.setOptions({
+        tabBarStyle: {backgroundColor: '#ffffff', height: 60},
+      });
+    };
+  }, [navigation, route]);
 
   const renderOnBoadingSteps = () => {
     if (onBoardingStep == 1)
