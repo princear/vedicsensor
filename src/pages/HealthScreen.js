@@ -112,7 +112,7 @@ const HealthScreen = ({navigation}) => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              //   navigation.navigate('DeviceListScreen');
+              navigation.navigate('DeviceListScreen');
             }}
             style={{flexDirection: 'row', alignItems: 'center'}}>
             <Devices style={{marginRight: 8}} height={17} width={17} />
