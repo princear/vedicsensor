@@ -84,6 +84,7 @@ const OnBoardingScreen = ({navigation, route}) => {
   const getPhoneNumber = async () => {
     return await getDataFromAsyncStorage('phone_number');
   };
+
   useEffect(() => {
     if (route?.params?.showStatusBar != undefined) {
       setShowStatusBar(route?.params?.showStatusBar);
@@ -702,9 +703,16 @@ const Step4 = props => {
     })
       .then(resp => {
         setLoading(false);
-        setOnBoardingStep(5);
-        console.log(onBoardingDetails);
-        console.log(resp);
+
+        if (resp.status === 200) {
+          setOnBoardingStep(5);
+        } else {
+          Toast.show({
+            description: 'Something went wrong',
+            duration: 2000,
+          });
+        }
+        console.log(resp.status, onBoardingDetails);
       })
       .catch(error => {
         setLoading(false);
@@ -914,7 +922,7 @@ const Step4 = props => {
           if (changeActiveEmail) {
             storeDataToAsyncStorage('active_email', onBoardingDetails.email);
           }
-          if (!loading) postOnBoardingDetails();
+          postOnBoardingDetails();
         }}>
         {loading ? (
           <>
