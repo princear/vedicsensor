@@ -30,7 +30,7 @@ import {
   getDataFromAsyncStorage,
   storeDataToAsyncStorage,
 } from '../utils/asyncStorage';
-import {BASE_URL} from '@env';
+import {BASE_URL, TOKEN} from '@env';
 import {Toast} from 'native-base';
 import {ActivityIndicator} from 'react-native';
 
@@ -95,7 +95,7 @@ const OnBoardingScreen = ({navigation, route}) => {
     getPhoneNumber().then(phone => {
       setOnBoardingDetails({
         ...onBoardingDetails,
-        phone_number: `+91 ${phone}`,
+        phone_number: `${phone}`,
       });
     });
   }, [route]);
@@ -680,9 +680,6 @@ const Step4 = props => {
 
   const postOnBoardingDetails = async () => {
     setLoading(true);
-    if (changeActiveEmail) {
-      storeDataToAsyncStorage('active_email', onBoardingDetails.email);
-    }
     setOnBoardingDetails({
       ...onBoardingDetails,
       height: {
@@ -693,18 +690,21 @@ const Step4 = props => {
     });
 
     const url = `${BASE_URL}/v1/api/add-user-health-info`;
+    const firebase_token = await getDataFromAsyncStorage('token');
     fetch(url, {
       method: 'POST',
-      body: onBoardingDetails,
+      body: JSON.stringify(onBoardingDetails),
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + TOKEN,
       },
     })
       .then(resp => {
         setLoading(false);
         setOnBoardingStep(5);
-        console.log('User OnBoarded successfully!');
+        console.log(onBoardingDetails);
+        console.log(resp);
       })
       .catch(error => {
         setLoading(false);
@@ -785,7 +785,7 @@ const Step4 = props => {
             {len.map((item, idx) => (
               <>
                 <View
-                  key={`${idx}large`}
+                  key={Math.random() * idx}
                   style={[styles.dash_sm_left, {left: 26.5 + idx * 22}]}
                 />
                 <View
@@ -826,7 +826,7 @@ const Step4 = props => {
                   style={[styles.dash_right, {left: 15.5 + idx * 22}]}
                 />
                 <View
-                  key={`${idx * 0.002}small`}
+                  key={Math.random() + idx + Math.random()}
                   style={[styles.dash_sm_right, {left: 26.5 + idx * 22}]}
                 />
               </>
@@ -911,6 +911,9 @@ const Step4 = props => {
       <TouchableOpacity
         style={loading ? styles.button_blue_disabled : styles.button_blue}
         onPress={() => {
+          if (changeActiveEmail) {
+            storeDataToAsyncStorage('active_email', onBoardingDetails.email);
+          }
           if (!loading) postOnBoardingDetails();
         }}>
         {loading ? (
