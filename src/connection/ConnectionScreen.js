@@ -188,6 +188,8 @@ export default class ConnectionScreen extends React.Component {
           console.log(data);
           this.onReceivedData({data});
         }
+        let user_id = await getDataFromAsyncStorage('active_email');
+        metricData.push({user_id: user_id});
         this.postMetricData(metricData);
       }
     } catch (err) {
@@ -244,6 +246,7 @@ export default class ConnectionScreen extends React.Component {
    * Attempts to send data to the connected Device.  The input text is
    * padded with a NEWLINE (which is required for most commands)
    */
+
   async sendData() {
     try {
       console.log(`Attempting to send data ${this.state.text}`);

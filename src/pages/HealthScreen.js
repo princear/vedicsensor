@@ -335,6 +335,7 @@ const HealthScreen = ({navigation}) => {
                   navigation.navigate('OnBoarding', {
                     showStatusBar: false,
                     showBottomTabs: false,
+                    changeActiveEmail: false,
                   });
                 }}>
                 <MyText
