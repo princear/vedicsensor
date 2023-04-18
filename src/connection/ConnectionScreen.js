@@ -151,7 +151,7 @@ export default class ConnectionScreen extends React.Component {
 
   postMetricData(data) {
     const json_data = JSON.stringify({pulses: data});
-    fetch('https://madmachines.datasyndicate.in/v1/ api/pulse-data', {
+    fetch('https://madmachines.datasyndicate.in/v1/api/pulse-data', {
       method: 'POST',
       body: json_data,
       headers: {
