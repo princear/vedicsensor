@@ -232,6 +232,7 @@ const Step2 = props => {
       // console.log('user:', user);
       // console.log('Firebase token:', firebaseToken);
       storeDataToAsyncStorage('token', firebaseToken);
+      storeDataToAsyncStorage('phone_number', phone);
       navigation.navigate('OnBoarding');
       setError('');
     } catch (error) {

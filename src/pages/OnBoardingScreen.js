@@ -26,7 +26,13 @@ import Boy from '../../assets/boy.svg';
 import Girl from '../../assets/girl.svg';
 import Statusbar from '../components/Statusbar';
 import {AuthContext} from '../context';
-import {storeDataToAsyncStorage} from '../utils/asyncStorage';
+import {
+  getDataFromAsyncStorage,
+  storeDataToAsyncStorage,
+} from '../utils/asyncStorage';
+import {BASE_URL} from '@env';
+import {Toast} from 'native-base';
+import {ActivityIndicator} from 'react-native';
 
 const OnBoardingScreen = ({navigation, route}) => {
   const [onBoardingStep, setOnBoardingStep] = useState(1);
@@ -49,6 +55,7 @@ const OnBoardingScreen = ({navigation, route}) => {
       unit: 'kg',
       value: '70',
     },
+    phone_number: '',
   });
 
   const [timeOfBirth, setTimeOfBirth] = useState(new Date());
@@ -73,6 +80,10 @@ const OnBoardingScreen = ({navigation, route}) => {
 
   const [showStatusBar, setShowStatusBar] = useState(true);
   const [changeActiveEmail, setChangeActiveEmail] = useState(true);
+
+  const getPhoneNumber = async () => {
+    return await getDataFromAsyncStorage('phone_number');
+  };
   useEffect(() => {
     if (route?.params?.showStatusBar != undefined) {
       setShowStatusBar(route?.params?.showStatusBar);
@@ -80,6 +91,13 @@ const OnBoardingScreen = ({navigation, route}) => {
     if (route?.params?.changeActiveEmail != undefined) {
       setChangeActiveEmail(route?.params?.changeActiveEmail);
     }
+
+    getPhoneNumber().then(phone => {
+      setOnBoardingDetails({
+        ...onBoardingDetails,
+        phone_number: `+91 ${phone}`,
+      });
+    });
   }, [route]);
 
   useEffect(() => {
@@ -649,17 +667,53 @@ const Step4 = props => {
     setOnBoardingDetails,
   } = props;
 
-  console.warn(changeActiveEmail);
-
   const [unit, setUnit] = useState({
     height: 'ft/in',
     weight: 'kg',
   });
 
-  const [heightInteger, setHeightInteger] = useState(6);
+  const [heightInteger, setHeightInteger] = useState(5);
   const [heightDecimal, setHeightDecimal] = useState(7);
   const [weight, setWeight] = useState(60);
+  const [loading, setLoading] = useState(false);
   const len = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+  const postOnBoardingDetails = async () => {
+    setLoading(true);
+    if (changeActiveEmail) {
+      storeDataToAsyncStorage('active_email', onBoardingDetails.email);
+    }
+    setOnBoardingDetails({
+      ...onBoardingDetails,
+      height: {
+        unit: unit.height,
+        value: `${heightInteger}.${heightDecimal}`,
+      },
+      weight: {unit: unit.weight, value: weight},
+    });
+
+    const url = `${BASE_URL}/v1/api/add-user-health-info`;
+    fetch(url, {
+      method: 'POST',
+      body: onBoardingDetails,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(resp => {
+        setLoading(false);
+        setOnBoardingStep(5);
+        console.log('User OnBoarded successfully!');
+      })
+      .catch(error => {
+        setLoading(false);
+        Toast.show({
+          description: 'Something went wrong',
+          duration: 2000,
+        });
+      });
+  };
 
   return (
     <>
@@ -855,20 +909,17 @@ const Step4 = props => {
       </View>
 
       <TouchableOpacity
-        style={[styles.button_blue]}
+        style={loading ? styles.button_blue_disabled : styles.button_blue}
         onPress={() => {
-          storeDataToAsyncStorage('active_email', onBoardingDetails.email);
-          setOnBoardingDetails({
-            ...onBoardingDetails,
-            height: {
-              unit: unit.height,
-              value: `${heightInteger}.${heightDecimal}`,
-            },
-            weight: {unit: unit.weight, value: weight},
-          });
-          setOnBoardingStep(5);
+          if (!loading) postOnBoardingDetails();
         }}>
-        <MyText style={styles.button_blue_text}>Done</MyText>
+        {loading ? (
+          <>
+            <ActivityIndicator size="large" color="#3460D7" />
+          </>
+        ) : (
+          <MyText style={styles.button_blue_text}>Done</MyText>
+        )}
       </TouchableOpacity>
     </>
   );
