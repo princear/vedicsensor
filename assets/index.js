@@ -16,6 +16,8 @@ const assets = {
     confetti: require('./confetti.json'),
     success: require('./success-animation.json'),
     successCalender: require('./calendar-success-add.json'),
+    quiz: require('./quiz.json'),
+    friends: require('./friends.json'),
   },
   png: {
     devices: require('./devices_wearables.png'),

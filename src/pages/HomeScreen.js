@@ -16,12 +16,12 @@ import LoginScreen from './LoginScreen.js';
 import IntroScreen from './IntroScreen.js';
 import OnBoardingScreen from './OnBoardingScreen';
 import Questionnaire from './Questionnaire';
-import {BluetoothContext, AuthContext} from '../context';
+import {BluetoothContext, AuthContext, MainContext} from '../context';
 import ActivityScreen from './ActivityScreen';
 import NutritionScreen from './NutritionScreen';
 import NotificationScreen from './NotificationScreen';
 import ProfileScreen from './ProfileScreen';
-import {View} from 'react-native';
+import {TouchableOpacity, View} from 'react-native';
 import {
   AddMember,
   CheckZipCode,
@@ -41,6 +41,7 @@ export default class HomeScreen extends React.Component {
       isAuthenticated: false,
       device: undefined,
       bluetoothEnabled: true,
+      isVirtualProfileModalOpen: false,
     };
     this.setState = this.setState.bind(this);
   }
@@ -181,6 +182,7 @@ export default class HomeScreen extends React.Component {
         <Stack.Screen name="AddMember" component={AddMember} />
         <Stack.Screen name="LocateMe" component={LocateMe} />
         <Stack.Screen name="ScheduleTest" component={ScheduleTest} />
+        <Stack.Screen name="OnBoarding" component={OnBoardingScreen} />
       </Stack.Navigator>
     );
   }
@@ -189,13 +191,13 @@ export default class HomeScreen extends React.Component {
     return (
       <Tab.Navigator
         initialRouteName="Home"
-        screenOptions={props => ({
+        screenOptions={({route}) => ({
           headerShown: false,
           //  headerTintColor: '#fff',
           //  headerTitleStyle: {fontWeight: 'bold'},
           tabBarActiveTintColor: '#000000',
           tabBarInactiveTintColor: 'gray',
-          tabBarIcon: e => this.tabBarIcon(props.route, e),
+          tabBarIcon: e => this.tabBarIcon(route, e),
           tabBarStyle: {
             backgroundColor: '#ffffff',
             height: 60,
@@ -206,6 +208,19 @@ export default class HomeScreen extends React.Component {
           },
           defaultNavigationOptions: {
             tabBarVisible: false,
+          },
+          tabBarButton: props => {
+            if (route.name === 'Profile') {
+              return (
+                <TabBarButton
+                  {...props}
+                  onLongPress={() =>
+                    this.setState({isVirtualProfileModalOpen: true})
+                  }
+                />
+              );
+            }
+            return <TabBarButton {...props} />;
           },
         })}>
         <Tab.Screen
@@ -273,26 +288,54 @@ export default class HomeScreen extends React.Component {
 
   render() {
     return (
-      <AuthContext.Provider
+      <MainContext.Provider
         value={{
-          isAuthenticated: this.state.isAuthenticated,
+          isVirtualProfileModalOpen: this.state.isVirtualProfileModalOpen,
           setState: this.setState,
-          authenticate: this.authenticate,
         }}>
-        <BluetoothContext.Provider
+        <AuthContext.Provider
           value={{
-            selectDevice: this.selectDevice,
-            onBack: this.onBack,
-            bluetoothEnabled: this.state.bluetoothEnabled,
-            device: this.state.device,
+            isAuthenticated: this.state.isAuthenticated,
+            authenticate: this.authenticate,
+            setState: this.setState,
           }}>
-          <NativeBaseProvider>
-            <NavigationContainer>
-              {this.state.isAuthenticated ? this.tabStack() : this.authStack()}
-            </NavigationContainer>
-          </NativeBaseProvider>
-        </BluetoothContext.Provider>
-      </AuthContext.Provider>
+          <BluetoothContext.Provider
+            value={{
+              selectDevice: this.selectDevice,
+              onBack: this.onBack,
+              bluetoothEnabled: this.state.bluetoothEnabled,
+              device: this.state.device,
+            }}>
+            <NativeBaseProvider>
+              <NavigationContainer>
+                {this.state.isAuthenticated
+                  ? this.tabStack()
+                  : this.authStack()}
+              </NavigationContainer>
+            </NativeBaseProvider>
+          </BluetoothContext.Provider>
+        </AuthContext.Provider>
+      </MainContext.Provider>
+    );
+  }
+}
+
+class TabBarButton extends React.Component {
+  render() {
+    const {accessibilityState, children, onPress, onLongPress} = this.props;
+    const focused = accessibilityState.selected;
+    return (
+      <TouchableOpacity
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          margin: 6,
+        }}
+        onPress={onPress}
+        onLongPress={onLongPress}>
+        {children}
+      </TouchableOpacity>
     );
   }
 }

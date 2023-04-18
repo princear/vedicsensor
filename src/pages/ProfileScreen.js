@@ -1,10 +1,8 @@
-import React, {useEffect, useRef} from 'react';
-import LottieView from 'lottie-react-native';
+import React from 'react';
 import MyText from '../components/MyText';
-import assets from '../../assets';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {StyleSheet, View, TouchableOpacity} from 'react-native';
+import {StyleSheet, TouchableOpacity} from 'react-native';
 
 const ProfileScreen = ({navigation}) => {
   return (
@@ -41,6 +39,39 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingHorizontal: 20,
     backgroundColor: '#ffffff',
+  },
+  modalContent: {
+    flex: 1,
+    backgroundColor: 'red',
+    height: 300,
+    width: '100%',
+  },
+  modalBottomContainer: {
+    borderTopWidth: 0.5,
+    borderTopColor: '#818181',
+
+    position: 'absolute',
+    bottom: 0,
+    height: 65,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    flexDirection: 'row',
+  },
+  active__bluedot: {
+    width: 12,
+    height: 8,
+    backgroundColor: '#3460D7',
+    borderRadius: 4,
+    marginRight: 4,
+  },
+  inactive__bluedot: {
+    width: 8,
+    height: 8,
+    backgroundColor: '#bfbfbf',
+    borderRadius: 4,
+    marginRight: 4,
   },
   arrow_back: {
     width: 30,
