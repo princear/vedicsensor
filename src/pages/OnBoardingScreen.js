@@ -26,6 +26,7 @@ import Boy from '../../assets/boy.svg';
 import Girl from '../../assets/girl.svg';
 import Statusbar from '../components/Statusbar';
 import {AuthContext} from '../context';
+import {storeDataToAsyncStorage} from '../utils/asyncStorage';
 
 const OnBoardingScreen = ({navigation, route}) => {
   const [onBoardingStep, setOnBoardingStep] = useState(1);
@@ -71,9 +72,13 @@ const OnBoardingScreen = ({navigation, route}) => {
   });
 
   const [showStatusBar, setShowStatusBar] = useState(true);
+  const [changeActiveEmail, setChangeActiveEmail] = useState(true);
   useEffect(() => {
     if (route?.params?.showStatusBar != undefined) {
       setShowStatusBar(route?.params?.showStatusBar);
+    }
+    if (route?.params?.changeActiveEmail != undefined) {
+      setChangeActiveEmail(route?.params?.changeActiveEmail);
     }
   }, [route]);
 
@@ -131,6 +136,7 @@ const OnBoardingScreen = ({navigation, route}) => {
     else if (onBoardingStep == 4)
       return (
         <Step4
+          changeActiveEmail={changeActiveEmail}
           onBoardingStep={onBoardingStep}
           setOnBoardingStep={setOnBoardingStep}
           onBoardingDetails={onBoardingDetails}
@@ -141,6 +147,7 @@ const OnBoardingScreen = ({navigation, route}) => {
       return (
         <Step5
           navigation={navigation}
+          changeActiveEmail={changeActiveEmail}
           onBoardingStep={onBoardingStep}
           setOnBoardingStep={setOnBoardingStep}
           onBoardingDetails={onBoardingDetails}
@@ -635,11 +642,14 @@ const Step3 = props => {
 
 const Step4 = props => {
   const {
+    changeActiveEmail,
     onBoardingStep,
     setOnBoardingStep,
     onBoardingDetails,
     setOnBoardingDetails,
   } = props;
+
+  console.warn(changeActiveEmail);
 
   const [unit, setUnit] = useState({
     height: 'ft/in',
@@ -847,6 +857,7 @@ const Step4 = props => {
       <TouchableOpacity
         style={[styles.button_blue]}
         onPress={() => {
+          storeDataToAsyncStorage('active_email', onBoardingDetails.email);
           setOnBoardingDetails({
             ...onBoardingDetails,
             height: {
@@ -866,6 +877,7 @@ const Step4 = props => {
 const Step5 = props => {
   const {
     navigation,
+    changeActiveEmail,
     onBoardingStep,
     setOnBoardingStep,
     onBoardingDetails,
@@ -914,6 +926,7 @@ const Step5 = props => {
       <TouchableOpacity
         style={[styles.button_blue]}
         onPress={() => {
+          if (!changeActiveEmail) navigation.navigate('Health');
           authContext?.authenticate();
         }}>
         <MyText style={styles.button_blue_text}>Continue</MyText>
