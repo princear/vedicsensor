@@ -151,22 +151,17 @@ export default class ConnectionScreen extends React.Component {
 
   postMetricData(data) {
     const json_data = JSON.stringify({pulses: data});
-    let firebase_token = '';
-    this.getToken(token => {
-      firebase_token = token;
-    });
-    fetch('https://madmachines.datasyndicate.in/v1/ api/pulse-data', {
+    fetch('https://madmachines.datasyndicate.in/v1/api/pulse-data', {
       method: 'POST',
       body: json_data,
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + TOKEN,
-        //   firebase: firebase_token,
       },
     })
       .then(resp => {
-        console.log('Data pushed successfully!');
+        console.log('Data pushed successfully!', resp);
       })
       .catch(error => {
         Toast.show({

@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useContext} from 'react';
 import {
   StyleSheet,
   TouchableOpacity,
@@ -15,6 +15,8 @@ import auth from '@react-native-firebase/auth';
 import MyText from '../components/MyText';
 import Statusbar from '../components/Statusbar';
 import {storeDataToAsyncStorage} from '../utils/asyncStorage';
+import {callGetApi} from '../utils/axios';
+import {AuthContext} from '../context';
 
 const LoginScreen = ({navigation}) => {
   const animation = useRef(null);
@@ -26,6 +28,7 @@ const LoginScreen = ({navigation}) => {
   //   const [phone, setPhone] = useState('8445666963');
   const [phone, setPhone] = useState('');
   const [confirmation, setConfirmation] = useState();
+  const [alreadyOnBoarded, setAlreadyOnBoarded] = useState(false);
 
   useEffect(() => {
     animation?.current?.play();
@@ -43,6 +46,7 @@ const LoginScreen = ({navigation}) => {
           isAnimationHidden={isAnimationHidden}
           setIsAnimationHidden={setIsAnimationHidden}
           setConfirmation={setConfirmation}
+          setAlreadyOnBoarded={setAlreadyOnBoarded}
         />
       );
     } else if (step == 2) {
@@ -55,6 +59,7 @@ const LoginScreen = ({navigation}) => {
           setIsAnimationHidden={setIsAnimationHidden}
           confirmation={confirmation}
           navigation={navigation}
+          alreadyOnBoarded={alreadyOnBoarded}
         />
       );
     }
@@ -73,6 +78,7 @@ const Step1 = props => {
     phone,
     setPhone,
     setConfirmation,
+    setAlreadyOnBoarded,
   } = props;
 
   const [loading, setLoading] = useState(false);
@@ -83,6 +89,15 @@ const Step1 = props => {
       try {
         const res = await auth().signInWithPhoneNumber(`+91 ${phone}`);
         setConfirmation(res);
+        const url = `/v1/api/get-user-info?phone_number=${phone}`;
+        callGetApi(url)
+          .then(res => {
+            if (res.data.email) {
+              storeDataToAsyncStorage('active_email', res.data.email);
+              setAlreadyOnBoarded(true);
+            }
+          })
+          .catch(err => console.log(err));
         setStep(2);
       } catch (error) {
         console.log(error);
@@ -180,8 +195,10 @@ const Step2 = props => {
     phone,
     confirmation,
     navigation,
+    alreadyOnBoarded,
   } = props;
 
+  const authContext = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(30);
   const [otp, setOtp] = useState('');
@@ -233,7 +250,12 @@ const Step2 = props => {
       // console.log('Firebase token:', firebaseToken);
       storeDataToAsyncStorage('token', firebaseToken);
       storeDataToAsyncStorage('phone_number', phone);
-      navigation.navigate('OnBoarding');
+
+      if (alreadyOnBoarded) {
+        authContext?.authenticate();
+      } else {
+        navigation.navigate('OnBoarding');
+      }
       setError('');
     } catch (error) {
       setError('Invalid OTP');
