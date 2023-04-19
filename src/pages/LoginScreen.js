@@ -92,12 +92,15 @@ const Step1 = props => {
         const url = `/v1/api/get-user-info?phone_number=${phone}`;
         callGetApi(url)
           .then(res => {
-            if (res.data.email) {
+            if (res.status === 200) {
               storeDataToAsyncStorage('active_email', res.data.email);
               setAlreadyOnBoarded(true);
             }
           })
-          .catch(err => console.log(err));
+          .catch(err => {
+            setAlreadyOnBoarded(false);
+            console.log(err);
+          });
         setStep(2);
       } catch (error) {
         console.log(error);
