@@ -29,6 +29,7 @@ import {
   MembersList,
   ScheduleTest,
 } from './BookTest';
+import VirtualProfilesList from './VirtualProfilesList';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -135,6 +136,10 @@ export default class HomeScreen extends React.Component {
         <Stack.Screen name="DeviceListScreen" component={DeviceListScreen} />
         <Stack.Screen name="ConnectionScreen" component={ConnectionScreen} />
         <Stack.Screen name="OnBoarding" component={OnBoardingScreen} />
+        <Stack.Screen
+          name="VirtualProfilesList"
+          component={VirtualProfilesList}
+        />
       </Stack.Navigator>
     );
   }

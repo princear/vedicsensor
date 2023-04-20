@@ -274,7 +274,7 @@ const HealthScreen = ({navigation}) => {
           />
           <View
             style={{
-              height: 300,
+              height: 320,
               backgroundColor: '#ffffff',
               borderTopLeftRadius: 12,
               borderTopRightRadius: 12,
@@ -285,7 +285,7 @@ const HealthScreen = ({navigation}) => {
                 autoPlay={false}
                 width={width}
                 data={[1, 2]}
-                scrollAnimationDuration={160}
+                scrollAnimationDuration={100}
                 onSnapToItem={index => {
                   setVirtualProfileModalSteps(index);
                   animation?.current?.play();
@@ -347,7 +347,11 @@ const HealthScreen = ({navigation}) => {
                   Add Account
                 </MyText>
               </TouchableOpacity>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  mainContext.setState({isVirtualProfileModalOpen: false});
+                  navigation.navigate('VirtualProfilesList');
+                }}>
                 <MyText style={{color: '#3460D7', fontWeight: '500'}}>
                   Choose existing
                 </MyText>
@@ -601,7 +605,7 @@ const styles = StyleSheet.create({
   modalContent: {
     flex: 1,
     backgroundColor: 'red',
-    height: 300,
+    height: 380,
     width: '100%',
   },
   modalBottomContainer: {
@@ -610,7 +614,7 @@ const styles = StyleSheet.create({
 
     position: 'absolute',
     bottom: 0,
-    height: 65,
+    height: 60,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
@@ -622,14 +626,14 @@ const styles = StyleSheet.create({
     height: 8,
     backgroundColor: '#3460D7',
     borderRadius: 4,
-    marginRight: 4,
+    marginRight: 6,
   },
   inactive__bluedot: {
     width: 8,
     height: 8,
     backgroundColor: '#bfbfbf',
     borderRadius: 4,
-    marginRight: 4,
+    marginRight: 6,
   },
 });
 export default HealthScreen;
