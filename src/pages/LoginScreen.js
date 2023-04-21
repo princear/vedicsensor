@@ -87,20 +87,21 @@ const Step1 = props => {
     if (phone.length == 10) {
       setLoading(true);
       try {
-        const res = await auth().signInWithPhoneNumber(`+91 ${phone}`);
-        setConfirmation(res);
         const url = `/v1/api/get-user-info?phone_number=${phone}`;
         callGetApi(url)
           .then(res => {
             if (res.status === 200) {
               storeDataToAsyncStorage('active_email', res.data.email);
+              storeDataToAsyncStorage('master_email', res.data.email);
               setAlreadyOnBoarded(true);
             }
           })
           .catch(err => {
             setAlreadyOnBoarded(false);
-            console.log(err);
+            console.log('get user info error', err);
           });
+        const res = await auth().signInWithPhoneNumber(`+91 ${phone}`);
+        setConfirmation(res);
         setStep(2);
       } catch (error) {
         console.log(error);

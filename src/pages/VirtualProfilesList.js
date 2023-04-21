@@ -1,8 +1,11 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import MyText from '../components/MyText';
 import {Animated, StyleSheet, View, TouchableOpacity} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Image} from 'react-native';
+import {getVirtualProfiles} from '../utils/user';
+import {storeDataToAsyncStorage} from '../utils/asyncStorage';
+import {MainContext} from '../context';
 
 const data = [
   {id: 1, name: 'Navdeep', email: 'navdeep@dataorc.in'},
@@ -32,8 +35,15 @@ const data = [
 ];
 
 const VirtualProfilesList = ({navigation, route}) => {
+  const mainContext = useContext(MainContext);
   const [accounts, setAccounts] = useState([]);
   const scrollY = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    getVirtualProfiles().then(res => {
+      setAccounts(res.data);
+    });
+  }, []);
 
   useEffect(() => {
     navigation.getParent()?.setOptions({
@@ -67,6 +77,7 @@ const VirtualProfilesList = ({navigation, route}) => {
             onPress={() =>
               navigation.navigate('OnBoarding', {
                 showStatusBar: false,
+                showBottomTabs: false,
                 changeActiveEmail: false,
               })
             }>
@@ -77,21 +88,6 @@ const VirtualProfilesList = ({navigation, route}) => {
         </View>
       ) : (
         <>
-          <Image
-            style={{
-              height: '100%',
-              width: '100%',
-              position: 'absolute',
-              top: 0,
-              opacity: 0.9,
-              transform: [],
-            }}
-            blurRadius={6}
-            source={{
-              uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6Rrx4rWt7UYv5xFbyvg9XbWsg2w2SPTfXenFWns3ftPfTFwWFzexCXDzXt6-fINLVHNQ&usqp=CAU',
-            }}
-          />
-
           <Animated.FlatList
             data={accounts}
             onScroll={Animated.event(
@@ -124,13 +120,19 @@ const VirtualProfilesList = ({navigation, route}) => {
                         fontWeight: '700',
                         fontSize: 15,
                       }}>
-                      {item.name}
+                      {item.first_name} {item.last_name}
                     </MyText>
                     <MyText style={{color: '#323232', fontSize: 12}}>
                       {item.email}
                     </MyText>
                   </View>
-                  <TouchableOpacity style={styles.button_blue}>
+                  <TouchableOpacity
+                    style={styles.button_blue}
+                    onPress={() => {
+                      mainContext.setState({activeEmail: item.email});
+                      storeDataToAsyncStorage('active_email', item.email);
+                      navigation.navigate('Health');
+                    }}>
                     <MyText style={styles.button_blue_text}>Select</MyText>
                   </TouchableOpacity>
                 </Animated.View>

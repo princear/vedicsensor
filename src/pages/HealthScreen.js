@@ -32,6 +32,7 @@ import Carousel from 'react-native-reanimated-carousel';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {MainContext} from '../context';
 import LottieView from 'lottie-react-native';
+import {getUserInfo} from '../utils/user';
 
 const HealthScreen = ({navigation}) => {
   const mainContext = useContext(MainContext);
@@ -40,6 +41,13 @@ const HealthScreen = ({navigation}) => {
   const animation = useRef(null);
   const [virtualProfileModalSteps, setVirtualProfileModalSteps] = useState(0);
   const width = Dimensions.get('window').width;
+
+  const [user, setUser] = useState();
+  useEffect(() => {
+    getUserInfo(mainContext.activeEmail).then(res => {
+      setUser(res.data);
+    });
+  }, [mainContext.activeEmail]);
 
   useEffect(() => {
     animation?.current?.play();
@@ -139,7 +147,7 @@ const HealthScreen = ({navigation}) => {
             </MyText>
           </View>
           <MyText style={{color: '#323232', fontWeight: '700', fontSize: 20}}>
-            Hello Vikalp,
+            Hello {user?.first_name},
           </MyText>
 
           <View

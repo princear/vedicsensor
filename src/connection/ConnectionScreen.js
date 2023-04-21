@@ -149,8 +149,9 @@ export default class ConnectionScreen extends React.Component {
     return await getDataFromAsyncStorage('token');
   }
 
-  postMetricData(data) {
-    const json_data = JSON.stringify({pulses: data});
+  async postMetricData(data) {
+    let user_id = await getDataFromAsyncStorage('active_email');
+    const json_data = JSON.stringify({pulses: data, user_id: user_id});
     fetch('https://madmachines.datasyndicate.in/v1/api/pulse-data', {
       method: 'POST',
       body: json_data,
@@ -195,8 +196,7 @@ export default class ConnectionScreen extends React.Component {
           console.log(data);
           this.onReceivedData({data});
         }
-        let user_id = await getDataFromAsyncStorage('active_email');
-        metricData.push({user_id: user_id});
+
         this.postMetricData(metricData);
       }
     } catch (err) {

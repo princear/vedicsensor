@@ -14,6 +14,7 @@ import {
   TextInput,
   Modal,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import CalendarPicker from 'react-native-calendar-picker';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
@@ -30,9 +31,9 @@ import {
   getDataFromAsyncStorage,
   storeDataToAsyncStorage,
 } from '../utils/asyncStorage';
-import {BASE_URL, TOKEN} from '@env';
 import {Toast} from 'native-base';
-import {ActivityIndicator} from 'react-native';
+import {getMasterEmail} from '../utils/user';
+import {callPostApi} from '../utils/axios';
 
 const OnBoardingScreen = ({navigation, route}) => {
   const [onBoardingStep, setOnBoardingStep] = useState(1);
@@ -55,7 +56,7 @@ const OnBoardingScreen = ({navigation, route}) => {
       unit: 'kg',
       value: '70',
     },
-    phone_number: '',
+    master_user_id: '',
   });
 
   const [timeOfBirth, setTimeOfBirth] = useState(new Date());
@@ -84,7 +85,6 @@ const OnBoardingScreen = ({navigation, route}) => {
   const getPhoneNumber = async () => {
     return await getDataFromAsyncStorage('phone_number');
   };
-
   useEffect(() => {
     if (route?.params?.showStatusBar != undefined) {
       setShowStatusBar(route?.params?.showStatusBar);
@@ -92,14 +92,25 @@ const OnBoardingScreen = ({navigation, route}) => {
     if (route?.params?.changeActiveEmail != undefined) {
       setChangeActiveEmail(route?.params?.changeActiveEmail);
     }
-
-    getPhoneNumber().then(phone => {
-      setOnBoardingDetails({
-        ...onBoardingDetails,
-        phone_number: `${phone}`,
-      });
-    });
   }, [route]);
+
+  useEffect(() => {
+    if (changeActiveEmail) {
+      getPhoneNumber().then(phone => {
+        setOnBoardingDetails(prevState => ({
+          ...prevState,
+          phone_number: `${phone}`,
+        }));
+      });
+    }
+
+    getMasterEmail().then(email => {
+      setOnBoardingDetails(prevState => ({
+        ...prevState,
+        master_user_id: `${email}`,
+      }));
+    });
+  }, [onBoardingStep]);
 
   useEffect(() => {
     navigation.getParent()?.setOptions({
@@ -566,7 +577,9 @@ const Step3 = props => {
   return (
     <>
       <View style={{flex: 1}}>
-        <MyText style={styles.heading}>Hello Vikalp,</MyText>
+        <MyText style={styles.heading}>
+          Hello {onBoardingDetails.first_name},
+        </MyText>
         <MyText style={styles.subHeading}>Which one are you?</MyText>
 
         <View
@@ -690,37 +703,26 @@ const Step4 = props => {
       weight: {unit: unit.weight, value: weight},
     });
 
-    const url = `${BASE_URL}/v1/api/add-user-health-info`;
-    const firebase_token = await getDataFromAsyncStorage('token');
-    fetch(url, {
-      method: 'POST',
-      body: JSON.stringify(onBoardingDetails),
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + TOKEN,
-      },
-    })
-      .then(resp => {
-        setLoading(false);
+    if (!changeActiveEmail) delete onBoardingDetails.phone_number;
 
-        if (resp.status === 200) {
-          setOnBoardingStep(5);
-        } else {
-          Toast.show({
-            description: 'Something went wrong',
-            duration: 2000,
-          });
-        }
-        console.log(resp.status, onBoardingDetails);
-      })
-      .catch(error => {
+    console.log(onBoardingDetails);
+    const firebase_token = await getDataFromAsyncStorage('token');
+    try {
+      const url = `/v1/api/add-user-health-info`;
+      const res = await callPostApi(url, onBoardingDetails);
+      console.log('onBOardingRes', res.data);
+      setOnBoardingStep(5);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.log('Error', error.response.data);
+      Toast.show({
+        description: 'Something went wrong',
+        duration: 2000,
+      }).finally(() => {
         setLoading(false);
-        Toast.show({
-          description: 'Something went wrong',
-          duration: 2000,
-        });
       });
+    }
   };
 
   return (
@@ -918,9 +920,10 @@ const Step4 = props => {
 
       <TouchableOpacity
         style={loading ? styles.button_blue_disabled : styles.button_blue}
-        onPress={() => {
+        onPress={async () => {
           if (changeActiveEmail) {
             storeDataToAsyncStorage('active_email', onBoardingDetails.email);
+            storeDataToAsyncStorage('master_email', onBoardingDetails.email);
           }
           postOnBoardingDetails();
         }}>
@@ -988,7 +991,8 @@ const Step5 = props => {
       <TouchableOpacity
         style={[styles.button_blue]}
         onPress={() => {
-          if (!changeActiveEmail) navigation.navigate('Health');
+          setOnBoardingStep(1);
+          if (!changeActiveEmail) navigation.navigate('VirtualProfilesList');
           authContext?.authenticate();
         }}>
         <MyText style={styles.button_blue_text}>Continue</MyText>

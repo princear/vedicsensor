@@ -37,7 +37,7 @@ export function callPostApi(url, params) {
         //     headers: {Authorization: 'Bearer ' + access_token},
         //   },
         {
-          headers: {Authorization: 'Bearer ' + access_token},
+          headers: {Authorization: 'Bearer ' + TOKEN},
         },
       );
       return resolve(response);
