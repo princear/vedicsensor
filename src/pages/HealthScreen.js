@@ -32,6 +32,7 @@ import Carousel from 'react-native-reanimated-carousel';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {MainContext} from '../context';
 import LottieView from 'lottie-react-native';
+import {getUserInfo} from '../utils/user';
 
 const HealthScreen = ({navigation}) => {
   const mainContext = useContext(MainContext);
@@ -40,6 +41,13 @@ const HealthScreen = ({navigation}) => {
   const animation = useRef(null);
   const [virtualProfileModalSteps, setVirtualProfileModalSteps] = useState(0);
   const width = Dimensions.get('window').width;
+
+  const [user, setUser] = useState();
+  useEffect(() => {
+    getUserInfo(mainContext.activeEmail).then(res => {
+      setUser(res.data);
+    });
+  }, [mainContext.activeEmail]);
 
   useEffect(() => {
     animation?.current?.play();
@@ -139,7 +147,7 @@ const HealthScreen = ({navigation}) => {
             </MyText>
           </View>
           <MyText style={{color: '#323232', fontWeight: '700', fontSize: 20}}>
-            Hello Vikalp,
+            Hello {user?.first_name},
           </MyText>
 
           <View
@@ -237,7 +245,7 @@ const HealthScreen = ({navigation}) => {
             </TouchableOpacity>
           </View>
 
-          <Metrics />
+          <Metrics user={user} />
           <Card
             title="Dosha clock"
             details="Eat your largest meal of the day as digestion strongest..."
@@ -274,7 +282,7 @@ const HealthScreen = ({navigation}) => {
           />
           <View
             style={{
-              height: 300,
+              height: 320,
               backgroundColor: '#ffffff',
               borderTopLeftRadius: 12,
               borderTopRightRadius: 12,
@@ -285,7 +293,7 @@ const HealthScreen = ({navigation}) => {
                 autoPlay={false}
                 width={width}
                 data={[1, 2]}
-                scrollAnimationDuration={160}
+                scrollAnimationDuration={100}
                 onSnapToItem={index => {
                   setVirtualProfileModalSteps(index);
                   animation?.current?.play();
@@ -347,7 +355,11 @@ const HealthScreen = ({navigation}) => {
                   Add Account
                 </MyText>
               </TouchableOpacity>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  mainContext.setState({isVirtualProfileModalOpen: false});
+                  navigation.navigate('VirtualProfilesList');
+                }}>
                 <MyText style={{color: '#3460D7', fontWeight: '500'}}>
                   Choose existing
                 </MyText>
@@ -360,13 +372,15 @@ const HealthScreen = ({navigation}) => {
   );
 };
 
-const Metrics = () => {
+const Metrics = ({user}) => {
   return (
     <>
       <View style={{height: 200, flexGrow: 1, marginVertical: 20}}>
         <WebView
           source={{
-            uri: 'http://grafana.madmachines.in/d-solo/vtJmaDhVk/nadi-monitoring?orgId=1&from=1681131684285&to=1681139825402&var-device_name=device1&panelId=2',
+            uri: `http://grafana.madmachines.in/d-solo/vtJmaDhVk/nadi-monitoring?orgId=1&from=1681131684285&to=1681139825402&var-device_name=${
+              user?.email?.split('@')[0]
+            }&panelId=2`,
           }}
           style={{flex: 1}}
         />
@@ -601,7 +615,7 @@ const styles = StyleSheet.create({
   modalContent: {
     flex: 1,
     backgroundColor: 'red',
-    height: 300,
+    height: 380,
     width: '100%',
   },
   modalBottomContainer: {
@@ -610,7 +624,7 @@ const styles = StyleSheet.create({
 
     position: 'absolute',
     bottom: 0,
-    height: 65,
+    height: 60,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
@@ -622,14 +636,14 @@ const styles = StyleSheet.create({
     height: 8,
     backgroundColor: '#3460D7',
     borderRadius: 4,
-    marginRight: 4,
+    marginRight: 6,
   },
   inactive__bluedot: {
     width: 8,
     height: 8,
     backgroundColor: '#bfbfbf',
     borderRadius: 4,
-    marginRight: 4,
+    marginRight: 6,
   },
 });
 export default HealthScreen;

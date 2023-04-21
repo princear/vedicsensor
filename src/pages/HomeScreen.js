@@ -29,6 +29,8 @@ import {
   MembersList,
   ScheduleTest,
 } from './BookTest';
+import VirtualProfilesList from './VirtualProfilesList';
+import {getActiveEmail} from '../utils/user';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -42,6 +44,7 @@ export default class HomeScreen extends React.Component {
       device: undefined,
       bluetoothEnabled: true,
       isVirtualProfileModalOpen: false,
+      activeEmail: '',
     };
     this.setState = this.setState.bind(this);
   }
@@ -68,6 +71,7 @@ export default class HomeScreen extends React.Component {
     );
 
     this.checkBluetootEnabled();
+    this.setState({activeEmail: await getActiveEmail()});
   }
 
   async checkBluetootEnabled() {
@@ -135,6 +139,10 @@ export default class HomeScreen extends React.Component {
         <Stack.Screen name="DeviceListScreen" component={DeviceListScreen} />
         <Stack.Screen name="ConnectionScreen" component={ConnectionScreen} />
         <Stack.Screen name="OnBoarding" component={OnBoardingScreen} />
+        <Stack.Screen
+          name="VirtualProfilesList"
+          component={VirtualProfilesList}
+        />
       </Stack.Navigator>
     );
   }
@@ -291,6 +299,7 @@ export default class HomeScreen extends React.Component {
       <MainContext.Provider
         value={{
           isVirtualProfileModalOpen: this.state.isVirtualProfileModalOpen,
+          activeEmail: this.state.activeEmail,
           setState: this.setState,
         }}>
         <AuthContext.Provider
