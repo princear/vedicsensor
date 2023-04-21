@@ -30,7 +30,7 @@ import {
   ScheduleTest,
 } from './BookTest';
 import VirtualProfilesList from './VirtualProfilesList';
-import {getActiveEmail} from '../utils/user';
+import {getActiveEmail, getMasterEmail} from '../utils/user';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -56,6 +56,18 @@ export default class HomeScreen extends React.Component {
     });
   };
 
+  async checkUserLoggedin() {
+    let master_email = await getMasterEmail();
+    let active_email = await getActiveEmail();
+
+    if (master_email !== undefined || master_email !== '') {
+      this.setState({
+        activeEmail: active_email,
+        isAuthenticated: true,
+      });
+    }
+  }
+
   async componentDidMount() {
     console.log(
       'App::componentDidMount adding listeners: onBluetoothEnabled and onBluetoothDistabled',
@@ -71,7 +83,7 @@ export default class HomeScreen extends React.Component {
     );
 
     this.checkBluetootEnabled();
-    this.setState({activeEmail: await getActiveEmail()});
+    this.checkUserLoggedin();
   }
 
   async checkBluetootEnabled() {
