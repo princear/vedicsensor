@@ -245,7 +245,7 @@ const HealthScreen = ({navigation}) => {
             </TouchableOpacity>
           </View>
 
-          <Metrics />
+          <Metrics user={user} />
           <Card
             title="Dosha clock"
             details="Eat your largest meal of the day as digestion strongest..."
@@ -372,13 +372,15 @@ const HealthScreen = ({navigation}) => {
   );
 };
 
-const Metrics = () => {
+const Metrics = ({user}) => {
   return (
     <>
       <View style={{height: 200, flexGrow: 1, marginVertical: 20}}>
         <WebView
           source={{
-            uri: 'http://grafana.madmachines.in/d-solo/vtJmaDhVk/nadi-monitoring?orgId=1&from=1681131684285&to=1681139825402&var-device_name=device1&panelId=2',
+            uri: `http://grafana.madmachines.in/d-solo/vtJmaDhVk/nadi-monitoring?orgId=1&from=1681131684285&to=1681139825402&var-device_name=${
+              user?.email?.split('@')[0]
+            }&panelId=2`,
           }}
           style={{flex: 1}}
         />
