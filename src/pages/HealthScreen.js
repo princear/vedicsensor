@@ -12,7 +12,6 @@ import {
   Pressable,
   Dimensions,
 } from 'react-native';
-import {RadialSlider} from 'react-native-radial-slider';
 import HeartBeat from '../../assets/heart-beat.svg';
 import O2 from '../../assets/o2-drop.svg';
 import OxygenLevel from '../../assets/oxygen-level.svg';
@@ -33,8 +32,35 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {MainContext} from '../context';
 import LottieView from 'lottie-react-native';
 import {getUserInfo} from '../utils/user';
+import {useDerivedValue, useSharedValue} from 'react-native-reanimated';
+import {ReText} from 'react-native-redash';
+import CircularProgressBar from '../components/CircularProgressBar';
 
-const HealthScreen = ({navigation}) => {
+const daysOfWeek = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+];
+const monthsOfYear = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+const HealthScreen = ({navigation, route}) => {
   const mainContext = useContext(MainContext);
   const {isVirtualProfileModalOpen} = mainContext;
 
@@ -94,25 +120,24 @@ const HealthScreen = ({navigation}) => {
     );
   };
 
+  const getFormattedDate = () => {
+    const today = new Date();
+    const dayOfWeek = daysOfWeek[today.getDay()];
+    const dayOfMonth = today.getDate();
+    const month = monthsOfYear[today.getMonth()];
+
+    const formattedDate = `${dayOfWeek} ${dayOfMonth} ${month}`;
+    return formattedDate;
+  };
+
+  const progress = useSharedValue(0);
+  const CIRCLE_LENGTH = 300;
+  const progressText = useDerivedValue(() => {
+    return `${Math.floor(progress.value * 100)}`;
+  });
+
   return (
     <SafeAreaView style={{flex: 1}}>
-      {/* <View
-        style={{
-          flexDirection: 'row',
-          marginVertical: 30,
-          justifyContent: 'center',
-        }}>
-        <TouchableOpacity
-          onPress={() => startService()}
-          style={{marginRight: 30, backgroundColor: 'lightblue', padding: 6}}>
-          <MyText>START</MyText>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => stopService()}
-          style={{marginRight: 30, backgroundColor: 'lightblue', padding: 6}}>
-          <MyText>STOP</MyText>
-        </TouchableOpacity>
-      </View> */}
       <ScrollView>
         <View style={styles.header}>
           <TouchableOpacity>
@@ -143,7 +168,7 @@ const HealthScreen = ({navigation}) => {
               style={{marginRight: 6}}
             />
             <MyText style={{color: '#3460D7', fontSize: 10, fontWeight: '500'}}>
-              TUESDAY 21 FEB
+              {getFormattedDate()}
             </MyText>
           </View>
           <MyText style={{color: '#323232', fontWeight: '700', fontSize: 20}}>
@@ -163,65 +188,53 @@ const HealthScreen = ({navigation}) => {
                 height: 130,
               }}>
               <View style={styles.radial_container}>
-                <RadialSlider
-                  variant={'radial-circle-slider'}
-                  isHideLines={true}
-                  isHideMarkerLine={true}
-                  isHideButtons={true}
-                  isHideCenterContent={true}
-                  isHideTailText={true}
-                  sliderTrackColor="#D9D9D9"
-                  sliderWidth={6}
-                  thumbRadius={0}
-                  thumbColor="#FF8B8B"
-                  value={80}
-                  min={0}
-                  max={100}
-                  radius={45}
-                  markerCircleColor="#FF8B8B"
-                  //  onChange={wt => setWeight(wt)}
+                <CircularProgressBar
+                  cx={55}
+                  cy={55}
+                  target={80 / 100}
+                  progress={progress}
+                  circleLength={CIRCLE_LENGTH}
                 />
-                <Fire style={{position: 'absolute', left: 13, bottom: 15}} />
+                <Fire
+                  width={48}
+                  height={48}
+                  style={{position: 'absolute', left: 17, bottom: 22}}
+                />
                 <Air
-                  width={40}
+                  width={45}
                   height={40}
-                  style={{position: 'absolute', top: 8, right: 10}}
+                  style={{position: 'absolute', top: 20, right: 10}}
                 />
                 <Waves
-                  width={20}
-                  height={20}
-                  style={{position: 'absolute', bottom: 12, right: 16}}
+                  width={18}
+                  height={18}
+                  style={{position: 'absolute', bottom: 20, right: 28}}
                 />
               </View>
-              <View
-                style={{
-                  alignItems: 'center',
-                  position: 'absolute',
-                  bottom: -2,
-                }}>
-                <MyText
-                  style={{fontWeight: '400', fontSize: 12, color: '#323232'}}>
-                  Your Score
-                </MyText>
-                <MyText
-                  style={{
-                    fontWeight: '800',
-                    marginTop: -5,
-                    fontSize: 15,
-                    color: '#323232',
-                  }}>
-                  80
-                </MyText>
-              </View>
             </View>
-            <View style={{justifyContent: 'center', flex: 1}}>
-              <MyText style={{width: '90%', fontWeight: '400'}}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor..
+            <View style={{flex: 1, marginLeft: 20}}>
+              <MyText
+                style={{
+                  width: '90%',
+                  fontWeight: '600',
+                  fontSize: 10,
+                  color: '#323232',
+                }}>
+                Your Health Score
               </MyText>
-              <TouchableOpacity style={{marignTop: 20}}>
+              <ReText
+                style={{
+                  fontWeight: '800',
+                  color: '#323232',
+                  fontSize: 42,
+                  marginLeft: -8,
+                  marginVertical: -14,
+                }}
+                text={progressText}
+              />
+              <TouchableOpacity>
                 <MyText
-                  style={{color: '#3460D7', fontWeight: '500', marginTop: 10}}>
+                  style={{color: '#3460D7', fontWeight: '500', marginTop: 14}}>
                   View More
                 </MyText>
               </TouchableOpacity>
@@ -593,13 +606,12 @@ const styles = StyleSheet.create({
   },
   radial_container: {
     position: 'absolute',
-    backgroundColor: 'white',
-    height: 80,
-    width: 80,
+    height: 110,
+    width: 110,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 50,
     top: 10,
+    left: 12,
   },
   square: {
     paddingHorizontal: 24,
