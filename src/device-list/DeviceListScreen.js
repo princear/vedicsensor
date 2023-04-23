@@ -1,26 +1,19 @@
 import React from 'react';
-import {
-  Box,
-  Button,
-  Text,
-  Icon,
-  Toast,
-  HStack,
-  StatusBar,
-  IconButton,
-  Center,
-  ScrollView,
-} from 'native-base';
+import {Button, Toast, Center, Flex} from 'native-base';
 import RNBluetoothClassic from 'react-native-bluetooth-classic';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {View, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   requestAccessFineLocationPermission,
   requestBluetoothPermission,
   requestBluetoothScanPermission,
 } from '../utils/permissions';
 import {BluetoothContext} from '../context';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import LottieView from 'lottie-react-native';
+import assets from '../../assets';
+import MyText from '../components/MyText';
+import {Linking} from 'react-native';
 
 export default class DeviceListScreen extends React.Component {
   static contextType = BluetoothContext;
@@ -31,12 +24,31 @@ export default class DeviceListScreen extends React.Component {
       devices: [],
       accepting: false,
       discovering: false,
+      showSplashScreen: true,
     };
+    this.animation = React.createRef();
   }
 
   componentDidMount() {
+    this.props.navigation.getParent()?.setOptions({
+      tabBarStyle: {display: 'none'},
+    });
+
+    setTimeout(() => {
+      this.setState({showSplashScreen: false});
+    }, 1700);
+    this.animation?.current?.play();
+
     this.getBondedDevices();
     requestBluetoothScanPermission();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.showSplashScreen === false) {
+      this.props.navigation.getParent()?.setOptions({
+        tabBarStyle: {backgroundColor: '#ffffff', height: 60},
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -47,6 +59,10 @@ export default class DeviceListScreen extends React.Component {
     if (this.state.discovering) {
       this.cancelDiscovery(false);
     }
+
+    this.props.navigation.getParent()?.setOptions({
+      tabBarStyle: {backgroundColor: '#ffffff', height: 60},
+    });
   }
 
   getBondedDevices = async unloading => {
@@ -180,69 +196,97 @@ export default class DeviceListScreen extends React.Component {
     }
   };
 
-  render() {
-    let toggleAccept = this.state.accepting
-      ? () => this.cancelAcceptConnections()
-      : () => this.acceptConnections();
-
-    let toggleDiscovery = this.state.discovering
-      ? () => this.cancelDiscovery()
-      : () => this.startDiscovery();
-
+  renderSplashScreen = () => {
     return (
-      <Box>
-        <StatusBar bg="#3700B3" barStyle="light-content" />
-        <Box safeAreaTop bg="violet.600" />
-        <HStack
-          bg="violet.800"
-          px="1"
-          py="3"
-          justifyContent="space-between"
-          alignItems="center"
-          w="100%">
-          <HStack alignItems="center">
-            <IconButton
-              icon={
-                <Icon size="sm" as={MaterialIcons} name="menu" color="white" />
-              }
+      <SafeAreaProvider
+        style={{
+          backgroundColor: '#3259CB',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <View style={{height: 240, alignItems: 'center'}}>
+          <LottieView
+            style={{height: '100%'}}
+            ref={this.animation}
+            autoplay={true}
+            loop={true}
+            source={assets.lottieFiles.bluetoothCircles}
+          />
+        </View>
+      </SafeAreaProvider>
+    );
+  };
+
+  renderDeviceList = () => {
+    return (
+      <SafeAreaProvider>
+        <View
+          style={{
+            height: 60,
+            backgroundColor: '#3259CB',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexDirection: 'row',
+            paddingHorizontal: 20,
+          }}>
+          <MyText
+            style={{
+              color: '#ffffff',
+              fontSize: 18,
+              fontWeight: '700',
+            }}>
+            Nearby Devices
+          </MyText>
+          <TouchableOpacity>
+            <FontAwesome
+              name="refresh"
+              size={16}
+              color="#ffffff"
+              style={{marginRight: 6}}
             />
-            <Text color="white" fontSize="20" fontWeight="bold">
-              Devices
-            </Text>
-          </HStack>
-          <HStack>
-            {this.context.bluetoothEnabled && (
-              <IconButton
-                transparent
-                onPress={() => {
-                  this.getBondedDevices();
-                  this.startDiscovery();
-                }}
-                icon={<Icon as={MaterialIcons} name="cached" />}></IconButton>
-            )}
-          </HStack>
-        </HStack>
-        <HStack bg="white" px="1" w="100%" minH="100%">
-          <View>
-            {this.context.bluetoothEnabled ? (
-              <DeviceList
-                devices={this.state.devices}
-                onPress={this.context.selectDevice}
-                navigation={this.props.navigation}
-              />
-            ) : (
-              <View>
-                <Center>
-                  <Text>Bluetooth is OFF</Text>
-                  <Button onPress={() => this.requestEnabled()}>
+          </TouchableOpacity>
+        </View>
+        <View>
+          {this.context.bluetoothEnabled ? (
+            <DeviceList
+              devices={this.state.devices}
+              onPress={this.context.selectDevice}
+              navigation={this.props.navigation}
+            />
+          ) : (
+            <View style={{paddingVertical: 10}}>
+              <Center>
+                <MyText
+                  style={{color: '#323232', fontSize: 16, letterSpacing: -0.5}}>
+                  Please enable Bluetooth to use this feature.
+                </MyText>
+                <Button
+                  backgroundColor={'#3460D7'}
+                  borderRadius={30}
+                  width={130}
+                  style={{marginTop: 14}}
+                  onPress={() => {
+                    Linking.sendIntent('android.settings.BLUETOOTH_SETTINGS');
+                  }}>
+                  <MyText style={{color: '#ffffff', fontSize: 12}}>
                     Enable Bluetooth
-                  </Button>
-                </Center>
-              </View>
-            )}
-          </View>
-        </HStack>
-      </Box>
+                  </MyText>
+                </Button>
+              </Center>
+            </View>
+          )}
+        </View>
+      </SafeAreaProvider>
+    );
+  };
+
+  render() {
+    return (
+      <>
+        {this.state.showSplashScreen
+          ? this.renderSplashScreen()
+          : this.renderDeviceList()}
+      </>
     );
   }
 }
@@ -272,28 +316,33 @@ const DeviceListItem = ({device, onPress, onLongPress}) => {
   let icon = device.bonded ? 'ios-bluetooth' : 'ios-cellular';
 
   return (
-    <TouchableOpacity
-      style={styles.deviceListItem}
-      onPress={() => onPress(device)}
-      onLongPress={() => onLongPress(device)}>
-      <View style={styles.deviceListItemIcon}>
-        <Ionicons name={icon} color={bgColor} size={24} />
-      </View>
-      <View>
-        <Text>{device.name}</Text>
-        <Text note>{device.address}</Text>
-      </View>
-    </TouchableOpacity>
+    <View style={styles.deviceListItem}>
+      <Flex flexDirection="row" justifyContent="space-between" flexGrow={1}>
+        <MyText style={{color: '#323232', fontWeight: '400'}}>
+          {device.name}
+        </MyText>
+
+        <TouchableOpacity
+          onPress={() => onPress(device)}
+          onLongPress={() => onLongPress(device)}>
+          <MyText
+            style={{color: '#3460D7', fontWeight: '500', letterSpacing: 0.3}}>
+            CONNECT
+          </MyText>
+        </TouchableOpacity>
+      </Flex>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   deviceListItem: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 8,
+    paddingHorizontal: 20,
+    height: 60,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#A6A6A6',
   },
   deviceListItemIcon: {
     paddingVertical: 8,

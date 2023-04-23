@@ -18,6 +18,8 @@ const assets = {
     successCalender: require('./calendar-success-add.json'),
     quiz: require('./quiz.json'),
     friends: require('./friends.json'),
+    bluetoothCircles: require('./bluetooth-circles.json'),
+    boundLoading: require('./bound-loading.json'),
   },
   png: {
     devices: require('./devices_wearables.png'),

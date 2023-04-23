@@ -2,9 +2,9 @@ import React, {useEffect} from 'react';
 import Svg, {Circle} from 'react-native-svg';
 import Animated, {useAnimatedProps, withTiming} from 'react-native-reanimated';
 
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const CircularProgressBar = ({cx, cy, progress, circleLength, target}) => {
   const R = circleLength / (2 * Math.PI);
-  const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
   const animatedProps = useAnimatedProps(() => ({
     strokeDashoffset: circleLength * (1 - progress.value),
