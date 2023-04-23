@@ -237,7 +237,7 @@ export default class DeviceListScreen extends React.Component {
             }}>
             Nearby Devices
           </MyText>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => this.startDiscovery()}>
             <FontAwesome
               name="refresh"
               size={16}

@@ -1,6 +1,14 @@
 import React from 'react';
 import RNBluetoothClassic from 'react-native-bluetooth-classic';
-import {Text, HStack, Icon, Box, IconButton, Toast} from 'native-base';
+import {
+  Text,
+  HStack,
+  Icon,
+  Box,
+  IconButton,
+  Toast,
+  ScrollView,
+} from 'native-base';
 import {
   FlatList,
   View,
@@ -13,6 +21,10 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {BluetoothContext} from '../context';
 import {getDataFromAsyncStorage} from '../utils/asyncStorage';
 import {TOKEN} from '@env';
+import {callPostApi} from '../utils/axios';
+import BackgroundTimer from 'react-native-background-timer';
+import MyText from '../components/MyText';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 export default class ConnectionScreen extends React.Component {
   static contextType = BluetoothContext;
@@ -24,10 +36,28 @@ export default class ConnectionScreen extends React.Component {
       data: [],
       polling: false,
       connection: false,
+      isRunning: false,
+      intervalId: null,
       connectionOptions: {
         DELIMITER: '9',
       },
     };
+  }
+
+  startService() {
+    const id = BackgroundTimer.setInterval(() => {
+      console.log('Triggering service');
+      // try calling perform read here
+      this.sendData();
+    }, 1000);
+    console.log('Started service with interval ID:', id);
+    this.setState({isRunning: true, intervalId: id});
+  }
+
+  stopService() {
+    console.log('Stopping service with interval ID:', this.state.intervalId);
+    BackgroundTimer.clearInterval(this.state.intervalId);
+    this.setState({isRunning: false, intervalId: null});
   }
 
   /**
@@ -151,25 +181,28 @@ export default class ConnectionScreen extends React.Component {
 
   async postMetricData(data) {
     let user_id = await getDataFromAsyncStorage('active_email');
-    const json_data = JSON.stringify({pulses: data, user_id: user_id});
-    fetch('https://madmachines.datasyndicate.in/v1/api/pulse-data', {
-      method: 'POST',
-      body: json_data,
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + TOKEN,
-      },
-    })
-      .then(resp => {
-        console.log('Data pushed successfully!', resp);
-      })
-      .catch(error => {
-        Toast.show({
-          description: JSON.stringify(error),
-          duration: 5000,
-        });
+    const _data = {pulses: data, user_id: user_id};
+    try {
+      const url = `/v1/api/pulse-data`;
+      const res = await callPostApi(url, _data);
+      console.log('Data pushed successfully!', res);
+    } catch (error) {
+      Toast.show({
+        description: JSON.stringify(error),
+        duration: 5000,
       });
+    }
+    //  fetch('https://madmachines.datasyndicate.in/v1/api/pulse-data', {
+    //    method: 'POST',
+    //    body: json_data,
+    //    headers: {
+    //      Accept: 'application/json',
+    //      'Content-Type': 'application/json',
+    //      Authorization: 'Bearer ' + TOKEN,
+    //    },
+    //  })
+    //    .then(resp => {})
+    //    .catch(error => {});
   }
 
   async performRead() {
@@ -296,7 +329,7 @@ export default class ConnectionScreen extends React.Component {
     let toggleIcon = this.state.connection ? 'toggle-on' : 'toggle-off';
 
     return (
-      <>
+      <SafeAreaProvider style={{paddingBottom: 0}}>
         <HStack
           bg="violet.800"
           px="1"
@@ -339,7 +372,28 @@ export default class ConnectionScreen extends React.Component {
             }
           />
         </HStack>
-        <HStack bg="white" h="82%" w="100%">
+        <View
+          style={{
+            paddingTop: 15,
+            flexDirection: 'row',
+            alignItems: 'space-between',
+            justifyContent: 'space-between',
+            paddingHorizontal: 12,
+            backgroundColor: '#ffffff',
+          }}>
+          <TouchableOpacity
+            style={styles.button_blue}
+            onPress={() => this.startService()}>
+            <MyText style={{color: '#FFFFFF'}}>Start</MyText>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button_blue}
+            onPress={() => this.stopService()}>
+            <MyText style={{color: '#FFFFFF'}}>Stop</MyText>
+          </TouchableOpacity>
+        </View>
+
+        <HStack bg="white" w="100%" style={{flex: 1}}>
           <FlatList
             style={styles.connectionScreenOutput}
             contentContainerStyle={{justifyContent: 'flex-end'}}
@@ -367,7 +421,7 @@ export default class ConnectionScreen extends React.Component {
             disabled={!this.state.connection}
           />
         </HStack>
-      </>
+      </SafeAreaProvider>
     );
   }
 }
@@ -431,5 +485,16 @@ const styles = StyleSheet.create({
     padding: 10,
     color: 'white',
     backgroundColor: '#39B5E0',
+  },
+  button_blue: {
+    height: 40,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 50,
+    backgroundColor: '#3460D7',
+    justifyContent: 'center',
+    flex: 1,
+    alignItems: 'center',
+    marginHorizontal: 20,
   },
 });
