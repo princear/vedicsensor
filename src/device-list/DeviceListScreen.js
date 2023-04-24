@@ -14,6 +14,8 @@ import LottieView from 'lottie-react-native';
 import assets from '../../assets';
 import MyText from '../components/MyText';
 import {Linking} from 'react-native';
+import {useSharedValue} from 'react-native-reanimated';
+import RotatingIcon from '../components/RotatingIcon';
 
 export default class DeviceListScreen extends React.Component {
   static contextType = BluetoothContext;
@@ -25,6 +27,7 @@ export default class DeviceListScreen extends React.Component {
       accepting: false,
       discovering: false,
       showSplashScreen: true,
+      isRotating: false,
     };
     this.animation = React.createRef();
   }
@@ -139,6 +142,7 @@ export default class DeviceListScreen extends React.Component {
   };
 
   startDiscovery = async () => {
+    this.setState({isRotating: true});
     try {
       let granted = await requestAccessFineLocationPermission();
 
@@ -166,6 +170,7 @@ export default class DeviceListScreen extends React.Component {
         });
       } finally {
         this.setState({devices, discovering: false});
+        this.setState({isRotating: false});
       }
     } catch (err) {
       Toast.show({
@@ -237,14 +242,18 @@ export default class DeviceListScreen extends React.Component {
             }}>
             Nearby Devices
           </MyText>
-          <TouchableOpacity onPress={() => this.startDiscovery()}>
+          {/* <TouchableOpacity onPress={() => this.startDiscovery()}>
             <FontAwesome
               name="refresh"
               size={16}
               color="#ffffff"
               style={{marginRight: 6}}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+          <RotatingIcon
+            isRotating={this.state.isRotating}
+            onPress={this.startDiscovery}
+          />
         </View>
         <View>
           {this.context.bluetoothEnabled ? (

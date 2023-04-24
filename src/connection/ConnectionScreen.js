@@ -1,14 +1,6 @@
 import React from 'react';
 import RNBluetoothClassic from 'react-native-bluetooth-classic';
-import {
-  Text,
-  HStack,
-  Icon,
-  Box,
-  IconButton,
-  Toast,
-  ScrollView,
-} from 'native-base';
+import {Text, HStack, Icon, Box, IconButton, Toast} from 'native-base';
 import {
   FlatList,
   View,
@@ -20,7 +12,6 @@ import {Buffer} from 'buffer';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {BluetoothContext} from '../context';
 import {getDataFromAsyncStorage} from '../utils/asyncStorage';
-import {TOKEN} from '@env';
 import {callPostApi} from '../utils/axios';
 import BackgroundTimer from 'react-native-background-timer';
 import MyText from '../components/MyText';
@@ -46,16 +37,15 @@ export default class ConnectionScreen extends React.Component {
 
   startService() {
     const id = BackgroundTimer.setInterval(() => {
-      console.log('Triggering service');
-      // try calling perform read here
-      this.sendData();
-    }, 1000);
+      this.initializeRead();
+    }, 0);
     console.log('Started service with interval ID:', id);
     this.setState({isRunning: true, intervalId: id});
   }
 
   stopService() {
     console.log('Stopping service with interval ID:', this.state.intervalId);
+    this.uninitializeRead();
     BackgroundTimer.clearInterval(this.state.intervalId);
     this.setState({isRunning: false, intervalId: null});
   }
@@ -114,7 +104,7 @@ export default class ConnectionScreen extends React.Component {
       }
 
       this.setState({connection});
-      this.initializeRead();
+      // this.initializeRead();
     } catch (error) {
       this.addData({
         data: `Connection failed: ${error.message}`,
@@ -383,12 +373,12 @@ export default class ConnectionScreen extends React.Component {
           }}>
           <TouchableOpacity
             style={styles.button_blue}
-            onPress={() => this.startService()}>
+            onPress={() => !this.state.isRunning && this.startService()}>
             <MyText style={{color: '#FFFFFF'}}>Start</MyText>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.button_blue}
-            onPress={() => this.stopService()}>
+            onPress={() => this.state.isRunning && this.stopService()}>
             <MyText style={{color: '#FFFFFF'}}>Stop</MyText>
           </TouchableOpacity>
         </View>
