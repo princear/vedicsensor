@@ -104,7 +104,7 @@ export default class ConnectionScreen extends React.Component {
       }
 
       this.setState({connection});
-      // this.initializeRead();
+      this.initializeRead();
     } catch (error) {
       this.addData({
         data: `Connection failed: ${error.message}`,
@@ -362,7 +362,7 @@ export default class ConnectionScreen extends React.Component {
             }
           />
         </HStack>
-        <View
+        {/* <View
           style={{
             paddingTop: 15,
             flexDirection: 'row',
@@ -381,7 +381,7 @@ export default class ConnectionScreen extends React.Component {
             onPress={() => this.state.isRunning && this.stopService()}>
             <MyText style={{color: '#FFFFFF'}}>Stop</MyText>
           </TouchableOpacity>
-        </View>
+        </View> */}
 
         <HStack bg="white" w="100%" style={{flex: 1}}>
           <FlatList

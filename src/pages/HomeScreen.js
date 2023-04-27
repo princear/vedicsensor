@@ -31,6 +31,7 @@ import {
 } from './BookTest';
 import VirtualProfilesList from './VirtualProfilesList';
 import {getActiveEmail, getMasterEmail} from '../utils/user';
+import {clearAsyncStorage} from '../utils/asyncStorage';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -60,15 +61,19 @@ export default class HomeScreen extends React.Component {
     let master_email = await getMasterEmail();
     let active_email = await getActiveEmail();
 
-    if (master_email !== undefined || master_email !== '') {
+    if (master_email) {
       this.setState({
         activeEmail: active_email,
         isAuthenticated: true,
       });
+    } else {
+      clearAsyncStorage();
+      this.setState({isAuthenticated: false});
     }
   }
 
   async componentDidMount() {
+    this.checkUserLoggedin();
     console.log(
       'App::componentDidMount adding listeners: onBluetoothEnabled and onBluetoothDistabled',
     );
@@ -83,7 +88,6 @@ export default class HomeScreen extends React.Component {
     );
 
     this.checkBluetootEnabled();
-    this.checkUserLoggedin();
   }
 
   async checkBluetootEnabled() {

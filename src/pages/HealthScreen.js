@@ -31,7 +31,7 @@ import Carousel from 'react-native-reanimated-carousel';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {MainContext} from '../context';
 import LottieView from 'lottie-react-native';
-import {getUserInfo} from '../utils/user';
+import {getActiveEmail, getUserInfo} from '../utils/user';
 import {useDerivedValue, useSharedValue} from 'react-native-reanimated';
 import {ReText} from 'react-native-redash';
 import CircularProgressBar from '../components/CircularProgressBar';
@@ -70,9 +70,21 @@ const HealthScreen = ({navigation, route}) => {
 
   const [user, setUser] = useState();
   useEffect(() => {
-    getUserInfo(mainContext.activeEmail).then(res => {
-      setUser(res.data);
+    getActiveEmail().then(email => {
+      mainContext.setState({activeEmail: email});
     });
+  }, []);
+
+  useEffect(() => {
+    getUserInfo(mainContext.activeEmail)
+      .then(res => {
+        //   console.log('mainContext.activeEmail', mainContext.activeEmail);
+        setUser(res.data);
+      })
+      .catch(err => {
+        console.warn(err.response.data);
+        //   console.log('mainContext.activeEmail', mainContext);
+      });
   }, [mainContext.activeEmail]);
 
   useEffect(() => {
