@@ -32,15 +32,15 @@ import {
   storeDataToAsyncStorage,
 } from '../utils/asyncStorage';
 import {Toast} from 'native-base';
-import {getMasterEmail} from '../utils/user';
+import {getMasterEmail, getUserInfo} from '../utils/user';
 import {callPostApi} from '../utils/axios';
 
 const OnBoardingScreen = ({navigation, route}) => {
   const [onBoardingStep, setOnBoardingStep] = useState(1);
   const [onBoardingDetails, setOnBoardingDetails] = useState({
-    first_name: '',
-    last_name: '',
-    email: '',
+    first_name: 'rohaan',
+    last_name: 'ansari',
+    email: 'rohaan@dataorc.in',
     dob: '',
     tob: '', // 24 hrs format
     pob: {
@@ -103,13 +103,19 @@ const OnBoardingScreen = ({navigation, route}) => {
         }));
       });
     }
-
-    getMasterEmail().then(email => {
-      setOnBoardingDetails(prevState => ({
-        ...prevState,
-        master_user_id: `${email}`,
-      }));
-    });
+    if (!changeActiveEmail) {
+      getMasterEmail().then(email => {
+        setOnBoardingDetails(prevState => ({
+          ...prevState,
+          master_user_id: `${email}`,
+        }));
+      });
+    } else {
+      setOnBoardingDetails({
+        ...onBoardingDetails,
+        master_user_id: onBoardingDetails.email,
+      });
+    }
   }, [onBoardingStep]);
 
   useEffect(() => {
@@ -216,15 +222,43 @@ const Step1 = props => {
     setOnBoardingDetails({...onBoardingDetails, [k]: v});
   };
 
+  function debounce(func, delay) {
+    let timer;
+    return function (...args) {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        func.apply(this, args);
+      }, delay);
+    };
+  }
+
+  const delayedGetUserInfo = debounce(async () => {
+    try {
+      const res = await getUserInfo(onBoardingDetails?.email);
+      if (res.status === 200) {
+        setError('Email already exist');
+        setDisabled(true);
+      } else {
+        setDisabled(false);
+        setError(false);
+      }
+    } catch (error) {
+      console.log('Error:', error.response.data);
+    }
+  }, 700);
+
   useEffect(() => {
-    if (
-      onBoardingDetails?.email !== '' &&
-      isEmailValid(onBoardingDetails?.email) === false
-    ) {
-      setError('Please provide a valid email');
+    if (onBoardingDetails?.email !== '') {
+      if (!isEmailValid(onBoardingDetails?.email)) {
+        setError('Please provide a valid email');
+      } else {
+        setError(false);
+        delayedGetUserInfo();
+      }
     } else {
       setError(false);
     }
+
     if (
       onBoardingDetails?.first_name === '' ||
       onBoardingDetails?.last_name === '' ||
@@ -705,12 +739,18 @@ const Step4 = props => {
 
     if (!changeActiveEmail) delete onBoardingDetails.phone_number;
 
-    console.log(onBoardingDetails);
+    console.warn(onBoardingDetails);
     const firebase_token = await getDataFromAsyncStorage('token');
     try {
       const url = `/v1/api/add-user-health-info`;
       const res = await callPostApi(url, onBoardingDetails);
       console.log('onBOardingRes', res.data);
+
+      if (res.status === 200 && changeActiveEmail) {
+        storeDataToAsyncStorage('active_email', onBoardingDetails.email);
+        storeDataToAsyncStorage('master_email', onBoardingDetails.email);
+      }
+
       setOnBoardingStep(5);
       setLoading(false);
     } catch (error) {
@@ -921,10 +961,6 @@ const Step4 = props => {
       <TouchableOpacity
         style={loading ? styles.button_blue_disabled : styles.button_blue}
         onPress={async () => {
-          if (changeActiveEmail) {
-            storeDataToAsyncStorage('active_email', onBoardingDetails.email);
-            storeDataToAsyncStorage('master_email', onBoardingDetails.email);
-          }
           postOnBoardingDetails();
         }}>
         {loading ? (
