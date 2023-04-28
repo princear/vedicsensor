@@ -38,9 +38,9 @@ import {callPostApi} from '../utils/axios';
 const OnBoardingScreen = ({navigation, route}) => {
   const [onBoardingStep, setOnBoardingStep] = useState(1);
   const [onBoardingDetails, setOnBoardingDetails] = useState({
-    first_name: 'rohaan',
-    last_name: 'ansari',
-    email: 'rohaan@dataorc.in',
+    first_name: '',
+    last_name: '',
+    email: '',
     dob: '',
     tob: '', // 24 hrs format
     pob: {
