@@ -26,6 +26,19 @@ const ProfileScreen = ({navigation}) => {
         }}>
         <MyText style={{color: '#ffffff'}}>Book a test</MyText>
       </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Questionnaire')}
+        style={{
+          marginTop: 10,
+          backgroundColor: '#3259CB',
+          width: 120,
+          padding: 8,
+          borderRadius: 8,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <MyText style={{color: '#ffffff'}}>Questionnaire</MyText>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };

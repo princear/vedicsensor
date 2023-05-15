@@ -207,6 +207,7 @@ export default class HomeScreen extends React.Component {
         <Stack.Screen name="AddMember" component={AddMember} />
         <Stack.Screen name="LocateMe" component={LocateMe} />
         <Stack.Screen name="ScheduleTest" component={ScheduleTest} />
+        <Stack.Screen name="Questionnaire" component={Questionnaire} />
       </Stack.Navigator>
     );
   }
@@ -297,7 +298,6 @@ export default class HomeScreen extends React.Component {
         <Stack.Screen name="IntroScreen" component={IntroScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="OnBoarding" component={OnBoardingScreen} />
-        <Stack.Screen name="Questionnaire" component={Questionnaire} />
       </Stack.Navigator>
     );
   }

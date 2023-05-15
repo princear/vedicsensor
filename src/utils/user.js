@@ -22,7 +22,7 @@ export const getMasterEmail = async () => {
 
 export const getUserInfo = async email => {
   const url = `/v1/api/get-user-info?email=${email}`;
-  const res = callGetApi(url);
+  const res = await callGetApi(url);
   return res;
 };
 
