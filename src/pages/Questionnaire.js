@@ -25,8 +25,9 @@ import Animated, {
 } from 'react-native-reanimated';
 import MyText from '../components/MyText';
 import {callGetApi} from '../utils/axios';
+import {SvgUri} from 'react-native-svg';
 
-// question types - slider, tap, yes/no, select, multi select,
+// question types - slider, scale, yes/no, select, multi select,
 
 const ques = [
   {
@@ -264,7 +265,7 @@ const Questionnaire = ({navigation, route}) => {
   //   }, [answers[questionIndex]?.valueIndex]);
 
   const renderQuestion = question => {
-    if (question['question_type'] === 'yes_and_no') {
+    if (question?.question_type === 'yes_and_no') {
       const handleChange = value => {
         const selected_answer = question.options.filter(
           option => option.option_label === value,
@@ -305,64 +306,75 @@ const Questionnaire = ({navigation, route}) => {
           </View>
         </View>
       );
+    } else if (
+      question?.question_type === 'slider' ||
+      question?.question_type === 'msq'
+    ) {
+      const handleChange = value => {
+        const selectedValue = question.options.filter(
+          option => option.option_value === value,
+        );
+
+        setQuestions(prevData => ({
+          ...prevData,
+          [question.id]: {
+            ...prevData[question.id],
+            answered_value: selectedValue[0],
+          },
+        }));
+      };
+      return (
+        <View style={styles.content}>
+          <View>
+            <Animated.View style={[{width: 100, height: 100}, animatedStyles]}>
+              {/* {questions[questionIndex]?.svg} */}
+              <SvgUri
+                width="100%"
+                height="100%"
+                uri="https://pub-29de66f206a745729211a42227c53bf2.r2.dev/default_location.svg"
+              />
+            </Animated.View>
+          </View>
+          <View style={{width: '100%', alignItems: 'center', marginTop: 80}}>
+            <MyText
+              style={{
+                color: '#3259CB',
+                fontWeight: '700',
+                fontFamily: 'Poppins',
+                textTransform: 'uppercase',
+              }}>
+              {!question.answered_value
+                ? question.options[0].option_label
+                : question?.answered_value?.option_label}
+            </MyText>
+            <View style={{width: '80%', alignItems: 'center'}}>
+              <Slider
+                style={{width: '80%'}}
+                step={1}
+                minimumValue={0}
+                maximumValue={question.options.length - 1}
+                value={
+                  !question.answered_value
+                    ? 0
+                    : question?.answered_value?.option_value
+                }
+                onValueChange={val => handleChange(val + 1)}
+                thumbTintColor="#67160F"
+                minimumTrackTintColor="#F94F41"
+                maximumTrackTintColor="#67160F"
+              />
+              <MyText style={styles.label_left}>
+                {question?.options[0]?.option_label}
+              </MyText>
+              <MyText style={styles.label_right}>
+                {question?.options[question.options.length - 1]?.option_label}
+              </MyText>
+            </View>
+          </View>
+        </View>
+      );
     }
-    //  if (question_type === 'slider') {
-    //    return (
-    //      <View style={styles.content}>
-    //        <View>
-    //          <Animated.View style={[{width: 100, height: 100}, animatedStyles]}>
-    //            {questions[questionIndex]?.svg}
-    //          </Animated.View>
-    //        </View>
-    //        <View style={{width: '100%', alignItems: 'center', marginTop: 80}}>
-    //          <MyText
-    //            style={{
-    //              color: '#3259CB',
-    //              fontWeight: '700',
-    //              fontFamily: 'Poppins',
-    //              textTransform: 'uppercase',
-    //            }}>
-    //            {
-    //              questions[questionIndex]?.values[
-    //                answers[questionIndex]?.valueIndex
-    //              ]
-    //            }
-    //          </MyText>
-    //          <View style={{width: '80%', alignItems: 'center'}}>
-    //            <Slider
-    //              style={{width: '80%'}}
-    //              step={1}
-    //              minimumValue={questions[questionIndex]?.min?.value}
-    //              maximumValue={4}
-    //              value={answers[questionIndex]?.valueIndex}
-    //              onValueChange={val => {
-    //                setAnswers(
-    //                  answers.map(item =>
-    //                    item.question === questions[questionIndex].question
-    //                      ? {
-    //                          ...item,
-    //                          answer: questions[questionIndex]?.values[val],
-    //                          valueIndex: val,
-    //                        }
-    //                      : item,
-    //                  ),
-    //                );
-    //              }}
-    //              thumbTintColor="#67160F"
-    //              minimumTrackTintColor="#F94F41"
-    //              maximumTrackTintColor="#67160F"
-    //            />
-    //            <MyText style={styles.label_left}>
-    //              {questions[questionIndex]?.min?.label}
-    //            </MyText>
-    //            <MyText style={styles.label_right}>
-    //              {questions[questionIndex]?.max?.label}
-    //            </MyText>
-    //          </View>
-    //        </View>
-    //      </View>
-    //    );
-    //  } else if (question_type === 'scale') {
+    //   else if (question_type === 'scale') {
     //    let value = answers[questionIndex].answer;
     //    const handleChange = newValue => {
     //      setAnswers(
@@ -739,9 +751,6 @@ const Questionnaire = ({navigation, route}) => {
             </MyText>
           </TouchableOpacity>
         )}
-
-        {/* Object.keys(questions).length */}
-        {/* {console.warn(Object.keys(questions).length)} */}
 
         {questionIndex < Object.keys(questions).length && (
           <TouchableOpacity
