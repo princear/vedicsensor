@@ -30,156 +30,127 @@ import {getActiveEmail} from '../utils/user';
 
 // question types - slider, scale, yes/no, select, multi select,
 
-// const ques = [
-//   {
-//     bg_color: '#3259CB',
-//     question_text: 'Do you regularly enagage in physical activities?',
-//     helperText: '',
-//     svg: false,
-//     animationName: 'basketBallPlaying',
-//     type: 'yes/no',
-//     options: [
-//       {
-//         option_value: 1,
-//         option_dosha: 'v',
-//         option_weight: 1.07,
-//         option_label: 'yes',
-//       },
-//       {
-//         option_value: 2,
-//         option_dosha: '',
-//         option_weight: 0,
-//         option_label: 'no',
-//       },
-//     ],
-//   },
-//   //   {
-//   //     answered: false,
-//   //     bgColor: '#3259CB',
-//   //     question: 'How many hours a day do you spend sitting?',
-//   //     helperText: false,
-//   //     helperSvg: false,
-//   //     svg: <SittingSvg width={'100%'} height={'100%'} />, // or svg_url
-//   //     type: 'slider',
-//   //     min: {value: 0, label: '< 2 Hours'},
-//   //     max: {value: 4, label: '5+ Hours'},
-//   //     values: [
-//   //       'Less than 2 hours',
-//   //       '2-3 Hours',
-//   //       '3-4 Hours',
-//   //       '4-5 Hours',
-//   //       '5 Hours +',
-//   //     ],
-//   //   },
-//   //   {
-//   //     answered: false,
-//   //     bgColor: '#087C53',
-//   //     question: 'How much physical activity is required by your job?',
-//   //     helperText: 'Like gym or cycling',
-//   //     svg: <WalkingDog width={'100%'} height={'100%'} />,
-//   //     type: 'slider',
-//   //     min: {value: 0, label: 'Not much'},
-//   //     max: {value: 4, label: 'Intense'},
-//   //     values: ['Not much', 'Moderate', 'Average', 'Intense', 'Very intense'],
-//   //   },
-//   //   {
-//   //     answered: false,
-//   //     bgColor: '#3259CB',
-//   //     question: 'How much effort do you believe you normally put in?',
-//   //     helperText: '(1 means very little while 5 means great deal of effort)',
-//   //     svg: <StruggleSvg width={60} height={60} />,
-//   //     type: 'scale',
-//   //     min: {value: 0, label: 'Not much'},
-//   //     max: {value: 4, label: 'Intense'},
-//   //     values: ['Not much', 'Moderate', 'Average', 'Intense', 'Very intense'],
-//   //   },
-
-//   //   {
-//   //     answered: false,
-//   //     bgColor: '#087C53',
-//   //     question: 'What eye size do you possess?',
-//   //     helperText: '',
-//   //     svg: <Eyes height={100} width={100} />,
-//   //     type: 'select',
-//   //     options: [
-//   //       {
-//   //         label: 'Small eyes',
-//   //         value: 'Small eyes',
-//   //         img: false,
-//   //       },
-//   //       {
-//   //         label: 'Medium eyes',
-//   //         value: 'Medium eyes',
-//   //         img: false,
-//   //       },
-//   //       {
-//   //         label: 'Big eyes',
-//   //         value: 'Big eyes',
-//   //         img: false,
-//   //       },
-//   //     ],
-//   //   },
-//   //   {
-//   //     answered: false,
-//   //     bgColor: '#087C53',
-//   //     question: 'What color is the white part of your eye?',
-//   //     helperText: '',
-//   //     svg: false,
-//   //     type: 'select',
-//   //     options: [
-//   //       {
-//   //         label: 'Dull or dusky',
-//   //         value: 'Dull or dusky',
-//   //         image_url:
-//   //           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT35CdN_4kgwnFEp7p9j-MOqyTZ7vpvcQtCwg&usqp=CAU',
-//   //       },
-//   //       {
-//   //         label: 'Coppery eyes',
-//   //         value: 'Coppery eyes',
-//   //         image_url:
-//   //           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS39nMxRdl2Xu8fK0FmH1HfsRVcjdb2mOSyyw&usqp=CAU',
-//   //       },
-//   //       {
-//   //         label: 'Milky white eyes',
-//   //         value: 'Milky white eyes',
-//   //         image_url:
-//   //           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT41Scnys7uiVc_vtDPtx2bC9aMmacKlHYwwQ&usqp=CAU',
-//   //       },
-//   //     ],
-//   //   },
-//   //   {
-//   //     answered: false,
-//   //     bgColor: '#087C53',
-//   //     question:
-//   //       'Choose the appropriate options for your hair type and condition.',
-//   //     helperText: '',
-//   //     svg: false,
-//   //     type: 'multi-select',
-//   //     options: [
-//   //       {
-//   //         label: 'Less dense hair',
-//   //         value: 'Less dense hair',
-//   //         image_url: <HairsLess />,
-//   //       },
-//   //       {
-//   //         label: 'Dense hair',
-//   //         value: 'Dense hair',
-//   //         image_url: <HairsLess />,
-//   //       },
-//   //       {
-//   //         label: 'Curly hair',
-//   //         value: 'Curly hair',
-//   //         image_url: <HairsLess />,
-//   //       },
-//   //       {
-//   //         label: 'Grey hair before 35 years',
-//   //         helper_label: '(more than 20%)',
-//   //         value: 'Grey hair before 35 years',
-//   //         image_url: <HairsLess />,
-//   //       },
-//   //     ],
-//   //   },
-// ];
+const ques = [
+  //   {
+  //     answered: false,
+  //     bg_color: '#087C53',
+  //     question_text: 'What eye size do you possess?',
+  //     helperText: '',
+  //     svg: <Eyes height={100} width={100} />,
+  //     type: 'select',
+  //     options: [
+  //       {
+  //         label: 'Small eyes',
+  //         value: 'Small eyes',
+  //         img: false,
+  //       },
+  //       {
+  //         label: 'Medium eyes',
+  //         value: 'Medium eyes',
+  //         img: false,
+  //       },
+  //       {
+  //         label: 'Big eyes',
+  //         value: 'Big eyes',
+  //         img: false,
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     bg_color: '#3259CB',
+  //     question_text: 'Do you regularly enagage in physical activities?',
+  //     helperText: '',
+  //     svg: false,
+  //     animationName: 'basketBallPlaying',
+  //     type: 'yes/no',
+  //     options: [
+  //       {
+  //         option_value: 1,
+  //         option_dosha: 'v',
+  //         option_weight: 1.07,
+  //         option_label: 'yes',
+  //       },
+  //       {
+  //         option_value: 2,
+  //         option_dosha: '',
+  //         option_weight: 0,
+  //         option_label: 'no',
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     answered: false,
+  //     bgColor: '#3259CB',
+  //     question: 'How many hours a day do you spend sitting?',
+  //     helperText: false,
+  //     helperSvg: false,
+  //     svg: <SittingSvg width={'100%'} height={'100%'} />, // or svg_url
+  //     type: 'slider',
+  //     min: {value: 0, label: '< 2 Hours'},
+  //     max: {value: 4, label: '5+ Hours'},
+  //     values: [
+  //       'Less than 2 hours',
+  //       '2-3 Hours',
+  //       '3-4 Hours',
+  //       '4-5 Hours',
+  //       '5 Hours +',
+  //     ],
+  //   },
+  //   {
+  //     answered: false,
+  //     bgColor: '#087C53',
+  //     question: 'How much physical activity is required by your job?',
+  //     helperText: 'Like gym or cycling',
+  //     svg: <WalkingDog width={'100%'} height={'100%'} />,
+  //     type: 'slider',
+  //     min: {value: 0, label: 'Not much'},
+  //     max: {value: 4, label: 'Intense'},
+  //     values: ['Not much', 'Moderate', 'Average', 'Intense', 'Very intense'],
+  //   },
+  //   {
+  //     answered: false,
+  //     bgColor: '#3259CB',
+  //     question: 'How much effort do you believe you normally put in?',
+  //     helperText: '(1 means very little while 5 means great deal of effort)',
+  //     svg: <StruggleSvg width={60} height={60} />,
+  //     type: 'scale',
+  //     min: {value: 0, label: 'Not much'},
+  //     max: {value: 4, label: 'Intense'},
+  //     values: ['Not much', 'Moderate', 'Average', 'Intense', 'Very intense'],
+  //   },
+  //   {
+  //     answered: false,
+  //     bgColor: '#087C53',
+  //     question:
+  //       'Choose the appropriate options for your hair type and condition.',
+  //     helperText: '',
+  //     svg: false,
+  //     type: 'multi-select',
+  //     options: [
+  //       {
+  //         label: 'Less dense hair',
+  //         value: 'Less dense hair',
+  //         image_url: <HairsLess />,
+  //       },
+  //       {
+  //         label: 'Dense hair',
+  //         value: 'Dense hair',
+  //         image_url: <HairsLess />,
+  //       },
+  //       {
+  //         label: 'Curly hair',
+  //         value: 'Curly hair',
+  //         image_url: <HairsLess />,
+  //       },
+  //       {
+  //         label: 'Grey hair before 35 years',
+  //         helper_label: '(more than 20%)',
+  //         value: 'Grey hair before 35 years',
+  //         image_url: <HairsLess />,
+  //       },
+  //     ],
+  //   },
+];
 
 const ans = [
   {
@@ -313,6 +284,7 @@ const Questionnaire = ({navigation, route}) => {
             answered_value: selected_answer[0],
           },
         }));
+        setQuestionIndex(questionIndex + 1);
       };
 
       return (
@@ -349,10 +321,7 @@ const Questionnaire = ({navigation, route}) => {
           </View>
         </View>
       );
-    } else if (
-      question?.question_type === 'slider' ||
-      question?.question_type === 'msq'
-    ) {
+    } else if (question?.question_type === 'slider') {
       const handleChange = value => {
         const selectedValue = question.options.filter(
           option => option.option_value === value,
@@ -413,6 +382,66 @@ const Questionnaire = ({navigation, route}) => {
                 {question?.options[question.options.length - 1]?.option_label}
               </MyText>
             </View>
+          </View>
+        </View>
+      );
+    } else if (question?.question_type === 'msq') {
+      const handleChange = value => {
+        const selectedValue = question.options.filter(
+          option => option.option_value === value,
+        );
+
+        setQuestions(prevData => ({
+          ...prevData,
+          [question.id]: {
+            ...prevData[question.id],
+            answered_value: selectedValue[0],
+          },
+        }));
+      };
+      return (
+        <View style={styles.content}>
+          {/* <View>
+            <View style={{width: 100, height: 100}}>
+              <SvgUri
+                width="100%"
+                height="100%"
+                uri="https://pub-29de66f206a745729211a42227c53bf2.r2.dev/default_location.svg"
+              />
+            </View>
+          </View> */}
+          <View
+            style={{
+              marginTop: 30,
+              paddingLeft: 20,
+              width: '100%',
+            }}>
+            {question?.options?.map((item, idx) => (
+              <View style={styles.radio_row} key={idx}>
+                <TouchableOpacity
+                  style={styles.radio}
+                  onPress={() => handleChange(item.option_value)}>
+                  {question?.answered_value?.option_value ===
+                    item.option_value && <View style={styles.radio_selected} />}
+                </TouchableOpacity>
+                <Pressable
+                  onPress={() => handleChange(item.option_value)}
+                  style={[
+                    styles.radio_text,
+                    {width: item?.image_url ? '30%' : '63%'},
+                  ]}>
+                  <MyText>{item?.option_label}</MyText>
+                </Pressable>
+                {item?.image_url && (
+                  <Image
+                    style={{width: 100, height: 50, borderRadius: 10}}
+                    source={{
+                      uri: item.image_url,
+                    }}
+                  />
+                )}
+              </View>
+            ))}
           </View>
         </View>
       );
