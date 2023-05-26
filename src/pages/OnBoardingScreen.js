@@ -26,7 +26,7 @@ import {isEmailValid} from '../utils/validations';
 import Boy from '../../assets/boy.svg';
 import Girl from '../../assets/girl.svg';
 import Statusbar from '../components/Statusbar';
-import {AuthContext} from '../context';
+import {AuthContext, MainContext} from '../context';
 import {
   getDataFromAsyncStorage,
   storeDataToAsyncStorage,
@@ -81,6 +81,7 @@ const OnBoardingScreen = ({navigation, route}) => {
 
   const [showStatusBar, setShowStatusBar] = useState(true);
   const [changeActiveEmail, setChangeActiveEmail] = useState(true);
+  const [partialDetails, setPartialDetails] = useState(false);
 
   const getPhoneNumber = async () => {
     return await getDataFromAsyncStorage('phone_number');
@@ -91,6 +92,9 @@ const OnBoardingScreen = ({navigation, route}) => {
     }
     if (route?.params?.changeActiveEmail != undefined) {
       setChangeActiveEmail(route?.params?.changeActiveEmail);
+    }
+    if (route?.params?.partialDetails != undefined) {
+      setPartialDetails(route?.params?.partialDetails);
     }
   }, [route]);
 
@@ -139,6 +143,8 @@ const OnBoardingScreen = ({navigation, route}) => {
           setOnBoardingStep={setOnBoardingStep}
           onBoardingDetails={onBoardingDetails}
           setOnBoardingDetails={setOnBoardingDetails}
+          partialDetails={partialDetails}
+          navigation={navigation}
         />
       );
     else if (onBoardingStep == 2)
@@ -212,11 +218,19 @@ const OnBoardingScreen = ({navigation, route}) => {
 };
 
 const Step1 = props => {
-  const {setOnBoardingStep, onBoardingDetails, setOnBoardingDetails} = props;
+  const {
+    setOnBoardingStep,
+    onBoardingDetails,
+    setOnBoardingDetails,
+    partialDetails,
+    navigation,
+  } = props;
+  const mainContext = useContext(MainContext);
   const [disabled, setDisabled] = useState(true);
   const [error, setError] = useState(null);
   const ref_last_name = useRef();
   const ref_email = useRef();
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (k, v) => {
     setOnBoardingDetails({...onBoardingDetails, [k]: v});
@@ -246,6 +260,42 @@ const Step1 = props => {
       console.log('Error:', error.response.data);
     }
   }, 700);
+
+  const postDetails = async () => {
+    const master_email = await getMasterEmail();
+
+    const data = {
+      first_name: onBoardingDetails.first_name,
+      last_name: onBoardingDetails.last_name,
+      email: onBoardingDetails.email,
+      master_user_id: master_email,
+    };
+
+    if (master_email == null) {
+      data['master_user_id'] = `masteruser+${
+        data.first_name + data.last_name
+      }@gmail.com`;
+    }
+    console.log(data);
+
+    try {
+      const url = `/v1/api/add-user-health-info`;
+      const res = await callPostApi(url, data);
+      storeDataToAsyncStorage('active_email', data.email);
+      mainContext.setState({activeEmail: data.email});
+      navigation.navigate('Health');
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.log('Error', error.response);
+      Toast.show({
+        description: 'Something went wrong',
+        duration: 2000,
+      }).finally(() => {
+        setLoading(false);
+      });
+    }
+  };
 
   useEffect(() => {
     if (onBoardingDetails?.email !== '') {
@@ -331,7 +381,13 @@ const Step1 = props => {
         <TouchableOpacity
           style={disabled ? styles.button_blue_disabled : styles.button_blue}
           onPress={() => {
-            !disabled && setOnBoardingStep(2);
+            if (!disabled) {
+              if (partialDetails) {
+                postDetails();
+              } else {
+                setOnBoardingStep(2);
+              }
+            }
           }}>
           <MyText
             style={
@@ -339,7 +395,13 @@ const Step1 = props => {
                 ? styles.button_blue_text_disabled
                 : styles.button_blue_text
             }>
-            Continue
+            {loading ? (
+              <>
+                <ActivityIndicator size="large" color="#3460D7" />
+              </>
+            ) : (
+              <MyText style={styles.button_blue_text}>Continue</MyText>
+            )}
           </MyText>
         </TouchableOpacity>
       </View>

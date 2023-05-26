@@ -32,6 +32,7 @@ import {
 import VirtualProfilesList from './VirtualProfilesList';
 import {getActiveEmail, getMasterEmail} from '../utils/user';
 import {clearAsyncStorage} from '../utils/asyncStorage';
+import {isEmailValid} from '../utils/validations';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -61,7 +62,12 @@ export default class HomeScreen extends React.Component {
     let master_email = await getMasterEmail();
     let active_email = await getActiveEmail();
 
-    if (master_email) {
+    if (
+      master_email &&
+      active_email &&
+      isEmailValid(master_email) &&
+      isEmailValid(active_email)
+    ) {
       this.setState({
         activeEmail: active_email,
         isAuthenticated: true,

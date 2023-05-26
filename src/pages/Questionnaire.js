@@ -776,7 +776,7 @@ const Questionnaire = ({navigation, route}) => {
           </MyText>
           <TouchableOpacity
             onPress={() => {
-              console.log(answers[questionIndex]);
+              navigation.navigate('ProfileScreen');
             }}
             style={{position: 'absolute', right: 10}}>
             <MaterialIcons name="close" size={20} color="white" />

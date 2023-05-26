@@ -91,26 +91,6 @@ const HealthScreen = ({navigation, route}) => {
     animation?.current?.play();
   }, [virtualProfileModalSteps]);
 
-  const [isRunning, setIsRunning] = useState(false);
-  const [intervalId, setIntervalId] = useState(null);
-
-  const startService = () => {
-    const id = BackgroundTimer.setInterval(() => {
-      console.log('Triggering service');
-      // try calling perform read here
-    }, 1000);
-    console.log('Started service with interval ID:', id);
-    setIntervalId(id);
-    setIsRunning(true);
-  };
-
-  const stopService = () => {
-    console.log('Stopping service with interval ID:', intervalId);
-    BackgroundTimer.clearInterval(intervalId);
-    setIntervalId(null);
-    setIsRunning(false);
-  };
-
   const renderModalAnimation = index => {
     animation?.current?.play();
     let source =
@@ -369,6 +349,7 @@ const HealthScreen = ({navigation, route}) => {
                     showStatusBar: false,
                     showBottomTabs: false,
                     changeActiveEmail: false,
+                    partialDetails: true,
                   });
                 }}>
                 <MyText
