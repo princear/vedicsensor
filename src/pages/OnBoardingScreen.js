@@ -257,42 +257,63 @@ const Step1 = props => {
         setError(false);
       }
     } catch (error) {
-      console.log('Error:', error.response.data);
+      console.log('Error:', error.response.data.message);
     }
   }, 700);
 
   const postDetails = async () => {
-    const master_email = await getMasterEmail();
-
-    const data = {
-      first_name: onBoardingDetails.first_name,
-      last_name: onBoardingDetails.last_name,
-      email: onBoardingDetails.email,
-      master_user_id: master_email,
-    };
-
-    if (master_email == null) {
-      data['master_user_id'] = `masteruser+${
-        data.first_name + data.last_name
-      }@gmail.com`;
-    }
-    console.log(data);
-
+    setLoading(true);
     try {
+      const master_email = await getMasterEmail();
+
+      const data = {
+        first_name: onBoardingDetails.first_name.trim(),
+        last_name: onBoardingDetails.last_name.trim(),
+        email: onBoardingDetails.email.trim(),
+        master_user_id: master_email,
+      };
+
+      if (master_email == null) {
+        data['master_user_id'] = `masteruser+${
+          data.first_name + data.last_name
+        }@gmail.com`;
+      }
+
+      console.log(data);
+
       const url = `/v1/api/add-user-health-info`;
       const res = await callPostApi(url, data);
-      storeDataToAsyncStorage('active_email', data.email);
-      mainContext.setState({activeEmail: data.email});
-      navigation.navigate('Health');
+
+      if (res.status === 200) {
+        storeDataToAsyncStorage('active_email', data.email).then(() => {
+          mainContext.setState({activeEmail: data.email});
+          navigation.navigate('Health');
+          setLoading(false);
+        });
+      } else {
+        console.log('Error', res.data);
+        Toast.show({
+          description: error.response.data.message,
+          duration: 2000,
+        });
+      }
+
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      console.log('Error', error.response);
+      let errorMessage = 'An error occurred.';
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errorFields = Object.keys(error.response.data.errors);
+        if (errorFields.length > 0) {
+          errorMessage = `Error: ${error.response.data.errors[errorFields[0]]}
+           Message: ${error.response.data.message}
+          `;
+        }
+      }
+
       Toast.show({
-        description: 'Something went wrong',
+        description: errorMessage,
         duration: 2000,
-      }).finally(() => {
-        setLoading(false);
       });
     }
   };
