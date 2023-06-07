@@ -355,7 +355,7 @@ const Questionnaire = ({navigation, route}) => {
                 fontFamily: 'Poppins',
                 textTransform: 'uppercase',
               }}>
-              {!question.answered_value
+              {!question?.answered_value
                 ? question.options[0].option_label
                 : question?.answered_value?.option_label}
             </MyText>
@@ -366,7 +366,7 @@ const Questionnaire = ({navigation, route}) => {
                 minimumValue={0}
                 maximumValue={question.options.length - 1}
                 value={
-                  !question.answered_value
+                  !question?.answered_value
                     ? 0
                     : question?.answered_value?.option_value
                 }
@@ -824,18 +824,18 @@ const Questionnaire = ({navigation, route}) => {
           </TouchableOpacity>
         )}
 
-        {questionIndex < Object.keys(questions).length && (
+        {questionIndex < Object.keys(questions).length - 1 && (
           <TouchableOpacity
             style={{flexDirection: 'row', alignItems: 'center'}}
             onPress={() => {
-              if (questions[questionIndex].answered_value) {
+              if (questions[questionIndex]?.answered_value) {
                 postAnswer();
                 setQuestionIndex(questionIndex + 1);
               }
             }}>
             <MyText
               style={{
-                color: questions[questionIndex].answered_value
+                color: questions[questionIndex]?.answered_value
                   ? '#1C1B1F'
                   : 'grey',
                 fontWeight: '500',
@@ -845,7 +845,32 @@ const Questionnaire = ({navigation, route}) => {
             <MaterialIcons
               name="chevron-right"
               size={28}
-              color={questions[questionIndex].answered_value ? 'black' : 'grey'}
+              color={questions[questionIndex]?.answered_value ? 'black' : 'grey'}
+            />
+          </TouchableOpacity>
+        )}
+        {questionIndex == Object.keys(questions).length - 1 && (
+          <TouchableOpacity
+            style={{flexDirection: 'row', alignItems: 'center'}}
+            onPress={() => {
+              if (questions[questionIndex]?.answered_value) {
+                postAnswer();
+                navigation.navigate('ProfileScreen');
+              }
+            }}>
+            <MyText
+              style={{
+                color: questions[questionIndex]?.answered_value
+                  ? '#1C1B1F'
+                  : 'grey',
+                fontWeight: '500',
+              }}>
+              Finish
+            </MyText>
+            <MaterialIcons
+              name="chevron-right"
+              size={28}
+              color={questions[questionIndex]?.answered_value ? 'black' : 'grey'}
             />
           </TouchableOpacity>
         )}
