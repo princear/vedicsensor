@@ -32,6 +32,7 @@ export default class ConnectionScreen extends React.Component {
       connectionOptions: {
         DELIMITER: '9',
       },
+      dataReceived: 0
     };
   }
 
@@ -239,9 +240,9 @@ export default class ConnectionScreen extends React.Component {
       const event_ts = event?.timestamp
             ? new Date(event?.timestamp).getTime()
             : new Date().getTime();
-      let amount = event?.data.match(/[+-]?\d+(\.\d+)?/g);
+      let amount = event?.data?.match(/[+-]?\d+(\.\d+)?/g);
       let metric_amount = 0;
-      if (amount && amount.length > 0) {
+      if (amount && amount?.length > 0) {
         metric_amount = parseFloat(amount[0]);
       }
       let metric_data = [
@@ -261,11 +262,13 @@ export default class ConnectionScreen extends React.Component {
           timestamp: event_ts,
         },
       ];
-      this.addData({
-        ...event,
-        timestamp: new Date(),
-        type: 'receive',
-      });
+      this.setState({dataReceived: this.state.dataReceived + 1});
+      // this.addData({
+      //   ...event,
+      //   data: 'received',
+      //   timestamp: new Date(),
+      //   type: 'receive',
+      // });
       this.postMetricData(metric_data);
     } catch (err) {
       console.log(err);
@@ -406,6 +409,9 @@ export default class ConnectionScreen extends React.Component {
               </View>
             )}
           />
+        </HStack>
+        <HStack bg="white" w="100%" style={{flex: 1}}>
+          <Text>Total data received: {this.state.dataReceived}</Text>
         </HStack>
         <HStack bg="white" h="8%" w="100%">
           <InputArea
