@@ -349,7 +349,7 @@ const HealthScreen = ({navigation, route}) => {
                     showStatusBar: false,
                     showBottomTabs: false,
                     changeActiveEmail: false,
-                    partialDetails: true,
+                    partialDetails: false,
                   });
                 }}>
                 <MyText
