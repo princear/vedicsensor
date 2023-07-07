@@ -26,6 +26,15 @@ export const getUserInfo = async email => {
   return res;
 };
 
+
+export const getScoreByUser = async email => {
+  const url = `/v1/api/get-score-by-user?user_email=${email}`;
+  const res = await callGetApi(url);
+  return res;
+};
+
+
+
 export const getVirtualProfiles = async () => {
   const master_email = await getMasterEmail();
   const url = `/v1/api/get-all-users-for-master-user?master_user_id=${master_email}`;

@@ -1,7 +1,10 @@
-import React, {useState, useContext, useRef, useEffect} from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Feather from 'react-native-vector-icons/Feather';
 import assets from '../../assets';
+import NetInfo from '@react-native-community/netinfo';
+import WifiManager from 'react-native-wifi-reborn';
+
 import {
   TouchableOpacity,
   StyleSheet,
@@ -9,8 +12,11 @@ import {
   SafeAreaView,
   ScrollView,
   Modal,
+  PermissionsAndroid,
+  Text,
   Pressable,
   Dimensions,
+  ActivityIndicator
 } from 'react-native';
 import HeartBeat from '../../assets/heart-beat.svg';
 import O2 from '../../assets/o2-drop.svg';
@@ -28,13 +34,33 @@ import MyText from '../components/MyText';
 import WebView from 'react-native-webview';
 import BackgroundTimer from 'react-native-background-timer';
 import Carousel from 'react-native-reanimated-carousel';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {MainContext} from '../context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { MainContext } from '../context';
 import LottieView from 'lottie-react-native';
-import {getActiveEmail, getUserInfo} from '../utils/user';
-import {useDerivedValue, useSharedValue} from 'react-native-reanimated';
-import {ReText} from 'react-native-redash';
+import { getActiveEmail, getScoreByUser, getUserInfo } from '../utils/user';
+import { useDerivedValue, useSharedValue } from 'react-native-reanimated';
+import { ReText } from 'react-native-redash';
 import CircularProgressBar from '../components/CircularProgressBar';
+import { callGetApi } from '../utils/axios'
+
+const accessPermission = async () => {
+  const granted = await PermissionsAndroid.request(
+    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    {
+      title: 'Location permission is required for WiFi connections',
+      message:
+        'This app needs location permission as this is required  ' +
+        'to scan for wifi networks.',
+      buttonNegative: 'DENY',
+      buttonPositive: 'ALLOW',
+    },
+  );
+  if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+    // You can now use react-native-wifi-reborn
+  } else {
+    // Permission denied
+  }
+};
 
 const daysOfWeek = [
   'Sunday',
@@ -60,18 +86,61 @@ const monthsOfYear = [
   'Dec',
 ];
 
-const HealthScreen = ({navigation, route}) => {
+const HealthScreen = ({ navigation, route }) => {
   const mainContext = useContext(MainContext);
-  const {isVirtualProfileModalOpen} = mainContext;
+  const { isVirtualProfileModalOpen } = mainContext;
 
   const animation = useRef(null);
   const [virtualProfileModalSteps, setVirtualProfileModalSteps] = useState(0);
   const width = Dimensions.get('window').width;
+  const data1 = ''
 
   const [user, setUser] = useState();
+
+  const [isConnected, setIsConnected] = useState(null);
+  const [ssid, setSsid] = useState('');
+
+
+  const initWifi = async () => {
+    try {
+      const ssid = await WifiManager.getCurrentWifiSSID();
+
+      setSsid(ssid);
+
+      console.log('Your current connected wifi SSID is ' + ssid);
+    } catch (error) {
+      setSsid('Cannot get current SSID!' + error.message);
+      console.log('Cannot get current SSID!', { error });
+    }
+  };
+
+  useEffect(() => {
+    // Linking.openSettings();
+
+    accessPermission();
+    initWifi();
+
+
+    NetInfo.addEventListener(networkState => {
+      console.log(networkState, '!!!!!');
+      setIsConnected(networkState.isConnected === true);
+    });
+    // const unsubscribe = NetInfo.addEventListener(networkState => {
+    //   console.log(networkState, '!!!!!');
+    //   setIsConnected(networkState.isConnected === true);
+
+    // });
+
+    // return () => {
+    //   unsubscribe();
+
+    // };
+  }, []);
+
+
   useEffect(() => {
     getActiveEmail().then(email => {
-      mainContext.setState({activeEmail: email});
+      mainContext.setState({ activeEmail: email });
     });
   }, []);
 
@@ -85,7 +154,10 @@ const HealthScreen = ({navigation, route}) => {
         console.warn(err.response.data);
         //   console.log('mainContext.activeEmail', mainContext);
       });
+
   }, [mainContext.activeEmail]);
+
+  // console.log(scoreData, 'WWWWWWWWWWW')
 
   useEffect(() => {
     animation?.current?.play();
@@ -129,7 +201,16 @@ const HealthScreen = ({navigation, route}) => {
   });
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+
+
+    <SafeAreaView style={{ flex: 1 }}>
+      {isConnected == false ? (
+        <>
+          <ActivityIndicator size={'large'} />
+        </>
+      ) : (
+
+     <>
       <ScrollView>
         <View style={styles.header}>
           <TouchableOpacity>
@@ -139,14 +220,14 @@ const HealthScreen = ({navigation, route}) => {
             onPress={() => {
               navigation.navigate('DeviceListScreen');
             }}
-            style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Devices style={{marginRight: 8}} height={17} width={17} />
-            <MyText style={{color: '#3460D7', fontWeight: '500'}}>
+            style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Devices style={{ marginRight: 8 }} height={17} width={17} />
+            <MyText style={{ color: '#3460D7', fontWeight: '500' }}>
               Connect device
             </MyText>
           </TouchableOpacity>
         </View>
-        <View style={{flex: 1, padding: 20}}>
+        <View style={{ flex: 1, padding: 20 }}>
           <View
             style={{
               flexDirection: 'row',
@@ -157,20 +238,20 @@ const HealthScreen = ({navigation, route}) => {
               name="sun"
               size={12}
               color="#C4B000"
-              style={{marginRight: 6}}
+              style={{ marginRight: 6 }}
             />
-            <MyText style={{color: '#3460D7', fontSize: 10, fontWeight: '500'}}>
+            <MyText style={{ color: '#3460D7', fontSize: 10, fontWeight: '500' }}>
               {getFormattedDate()}
             </MyText>
           </View>
-          <MyText style={{color: '#323232', fontWeight: '700', fontSize: 20}}>
+          <MyText style={{ color: '#323232', fontWeight: '700', fontSize: 20 }}>
             Hello {user?.first_name},
           </MyText>
 
           <View
             style={[
               styles.container_blue,
-              {flexDirection: 'row', alignItems: 'center'},
+              { flexDirection: 'row', alignItems: 'center' },
             ]}>
             <View
               style={{
@@ -190,21 +271,21 @@ const HealthScreen = ({navigation, route}) => {
                 <Fire
                   width={48}
                   height={48}
-                  style={{position: 'absolute', left: 17, bottom: 22}}
+                  style={{ position: 'absolute', left: 17, bottom: 22 }}
                 />
                 <Air
                   width={45}
                   height={40}
-                  style={{position: 'absolute', top: 20, right: 10}}
+                  style={{ position: 'absolute', top: 20, right: 10 }}
                 />
                 <Waves
                   width={18}
                   height={18}
-                  style={{position: 'absolute', bottom: 20, right: 28}}
+                  style={{ position: 'absolute', bottom: 20, right: 28 }}
                 />
               </View>
             </View>
-            <View style={{flex: 1, marginLeft: 20}}>
+            <View style={{ flex: 1, marginLeft: 20 }}>
               <MyText
                 style={{
                   width: '90%',
@@ -226,7 +307,7 @@ const HealthScreen = ({navigation, route}) => {
               />
               <TouchableOpacity>
                 <MyText
-                  style={{color: '#3460D7', fontWeight: '500', marginTop: 14}}>
+                  style={{ color: '#3460D7', fontWeight: '500', marginTop: 14 }}>
                   View More
                 </MyText>
               </TouchableOpacity>
@@ -240,11 +321,11 @@ const HealthScreen = ({navigation, route}) => {
               justifyContent: 'space-between',
               alignItems: 'center',
             }}>
-            <MyText style={{fontWeight: '400', color: '#323232', width: 180}}>
+            <MyText style={{ fontWeight: '400', color: '#323232', width: 180 }}>
               Last Nadi collection time was at 06:14 am, today
             </MyText>
-            <TouchableOpacity style={{marignTop: 20}}>
-              <MyText style={{color: '#3460D7', fontWeight: '500'}}>
+            <TouchableOpacity style={{ marignTop: 20 }}>
+              <MyText style={{ color: '#3460D7', fontWeight: '500' }}>
                 Check Now
               </MyText>
             </TouchableOpacity>
@@ -271,7 +352,7 @@ const HealthScreen = ({navigation, route}) => {
         transparent={true}
         visible={isVirtualProfileModalOpen}
         onRequestClose={() =>
-          mainContext.setState({isVirtualProfileModalOpen: false})
+          mainContext.setState({ isVirtualProfileModalOpen: false })
         }>
         <View
           style={{
@@ -280,9 +361,9 @@ const HealthScreen = ({navigation, route}) => {
             justifyContent: 'flex-end',
           }}>
           <Pressable
-            style={{flex: 1}}
+            style={{ flex: 1 }}
             onPress={() =>
-              mainContext.setState({isVirtualProfileModalOpen: false})
+              mainContext.setState({ isVirtualProfileModalOpen: false })
             }
           />
           <View
@@ -303,7 +384,7 @@ const HealthScreen = ({navigation, route}) => {
                   setVirtualProfileModalSteps(index);
                   animation?.current?.play();
                 }}
-                renderItem={({index, item}) => {
+                renderItem={({ index, item }) => {
                   return (
                     <View
                       style={{
@@ -322,7 +403,7 @@ const HealthScreen = ({navigation, route}) => {
                           ? 'Recommend healthier lifestyles to friends & family.'
                           : 'A quiz can reveal their physical metrics.'}
                       </MyText>
-                      <View style={{flexDirection: 'row', marginTop: 10}}>
+                      <View style={{ flexDirection: 'row', marginTop: 10 }}>
                         {[1, 2].map((_, i) => {
                           return (
                             <View
@@ -344,7 +425,7 @@ const HealthScreen = ({navigation, route}) => {
             <View style={styles.modalBottomContainer}>
               <TouchableOpacity
                 onPress={() => {
-                  mainContext.setState({isVirtualProfileModalOpen: false});
+                  mainContext.setState({ isVirtualProfileModalOpen: false });
                   navigation.navigate('OnBoarding', {
                     showStatusBar: false,
                     showBottomTabs: false,
@@ -363,10 +444,10 @@ const HealthScreen = ({navigation, route}) => {
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
-                  mainContext.setState({isVirtualProfileModalOpen: false});
+                  mainContext.setState({ isVirtualProfileModalOpen: false });
                   navigation.navigate('VirtualProfilesList');
                 }}>
-                <MyText style={{color: '#3460D7', fontWeight: '500'}}>
+                <MyText style={{ color: '#3460D7', fontWeight: '500' }}>
                   Choose existing
                 </MyText>
               </TouchableOpacity>
@@ -374,21 +455,51 @@ const HealthScreen = ({navigation, route}) => {
           </View>
         </View>
       </Modal>
+      </>
+      )}
     </SafeAreaView>
   );
 };
 
-const Metrics = ({user}) => {
+const Metrics = ({ user }) => {
+  const [scoreData, setScoreData] = useState('');
+  const [scoreData1, setScoreData1] = useState('');
+  const [scoreData2, setScoreData2] = useState('');
+
+  useEffect(() => {
+
+
+
+    getScoreByUser('mukul@eyelets.in')
+      .then(res => {
+
+
+        setScoreData(JSON.stringify(res.data.k));
+        setScoreData1(JSON.stringify(res.data.p));
+        setScoreData2(JSON.stringify(res.data.v));
+
+        //     console.log(JSON.stringify(res.data.k), 'PRINCE==============>')
+
+      })
+      .catch(err => {
+        console.warn(err.response.data);
+        //   console.log('mainContext.activeEmail', mainContext);
+      });
+
+
+
+  }, [setScoreData, setScoreData1, setScoreData2]);
+
+
   return (
     <>
-      <View style={{height: 200, flexGrow: 1, marginVertical: 20}}>
+      <View style={{ height: 200, flexGrow: 1, marginVertical: 20 }}>
         <WebView
           source={{
-            uri: `http://grafana.madmachines.in/d-solo/vtJmaDhVk/nadi-monitoring?orgId=1&from=1681131684285&to=1681139825402&var-device_name=${
-              user?.email?.split('@')[0]
-            }&panelId=2`,
+            uri: `http://grafana.madmachines.in/d-solo/vtJmaDhVk/nadi-monitoring?orgId=1&from=1681131684285&to=1681139825402&var-device_name=${user?.email?.split('@')[0]
+              }&panelId=2`,
           }}
-          style={{flex: 1}}
+          style={{ flex: 1 }}
         />
       </View>
       <View
@@ -398,9 +509,11 @@ const Metrics = ({user}) => {
           justifyContent: 'space-between',
           alignItems: 'center',
         }}>
-        <MyText style={{fontSize: 18, fontWeight: '700', color: '#323232'}}>
+
+        <MyText style={{ fontSize: 18, fontWeight: '700', color: '#323232' }}>
           Metrics
         </MyText>
+
         <TouchableOpacity>
           <MaterialCommunityIcons
             name="dots-horizontal"
@@ -416,21 +529,28 @@ const Metrics = ({user}) => {
           marginBottom: 10,
         }}>
         <View style={styles.square}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <MaterialCommunityIcons
               name="cards-heart-outline"
               size={18}
               color="#E82927"
-              style={{marginRight: 10}}
+              style={{ marginRight: 10 }}
             />
-            <MyText style={{fontSize: 12, color: '#323232'}}>Heart</MyText>
+            <MyText style={{ fontSize: 12, color: '#323232' }}>kaf</MyText>
           </View>
-          <View style={{marginTop: 12, alignItems: 'center'}}>
-            <HeartBeat width={120} height={50} />
+          <View style={{ marginTop: 12, alignItems: 'center' }}>
+            {/* <HeartBeat width={120} height={50} /> */}
           </View>
-          <View style={{marginTop: 10}}>
-            <MyText style={{fontSize: 26, color: '#323232', fontWeight: '500'}}>
-              92
+          <View style={{
+            marginTop: 12,
+            alignItems: 'center',
+            justifyContent: 'center',
+            flex: 1,
+          }}>
+
+            <MyText style={{ fontSize: 26, color: '#323232', fontWeight: '500' }}>
+
+              {Number(scoreData).toFixed(2)}
             </MyText>
             <MyText
               style={{
@@ -438,27 +558,37 @@ const Metrics = ({user}) => {
                 color: '#323232',
                 fontWeight: '500',
                 position: 'absolute',
-                left: 34,
+                left: 100,
                 top: 4,
               }}>
               BPM
             </MyText>
-            <MyText style={{fontSize: 8, color: '#323232', fontWeight: '400'}}>
+            <MyText style={{
+              marginTop: 30,
+              fontSize: 8,
+              color: '#323232',
+              fontWeight: '400',
+            }}>
               Last updated 2 hours ago
             </MyText>
           </View>
         </View>
         <View style={styles.square}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <O2 style={{marginRight: 10}} />
-            <MyText style={{fontSize: 12, color: '#323232'}}>Oxygen</MyText>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <O2 style={{ marginRight: 10 }} />
+            <MyText style={{ fontSize: 12, color: '#323232' }}>vat</MyText>
           </View>
-          <View style={{marginTop: 12, alignItems: 'center'}}>
-            <OxygenLevel width={120} height={50} />
+          <View style={{ marginTop: 12, alignItems: 'center' }}>
+            {/* <OxygenLevel width={120} height={50} /> */}
           </View>
-          <View style={{marginTop: 10}}>
-            <MyText style={{fontSize: 26, color: '#323232', fontWeight: '500'}}>
-              99
+          <View style={{
+            marginTop: 12,
+            alignItems: 'center',
+            justifyContent: 'center',
+            flex: 1,
+          }}>
+            <MyText style={{ fontSize: 26, color: '#323232', fontWeight: '500' }}>
+              {Number(scoreData1).toFixed(2)}
               <MyText
                 style={{
                   fontSize: 9,
@@ -471,26 +601,36 @@ const Metrics = ({user}) => {
                 %
               </MyText>
             </MyText>
-            <MyText style={{fontSize: 8, color: '#323232', fontWeight: '400'}}>
+            <MyText style={{
+              marginTop: 30,
+              fontSize: 8,
+              color: '#323232',
+              fontWeight: '400',
+            }}>
               Last updated 2 hours ago
             </MyText>
           </View>
         </View>
       </View>
-      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <View style={styles.square}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <GlucosePoint style={{marginRight: 10}} />
-            <MyText style={{fontSize: 12, color: '#323232'}}>
-              Blood glucose
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <GlucosePoint style={{ marginRight: 10 }} />
+            <MyText style={{ fontSize: 12, color: '#323232' }}>
+              pit
             </MyText>
           </View>
-          <View style={{marginTop: 12, alignItems: 'center'}}>
-            <Glucose width={110} height={40} style={{marginTop: 10}} />
+          <View style={{ marginTop: 12, alignItems: 'center' }}>
+            {/* <Glucose width={110} height={40} style={{ marginTop: 10 }} /> */}
           </View>
-          <View style={{marginTop: 10}}>
-            <MyText style={{fontSize: 26, color: '#323232', fontWeight: '500'}}>
-              106
+          <View style={{
+            marginTop: 12,
+            alignItems: 'center',
+            justifyContent: 'center',
+            flex: 1,
+          }}>
+            <MyText style={{ fontSize: 26, color: '#323232', fontWeight: '500' }}>
+              {Number(scoreData2).toFixed(2)}
             </MyText>
             <MyText
               style={{
@@ -498,21 +638,28 @@ const Metrics = ({user}) => {
                 color: '#323232',
                 fontWeight: '500',
                 position: 'absolute',
-                left: 48,
+                left: 90,
+
                 top: 2,
               }}>
               mg/dl
             </MyText>
-            <MyText style={{fontSize: 8, color: '#323232', fontWeight: '400'}}>
+
+            <MyText style={{
+              marginTop: 30,
+              fontSize: 8,
+              color: '#323232',
+              fontWeight: '400',
+            }}>
               Last updated 2 hours ago
             </MyText>
           </View>
         </View>
 
         <View style={styles.square}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <FootPrint style={{marginRight: 10}} />
-            <MyText style={{fontSize: 12, color: '#323232'}}>Steps</MyText>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <FootPrint style={{ marginRight: 10 }} />
+            <MyText style={{ fontSize: 12, color: '#323232' }}>Steps</MyText>
           </View>
           <View
             style={{
@@ -521,7 +668,7 @@ const Metrics = ({user}) => {
               justifyContent: 'center',
               flex: 1,
             }}>
-            <MyText style={{fontSize: 26, color: '#323232', fontWeight: '500'}}>
+            <MyText style={{ fontSize: 26, color: '#323232', fontWeight: '500' }}>
               9,586
             </MyText>
           </View>
@@ -540,11 +687,11 @@ const Metrics = ({user}) => {
   );
 };
 
-const Card = ({title, details, Svg}) => {
+const Card = ({ title, details, Svg }) => {
   return (
     <View style={styles.container_blue}>
       <MyText style={styles.container_blue_heading}>{title}</MyText>
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <View
           style={{
             position: 'relative',
@@ -555,9 +702,9 @@ const Card = ({title, details, Svg}) => {
           }}>
           <Svg />
         </View>
-        <View style={{justifyContent: 'center'}}>
-          <MyText style={{width: 200, fontWeight: '400'}}>{details}</MyText>
-          <TouchableOpacity style={{marignTop: 20}}>
+        <View style={{ justifyContent: 'center' }}>
+          <MyText style={{ width: 200, fontWeight: '400' }}>{details}</MyText>
+          <TouchableOpacity style={{ marignTop: 20 }}>
             <MyText
               style={{
                 color: '#3460D7',
